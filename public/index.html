@@ -29,21 +29,28 @@
             background: white;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             margin: 0 auto;
-            padding: 2.54cm;
+            padding: 8% 5%; /* Mobile friendly padding */
             outline: none;
         }
-        /* Custom Scrollbar for inner containers */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        @media (min-width: 768px) {
+            .editor-page { padding: 2.54cm; } /* Desktop padding */
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
     </style>
 </head>
 <body class="flex h-screen w-screen overflow-hidden bg-gray-200">
 
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden" onclick="toggleSidebar()"></div>
+
     <!-- Sidebar: Folder & File Management -->
-    <aside class="w-64 bg-[#111827] text-white flex flex-col h-full shrink-0 transition-all duration-300 z-20">
-        <div class="p-5 border-b border-gray-800">
+    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-40 w-64 bg-[#111827] text-white flex flex-col h-full shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none">
+        <div class="p-5 border-b border-gray-800 flex justify-between items-center">
             <h2 class="text-xl font-bold tracking-wide">SAHAL TEC</h2>
+            <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
         </div>
         
         <div class="p-4 border-b border-gray-800 flex items-center gap-3 cursor-pointer hover:bg-gray-800 transition">
@@ -79,26 +86,31 @@
     </aside>
 
     <!-- Main Content Area -->
-    <main class="flex-1 flex flex-col h-full min-w-0">
+    <main class="flex-1 flex flex-col h-full min-w-0 w-full relative">
         
         <!-- Top Toolbar -->
-        <header class="bg-white border-b border-gray-200 shadow-sm z-10 shrink-0">
+        <header class="bg-white border-b border-gray-200 shadow-sm z-10 shrink-0 w-full">
             <!-- Top Row: File Name & Action Buttons -->
-            <div class="flex justify-between items-center px-4 md:px-6 py-3 border-b border-gray-100">
-                <div class="flex items-center gap-4 w-full md:w-auto">
-                    <input type="text" value="Untitled Document" class="text-lg md:text-xl font-bold text-gray-700 outline-none hover:bg-gray-50 px-2 py-1 rounded w-full md:w-64 border-b border-transparent focus:border-blue-500 transition">
+            <div class="flex justify-between items-center px-3 md:px-6 py-2 md:py-3 border-b border-gray-100">
+                
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <!-- Mobile Sidebar Toggle -->
+                    <button onclick="toggleSidebar()" class="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <input type="text" value="Untitled Document" class="text-base md:text-xl font-bold text-gray-700 outline-none hover:bg-gray-50 px-2 py-1 rounded w-full md:w-64 border-b border-transparent focus:border-blue-500 transition">
                 </div>
                 
-                <!-- 3-Line Navigation Menu (Hamburger) -->
-                <div class="relative inline-block text-left shrink-0 ml-4">
-                    <button onclick="toggleDropdown(event)" class="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition focus:outline-none shadow-sm border border-gray-200">
-                        <i class="fas fa-bars text-xl"></i>
+                <!-- Action Menu (3 Dots on mobile, bars on desktop) -->
+                <div class="relative inline-block text-left shrink-0 ml-2 md:ml-4">
+                    <button onclick="toggleDropdown(event)" class="p-2 md:p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition focus:outline-none shadow-sm border border-gray-200">
+                        <i class="fas fa-ellipsis-v md:fa-bars text-xl px-1"></i>
                     </button>
                     
                     <div id="action-dropdown" class="hidden absolute right-0 mt-2 w-56 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-lg shadow-xl outline-none z-50 overflow-hidden">
                         <div class="py-1 bg-gray-50">
                             <button id="mode-toggle-btn" onclick="toggleMode()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-indigo-700 hover:bg-indigo-100 font-bold transition">
-                                <i class="fas fa-robot w-5 text-center text-lg"></i> এআই কনভার্টার চালু করুন
+                                <i class="fas fa-robot w-5 text-center text-lg"></i> এআই কনভার্টার চালু
                             </button>
                         </div>
                         <div class="py-1">
@@ -118,76 +130,68 @@
                                 <i class="fas fa-print w-5 text-center text-lg"></i> প্রিন্ট
                             </button>
                         </div>
-                        <div class="py-1">
-                            <button class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-purple-600 hover:bg-purple-50 font-semibold transition">
-                                <i class="fas fa-share-alt w-5 text-center text-lg"></i> শেয়ার
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Bottom Row: Formatting Tools -->
-            <div id="formatting-toolbar" class="flex flex-wrap items-center gap-2 px-4 md:px-6 py-2.5 bg-white text-gray-700 border-b border-gray-200">
-                <select class="border border-gray-300 rounded px-2 py-1.5 text-sm bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500">
-                    <option>Normal Text</option>
-                    <option>Heading 1</option>
-                    <option>Heading 2</option>
+            <!-- Bottom Row: Formatting Tools (Scrollable horizontally on mobile) -->
+            <div id="formatting-toolbar" class="flex items-center gap-2 px-3 md:px-6 py-2 bg-white text-gray-700 border-b border-gray-200 overflow-x-auto whitespace-nowrap hide-scrollbar">
+                <select class="border border-gray-300 rounded px-2 py-1 text-sm bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
+                    <option>Normal</option>
+                    <option>H1</option>
+                    <option>H2</option>
                 </select>
-                <div class="hidden md:block w-px h-6 bg-gray-300 mx-1"></div>
-                <button class="w-8 h-8 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg font-bold transition">B</button>
-                <button class="w-8 h-8 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg italic transition">I</button>
-                <button class="w-8 h-8 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg underline transition">U</button>
-                <button class="w-8 h-8 rounded hover:bg-gray-100 flex items-center justify-center text-red-500 font-serif text-lg font-bold transition">A</button>
-                <button class="w-8 h-8 rounded hover:bg-gray-100 flex items-center justify-center text-yellow-500 transition"><i class="fas fa-highlighter"></i></button>
-                <div class="hidden md:block w-px h-6 bg-gray-300 mx-1"></div>
-                <button class="px-2 py-1.5 text-sm font-bold bg-blue-50 text-blue-600 rounded hover:bg-blue-100 flex items-center gap-1.5 transition">
+                <div class="w-px h-6 bg-gray-300 mx-1 shrink-0"></div>
+                <button class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg font-bold transition">B</button>
+                <button class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg italic transition">I</button>
+                <button class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg underline transition">U</button>
+                <button class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-red-500 font-serif text-lg font-bold transition">A</button>
+                <div class="w-px h-6 bg-gray-300 mx-1 shrink-0"></div>
+                <button class="px-2 py-1 shrink-0 text-sm font-bold bg-blue-50 text-blue-600 rounded hover:bg-blue-100 flex items-center gap-1.5 transition">
                     <i class="fas fa-square-root-variable"></i> সমীকরণ
                 </button>
-                <button class="px-2 py-1.5 text-sm font-bold bg-indigo-50 text-indigo-600 rounded hover:bg-indigo-100 flex items-center gap-1.5 transition">
+                <button class="px-2 py-1 shrink-0 text-sm font-bold bg-indigo-50 text-indigo-600 rounded hover:bg-indigo-100 flex items-center gap-1.5 transition">
                     <i class="fas fa-chart-line"></i> চিত্র
                 </button>
-                <button class="px-2 py-1.5 text-sm font-bold bg-teal-50 text-teal-600 rounded hover:bg-teal-100 flex items-center gap-1.5 transition">
+                <button class="px-2 py-1 shrink-0 text-sm font-bold bg-teal-50 text-teal-600 rounded hover:bg-teal-100 flex items-center gap-1.5 transition">
                     <i class="fas fa-table"></i> টেবিল
                 </button>
             </div>
         </header>
 
         <!-- Workspace Area -->
-        <div class="flex-1 relative bg-[#cbd5e1] overflow-hidden">
+        <div class="flex-1 relative bg-[#cbd5e1] overflow-hidden w-full">
             
             <!-- MODE 1: Direct Editor View -->
-            <div id="editor-view" class="h-full w-full overflow-y-auto flex justify-center py-8 px-4">
-                <div contenteditable="true" class="editor-page text-lg leading-relaxed text-justify" placeholder="এখানে সরাসরি টাইপ করা শুরু করুন...">
-                    <h1 style="font-size: 26px; font-weight: bold; text-align: center; margin-bottom: 20px;">পদার্থবিজ্ঞান: গতির সমীকরণ</h1>
+            <div id="editor-view" class="h-full w-full overflow-y-auto flex justify-center py-4 md:py-8 px-2 md:px-4">
+                <div contenteditable="true" class="editor-page text-base md:text-lg leading-relaxed text-justify" placeholder="এখানে সরাসরি টাইপ করা শুরু করুন...">
+                    <h1 style="font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 20px;">পদার্থবিজ্ঞান: গতির সমীকরণ</h1>
                     <p class="text-center text-gray-700">এখানে আপনি সরাসরি টাইপ করতে পারবেন। উপরের টুলবার থেকে সমীকরণ, গ্রাফ বা টেবিল যুক্ত করা যাবে।</p>
                 </div>
             </div>
 
-            <!-- MODE 2: AI Chat Converter View (True Split Screen) -->
-            <div id="converter-view" class="hidden h-full w-full flex flex-col md:flex-row gap-4 p-4">
+            <!-- MODE 2: AI Chat Converter View (Stack on mobile, split on desktop) -->
+            <div id="converter-view" class="hidden h-full w-full flex-col md:flex-row gap-4 p-2 md:p-4 overflow-y-auto md:overflow-hidden">
                 
-                <!-- Left: Input Area -->
-                <div class="w-full md:w-1/2 h-full flex flex-col bg-white rounded-xl shadow border border-gray-300 overflow-hidden">
-                    <div class="bg-gray-100 p-3 border-b border-gray-300 flex justify-between items-center shrink-0">
-                        <label class="font-bold text-gray-700 text-sm ml-2">📝 এআই টেক্সট বা ল্যাটেক্স পেস্ট করুন</label>
-                        <div class="flex gap-2">
-                            <button onclick="pasteText()" class="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded font-bold hover:bg-blue-200 transition">পেস্ট</button>
-                            <button onclick="document.getElementById('ai-input').value=''; document.getElementById('ai-output').innerHTML=''" class="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded font-bold hover:bg-red-200 transition">ক্লিয়ার</button>
+                <!-- Left/Top: Input Area -->
+                <div class="w-full md:w-1/2 h-[45vh] md:h-full flex flex-col bg-white rounded-xl shadow border border-gray-300 overflow-hidden shrink-0 md:shrink">
+                    <div class="bg-gray-100 p-2 md:p-3 border-b border-gray-300 flex justify-between items-center shrink-0">
+                        <label class="font-bold text-gray-700 text-xs md:text-sm ml-1">📝 পেস্ট করুন</label>
+                        <div class="flex gap-1 md:gap-2">
+                            <button onclick="pasteText()" class="text-xs bg-blue-100 text-blue-700 px-2 md:px-3 py-1 md:py-1.5 rounded font-bold hover:bg-blue-200 transition">পেস্ট</button>
+                            <button onclick="document.getElementById('ai-input').value=''; document.getElementById('ai-output').innerHTML=''" class="text-xs bg-red-100 text-red-700 px-2 md:px-3 py-1 md:py-1.5 rounded font-bold hover:bg-red-200 transition">ক্লিয়ার</button>
                         </div>
                     </div>
-                    <textarea id="ai-input" class="w-full h-full flex-grow p-4 focus:outline-none resize-none font-mono text-base bg-gray-50 overflow-y-auto" placeholder="ChatGPT বা অন্য যেকোনো AI থেকে কপি করা টেক্সট এখানে পেস্ট করুন..."></textarea>
+                    <textarea id="ai-input" class="w-full h-full flex-grow p-3 md:p-4 focus:outline-none resize-none font-mono text-sm md:text-base bg-gray-50 overflow-y-auto" placeholder="ChatGPT বা AI থেকে কপি করা টেক্সট এখানে দিন..."></textarea>
                 </div>
 
-                <!-- Right: Live Preview A4 Paper -->
-                <div class="w-full md:w-1/2 h-full flex flex-col bg-[#cbd5e1] rounded-xl shadow-inner border border-gray-300 overflow-hidden">
-                    <div class="bg-gray-200 p-3 border-b border-gray-300 flex justify-center items-center shrink-0 shadow-sm z-10">
-                        <label class="font-bold text-gray-700 text-sm">👁️ লাইভ আউটপুট প্রিভিউ</label>
+                <!-- Right/Bottom: Live Preview -->
+                <div class="w-full md:w-1/2 h-[50vh] md:h-full flex flex-col bg-[#cbd5e1] rounded-xl shadow-inner border border-gray-300 overflow-hidden shrink-0 md:shrink">
+                    <div class="bg-gray-200 p-2 border-b border-gray-300 flex justify-center items-center shrink-0 shadow-sm z-10">
+                        <label class="font-bold text-gray-700 text-xs md:text-sm">👁️ লাইভ আউটপুট প্রিভিউ</label>
                     </div>
-                    <!-- This specific div scrolls independently -->
-                    <div class="flex-grow overflow-y-auto p-4 flex justify-center">
-                        <div id="ai-output" class="editor-page text-lg leading-relaxed text-justify mb-10">
-                            <!-- Rendered Math/Text will appear here -->
+                    <div class="flex-grow overflow-y-auto p-2 md:p-4 flex justify-center pb-10">
+                        <div id="ai-output" class="editor-page text-base md:text-lg leading-relaxed text-justify h-auto min-h-full">
                         </div>
                     </div>
                 </div>
@@ -198,6 +202,14 @@
     </main>
 
     <script>
+        // Sidebar Toggle Logic for Mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
         // Dropdown Toggle Logic
         function toggleDropdown(event) {
             if(event) event.stopPropagation(); 
@@ -205,7 +217,6 @@
             dropdown.classList.toggle('hidden');
         }
 
-        // Close dropdown when clicking outside
         window.onclick = function(event) {
             const dropdown = document.getElementById('action-dropdown');
             if (!event.target.closest('.relative')) {
@@ -227,17 +238,19 @@
             isEditorMode = !isEditorMode;
 
             if (isEditorMode) {
-                // Switch to Editor Mode
                 editorView.classList.remove('hidden');
+                editorView.classList.add('flex');
                 converterView.classList.add('hidden');
+                converterView.classList.remove('flex');
                 formattingToolbar.classList.remove('hidden'); 
                 
-                toggleBtn.innerHTML = '<i class="fas fa-robot w-5 text-center text-lg"></i> এআই কনভার্টার চালু করুন';
+                toggleBtn.innerHTML = '<i class="fas fa-robot w-5 text-center text-lg"></i> এআই কনভার্টার চালু';
                 toggleBtn.className = "w-full flex items-center gap-3 px-4 py-2.5 text-sm text-indigo-700 hover:bg-indigo-100 font-bold transition";
             } else {
-                // Switch to AI Converter Mode
                 editorView.classList.add('hidden');
+                editorView.classList.remove('flex');
                 converterView.classList.remove('hidden');
+                converterView.classList.add('flex');
                 formattingToolbar.classList.add('hidden'); 
                 
                 toggleBtn.innerHTML = '<i class="fas fa-pen w-5 text-center text-lg"></i> সরাসরি এডিটরে ফিরুন';
@@ -265,7 +278,7 @@
                 aiInput.value += text;
                 aiInput.dispatchEvent(new Event('input'));
             } catch (err) {
-                alert('ব্রাউজার ব্লক করেছে। দয়া করে বক্সে ট্যাপ/রাইট-ক্লিক করে পেস্ট করুন।');
+                alert('ব্রাউজার ব্লক করেছে। দয়া করে বক্সে ট্যাপ করে পেস্ট করুন।');
             }
         }
 
@@ -294,7 +307,7 @@
                     body: JSON.stringify({ text })
                 });
 
-                if (!response.ok) throw new Error('সার্ভার এরর! Pandoc ব্যাকএন্ড ঠিকমতো রান করছে কি না চেক করুন।');
+                if (!response.ok) throw new Error('সার্ভার এরর!');
 
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
