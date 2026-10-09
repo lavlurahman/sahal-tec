@@ -23,16 +23,19 @@
     <style>
         body { font-family: 'Noto Sans Bengali', sans-serif; background-color: #cbd5e1; overflow: hidden; }
         
-        /* Simulated Physical Paper */
+        /* Simulated Real Paper Container */
         .editor-page-container {
             position: relative;
             background-color: #ffffff;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
-            margin: 20px auto 50px auto;
+            margin: 20px auto 60px auto;
             transition: all 0.3s ease;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Paper Dimensions */
+        /* Standard Dimensions */
         .page-a4-portrait { width: 21cm; min-height: 29.7cm; }
         .page-a4-landscape { width: 29.7cm; min-height: 21cm; }
         .page-letter-portrait { width: 21.59cm; min-height: 27.94cm; }
@@ -45,13 +48,14 @@
         .margin-narrow { padding: 1.27cm; }
         .margin-wide { padding: 3.81cm; }
 
-        /* Margin Content Frame with Inner Borders */
+        /* Integrated Border Frame (Strictly inside paper margins) */
         .page-inner-frame {
             width: 100%;
-            height: 100%;
-            min-height: inherit;
+            flex-grow: 1;
             position: relative;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
         }
 
         .border-none { border: none !important; }
@@ -66,7 +70,7 @@
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
             font-size: 5rem;
-            color: rgba(148, 163, 184, 0.18);
+            color: rgba(148, 163, 184, 0.16);
             font-weight: 800;
             pointer-events: none;
             user-select: none;
@@ -74,11 +78,66 @@
             z-index: 1;
         }
 
+        /* Text Content Area with Strict Boundary Protection */
         .editor-content {
             position: relative;
             z-index: 2;
             outline: none;
-            min-height: 20cm;
+            width: 100%;
+            min-height: 100%;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+
+        /* Resizable Image Container */
+        .image-wrapper {
+            display: inline-block;
+            position: relative;
+            max-width: 100%;
+            margin: 10px 0;
+            user-select: none;
+            vertical-align: middle;
+        }
+        .image-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 4px;
+        }
+        .image-wrapper.selected {
+            outline: 2px dashed #2563eb;
+        }
+        .resize-handle {
+            display: none;
+            position: absolute;
+            bottom: -6px;
+            right: -6px;
+            width: 14px;
+            height: 14px;
+            background-color: #2563eb;
+            border: 2px solid white;
+            border-radius: 50%;
+            cursor: se-resize;
+            z-index: 10;
+        }
+        .image-wrapper.selected .resize-handle {
+            display: block;
+        }
+        .img-toolbar {
+            display: none;
+            position: absolute;
+            top: -36px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            padding: 2px 6px;
+            border-radius: 6px;
+            gap: 4px;
+            z-index: 10;
+        }
+        .image-wrapper.selected .img-toolbar {
+            display: flex;
         }
 
         @media (max-width: 768px) {
@@ -202,10 +261,9 @@
                     <option value="wide">মার্জিন: Wide (1.5")</option>
                 </select>
 
-                <!-- Border Selector with Inner Box Fix -->
                 <select id="pageBorderSelect" onchange="applyPageLayout()" class="border border-gray-300 rounded px-1.5 py-1 bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
                     <option value="none">বর্ডার: নেই</option>
-                    <option value="solid">বর্ডার: সলিড লাইন</option>
+                    <option value="solid" selected>বর্ডার: সলিড লাইন</option>
                     <option value="double">বর্ডার: ডাবল লাইন</option>
                     <option value="dashed">বর্ডার: ড্যাশড</option>
                 </select>
@@ -222,8 +280,9 @@
 
             <!-- Rich Formatting Toolbar -->
             <div id="formatting-toolbar" class="flex items-center gap-1.5 px-3 md:px-6 py-1.5 bg-white text-gray-700 border-b border-gray-200 overflow-x-auto whitespace-nowrap hide-scrollbar">
-                <button onclick="formatDoc('undo')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Undo"><i class="fas fa-undo"></i></button>
-                <button onclick="formatDoc('redo')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Redo"><i class="fas fa-redo"></i></button>
+                <!-- Undo / Redo with custom stack -->
+                <button onclick="handleUndo()" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Undo"><i class="fas fa-undo"></i></button>
+                <button onclick="handleRedo()" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Redo"><i class="fas fa-redo"></i></button>
                 <div class="w-px h-5 bg-gray-300 mx-1 shrink-0"></div>
 
                 <select onchange="formatDoc('fontName', this.value)" class="border border-gray-300 rounded px-2 py-0.5 text-xs bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
@@ -280,7 +339,7 @@
 
                 <div class="w-px h-5 bg-gray-300 mx-1 shrink-0"></div>
                 
-                <!-- Equation & Drawing Modals Trigger Buttons -->
+                <!-- Equation, Drawing & Table -->
                 <button onclick="openMathModal()" class="px-2 py-0.5 shrink-0 text-xs font-bold bg-blue-50 text-blue-600 rounded hover:bg-blue-100 flex items-center gap-1 transition">
                     <i class="fas fa-square-root-variable"></i> উন্নত সমীকরণ
                 </button>
@@ -297,20 +356,19 @@
         <div class="flex-1 relative bg-[#cbd5e1] overflow-hidden w-full z-0">
             
             <!-- MODE 1: Direct Editor View -->
-            <div id="editor-view" class="h-full w-full overflow-y-auto flex flex-col items-center py-6 px-2 md:px-4">
+            <div id="editor-view" class="h-full w-full overflow-y-auto flex flex-col items-center py-6 px-2 md:px-4" onclick="deselectImages(event)">
                 
-                <!-- Paper Page with Outer Margins -->
+                <!-- Paper Container with outer margins -->
                 <div id="paper-page" class="editor-page-container page-a4-portrait margin-normal">
                     
-                    <!-- Inner Margin Frame with Borders -->
-                    <div id="paper-inner-frame" class="page-inner-frame border-none">
-                        <!-- Watermark -->
+                    <!-- Paper Inner Frame: Strictly adapts to content & stays inside paper -->
+                    <div id="paper-inner-frame" class="page-inner-frame border-solid-thin">
                         <div id="watermark-layer" class="watermark-overlay hidden">লাভলু</div>
 
-                        <!-- Editable Content -->
-                        <div id="editor-content" contenteditable="true" class="editor-content text-base md:text-lg leading-relaxed text-justify">
+                        <!-- ContentEditable Area with word wrapping -->
+                        <div id="editor-content" contenteditable="true" class="editor-content text-base md:text-lg leading-relaxed text-justify" oninput="recordHistory()">
                             <h1 style="font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 20px;">পদার্থবিজ্ঞান: গতির সমীকরণ ও বিশ্লেষণ</h1>
-                            <p>এখানে আপনি সরাসরি এমএস ওয়ার্ড বা গুগল ডকসের মতো সকল কাজ সম্পন্ন করতে পারবেন। উপরের টুলবার থেকে পেজ সাইজ, মার্জিন, ভেতরের বর্ডার এবং ড্রয়িং বা উন্নত সমীকরণ যুক্ত করে নিন।</p>
+                            <p>এখানে আপনি সরাসরি টাইপ করতে পারবেন। বর্ডার লাইন এখন সবসময় পেজের কাগজের ভেতর থাকবে এবং কোনো লেখা বা চিত্র বাইরে ছিটকে যাবে না।</p>
                         </div>
                     </div>
 
@@ -353,7 +411,6 @@
             </div>
             
             <div class="p-4 space-y-3">
-                <!-- Equation Palette Buttons -->
                 <div class="bg-slate-100 p-2.5 rounded-lg border border-slate-200">
                     <p class="text-xs font-bold text-slate-500 mb-1.5">চিহ্ন বা ফর্মুলায় ক্লিক করুন:</p>
                     <div class="flex flex-wrap gap-1.5">
@@ -402,7 +459,6 @@
                 <button onclick="closeDrawModal()" class="text-white hover:text-gray-200"><i class="fas fa-times text-lg"></i></button>
             </div>
             
-            <!-- Drawing Canvas Controls -->
             <div class="bg-slate-100 p-2 flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 text-xs">
                 <div class="flex items-center gap-2">
                     <span class="font-bold text-gray-600">টুল:</span>
@@ -423,7 +479,6 @@
                 <button onclick="clearCanvas()" class="px-2.5 py-1 bg-red-100 text-red-700 rounded font-bold hover:bg-red-200"><i class="fas fa-trash-alt"></i> মুছুন</button>
             </div>
 
-            <!-- The Drawing Canvas -->
             <div class="p-3 bg-gray-200 flex justify-center">
                 <canvas id="sketchCanvas" width="600" height="320" class="bg-white rounded border border-gray-400 shadow-inner cursor-crosshair"></canvas>
             </div>
@@ -436,6 +491,47 @@
     </div>
 
     <script>
+        // --- CUSTOM UNDO / REDO MANAGER ---
+        let undoStack = [];
+        let redoStack = [];
+        const MAX_HISTORY = 40;
+
+        function recordHistory() {
+            const content = document.getElementById('editor-content').innerHTML;
+            if (undoStack.length === 0 || undoStack[undoStack.length - 1] !== content) {
+                undoStack.push(content);
+                if (undoStack.length > MAX_HISTORY) undoStack.shift();
+                redoStack = []; // Reset redo stack on new input
+            }
+        }
+
+        function handleUndo() {
+            const editor = document.getElementById('editor-content');
+            if (undoStack.length > 1) {
+                redoStack.push(undoStack.pop());
+                editor.innerHTML = undoStack[undoStack.length - 1];
+            } else if (undoStack.length === 1) {
+                redoStack.push(undoStack.pop());
+                editor.innerHTML = "";
+            }
+            if (window.MathJax) MathJax.typesetPromise([editor]).catch(() => {});
+        }
+
+        function handleRedo() {
+            const editor = document.getElementById('editor-content');
+            if (redoStack.length > 0) {
+                const restored = redoStack.pop();
+                undoStack.push(restored);
+                editor.innerHTML = restored;
+            }
+            if (window.MathJax) MathJax.typesetPromise([editor]).catch(() => {});
+        }
+
+        // Initialize state
+        window.addEventListener('DOMContentLoaded', () => {
+            recordHistory();
+        });
+
         // Sidebar & UI Controls
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
@@ -480,7 +576,7 @@
             document.getElementById('action-dropdown').classList.add('hidden');
         }
 
-        // Page Layout and Border Fix
+        // Page Layout Configuration
         function applyPageLayout() {
             const size = document.getElementById('pageSizeSelect').value;
             const orientation = document.getElementById('pageOrientationSelect').value;
@@ -490,10 +586,10 @@
             const page = document.getElementById('paper-page');
             const innerFrame = document.getElementById('paper-inner-frame');
 
-            // Set size and margins on outer page
+            // Apply size & margin strictly to paper container
             page.className = `editor-page-container page-${size}-${orientation} margin-${margin}`;
 
-            // Apply border to inner frame inside margins
+            // Apply border directly within inner margin frame
             innerFrame.className = 'page-inner-frame';
             if (border === 'solid') innerFrame.classList.add('border-solid-thin');
             else if (border === 'double') innerFrame.classList.add('border-double-thick');
@@ -533,15 +629,17 @@
             }
         }
 
-        // Rich Formatting
+        // Basic Text Formatting
         function formatDoc(command, value = null) {
             document.execCommand(command, false, value);
             document.getElementById('editor-content').focus();
+            recordHistory();
         }
 
         function formatHeading(tag) {
             document.execCommand('formatBlock', false, tag === 'p' ? '<p>' : `<${tag}>`);
             document.getElementById('editor-content').focus();
+            recordHistory();
         }
 
         function formatColor(color) {
@@ -549,6 +647,7 @@
             document.execCommand('styleWithCSS', false, true);
             document.execCommand('foreColor', false, color);
             document.getElementById('editor-content').focus();
+            recordHistory();
         }
 
         function formatHighlight(color) {
@@ -556,6 +655,7 @@
             document.execCommand('styleWithCSS', false, true);
             document.execCommand('hiliteColor', false, color);
             document.getElementById('editor-content').focus();
+            recordHistory();
         }
 
         function insertTable() {
@@ -572,10 +672,11 @@
                 }
                 tableHtml += '</table><p><br></p>';
                 document.execCommand('insertHTML', false, tableHtml);
+                recordHistory();
             }
         }
 
-        // ================= MATH MODAL BUILDER =================
+        // Math Modal Builder
         function openMathModal() {
             saveSelection();
             document.getElementById('math-modal').classList.remove('hidden');
@@ -596,9 +697,7 @@
             const input = document.getElementById('modal-latex-input').value;
             const preview = document.getElementById('modal-math-preview');
             preview.innerHTML = `$${input}$`;
-            if (window.MathJax) {
-                MathJax.typesetPromise([preview]).catch((err) => console.log(err));
-            }
+            if (window.MathJax) MathJax.typesetPromise([preview]).catch(() => {});
         }
 
         function confirmInsertMath() {
@@ -619,14 +718,13 @@
                     document.getElementById('editor-content').appendChild(span);
                 }
 
-                if (window.MathJax) {
-                    MathJax.typesetPromise([span]).catch((err) => console.log(err));
-                }
+                if (window.MathJax) MathJax.typesetPromise([span]).catch(() => {});
+                recordHistory();
             }
             closeMathModal();
         }
 
-        // ================= DRAWING CANVAS MODAL =================
+        // Drawing Canvas Modal & Image Resizing Setup
         let canvas, ctx, isDrawing = false, drawTool = 'free', startX, startY, snapshot;
 
         function openDrawModal() {
@@ -647,17 +745,15 @@
             canvas.addEventListener('mousemove', drawing);
             canvas.addEventListener('mouseup', endDraw);
             
-            // Touch support for mobile/tablets
             canvas.addEventListener('touchstart', (e) => {
                 const touch = e.touches[0];
-                const rect = canvas.getBoundingClientRect();
                 startDraw({ clientX: touch.clientX, clientY: touch.clientY, preventDefault: () => e.preventDefault() });
             });
             canvas.addEventListener('touchmove', (e) => {
                 const touch = e.touches[0];
                 drawing({ clientX: touch.clientX, clientY: touch.clientY, preventDefault: () => e.preventDefault() });
             });
-            canvas.addEventListener('touchend', endDraw);
+            canvas.addEventListener('touchstep', endDraw);
         }
 
         function setDrawTool(tool) {
@@ -714,27 +810,101 @@
             isDrawing = false;
         }
 
+        // Inserting Resizable Image into Document
         function insertDrawingToDoc() {
             const dataUrl = canvas.toDataURL('image/png');
             restoreSelection();
-            const img = document.createElement('img');
-            img.src = dataUrl;
-            img.style.maxWidth = '100%';
-            img.style.margin = '15px auto';
-            img.style.display = 'block';
-            img.style.borderRadius = '6px';
-            img.style.boxShadow = '0 2px 6px rgba(0,0,0,0.1)';
+
+            const wrapper = document.createElement('span');
+            wrapper.className = 'image-wrapper';
+            wrapper.contentEditable = 'false';
+            wrapper.style.width = '260px'; // Default reasonable size
+
+            wrapper.innerHTML = `
+                <img src="${dataUrl}">
+                <div class="resize-handle"></div>
+                <div class="img-toolbar">
+                    <button onclick="alignImg(this, 'left')" class="text-white hover:text-blue-400 px-1 text-xs"><i class="fas fa-align-left"></i></button>
+                    <button onclick="alignImg(this, 'center')" class="text-white hover:text-blue-400 px-1 text-xs"><i class="fas fa-align-center"></i></button>
+                    <button onclick="alignImg(this, 'right')" class="text-white hover:text-blue-400 px-1 text-xs"><i class="fas fa-align-right"></i></button>
+                    <button onclick="removeImg(this)" class="text-red-400 hover:text-red-600 px-1 text-xs"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+
+            // Event Listeners for Resizing & Selecting
+            wrapper.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deselectImages();
+                wrapper.classList.add('selected');
+            });
+
+            const handle = wrapper.querySelector('.resize-handle');
+            handle.addEventListener('mousedown', initImageResize);
 
             const sel = window.getSelection();
             if (sel.rangeCount > 0) {
                 const range = sel.getRangeAt(0);
                 range.deleteContents();
-                range.insertNode(img);
-                range.setStartAfter(img);
+                range.insertNode(wrapper);
+                range.setStartAfter(wrapper);
             } else {
-                document.getElementById('editor-content').appendChild(img);
+                document.getElementById('editor-content').appendChild(wrapper);
             }
+
             closeDrawModal();
+            recordHistory();
+        }
+
+        function deselectImages(e) {
+            document.querySelectorAll('.image-wrapper').forEach(w => w.classList.remove('selected'));
+        }
+
+        function alignImg(btn, alignment) {
+            const wrapper = btn.closest('.image-wrapper');
+            if (alignment === 'center') {
+                wrapper.style.display = 'block';
+                wrapper.style.margin = '10px auto';
+                wrapper.style.float = 'none';
+            } else if (alignment === 'left') {
+                wrapper.style.display = 'inline-block';
+                wrapper.style.float = 'left';
+                wrapper.style.margin = '5px 15px 5px 0';
+            } else if (alignment === 'right') {
+                wrapper.style.display = 'inline-block';
+                wrapper.style.float = 'right';
+                wrapper.style.margin = '5px 0 5px 15px';
+            }
+            recordHistory();
+        }
+
+        function removeImg(btn) {
+            btn.closest('.image-wrapper').remove();
+            recordHistory();
+        }
+
+        // Smooth Mouse Drag Resize Logic
+        function initImageResize(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            const wrapper = e.target.closest('.image-wrapper');
+            const startWidth = wrapper.offsetWidth;
+            const startMouseX = e.clientX;
+
+            function doResize(moveEvent) {
+                const newWidth = startWidth + (moveEvent.clientX - startMouseX);
+                if (newWidth > 60 && newWidth < 700) {
+                    wrapper.style.width = newWidth + 'px';
+                }
+            }
+
+            function stopResize() {
+                window.removeEventListener('mousemove', doResize);
+                window.removeEventListener('mouseup', stopResize);
+                recordHistory();
+            }
+
+            window.addEventListener('mousemove', doResize);
+            window.addEventListener('mouseup', stopResize);
         }
 
         // Live Preview for Converter
@@ -742,7 +912,7 @@
         const aiOutput = document.getElementById('ai-output');
         aiInput.addEventListener('input', () => {
             aiOutput.innerHTML = aiInput.value.replace(/\n/g, '<br>');
-            if (window.MathJax) MathJax.typesetPromise([aiOutput]).catch((err) => console.log(err));
+            if (window.MathJax) MathJax.typesetPromise([aiOutput]).catch(() => {});
         });
 
         async function pasteText() {
