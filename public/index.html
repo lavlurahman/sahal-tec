@@ -6,7 +6,7 @@
     <title>SAHAL TEC - Professional Workspace</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Noto Sans Bengali & Serif fonts -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -23,7 +23,7 @@
     <style>
         body { font-family: 'Noto Sans Bengali', sans-serif; background-color: #cbd5e1; overflow: hidden; }
         
-        /* Simulated Paper Settings */
+        /* Simulated Physical Paper */
         .editor-page-container {
             position: relative;
             background-color: #ffffff;
@@ -32,7 +32,7 @@
             transition: all 0.3s ease;
         }
 
-        /* Default A4 Portrait */
+        /* Paper Dimensions */
         .page-a4-portrait { width: 21cm; min-height: 29.7cm; }
         .page-a4-landscape { width: 29.7cm; min-height: 21cm; }
         .page-letter-portrait { width: 21.59cm; min-height: 27.94cm; }
@@ -40,16 +40,24 @@
         .page-legal-portrait { width: 21.59cm; min-height: 35.56cm; }
         .page-legal-landscape { width: 35.56cm; min-height: 21.59cm; }
 
-        /* Page Margins */
+        /* Outer Margin Spacing */
         .margin-normal { padding: 2.54cm; }
         .margin-narrow { padding: 1.27cm; }
         .margin-wide { padding: 3.81cm; }
 
-        /* Page Borders */
-        .border-none { border: none; }
-        .border-solid-thin { border: 1.5px solid #334155; }
-        .border-double-thick { border: 4px double #1e293b; }
-        .border-dashed-thin { border: 2px dashed #64748b; }
+        /* Margin Content Frame with Inner Borders */
+        .page-inner-frame {
+            width: 100%;
+            height: 100%;
+            min-height: inherit;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .border-none { border: none !important; }
+        .border-solid-thin { border: 1.5px solid #334155 !important; padding: 15px; }
+        .border-double-thick { border: 4px double #1e293b !important; padding: 15px; }
+        .border-dashed-thin { border: 2px dashed #64748b !important; padding: 15px; }
 
         /* Watermark styling */
         .watermark-overlay {
@@ -70,19 +78,12 @@
             position: relative;
             z-index: 2;
             outline: none;
-            min-height: inherit;
+            min-height: 20cm;
         }
 
-        /* Responsive Page Adjustments on Mobile */
         @media (max-width: 768px) {
-            .editor-page-container {
-                width: 100% !important;
-                min-height: auto !important;
-                margin: 10px 0;
-            }
-            .margin-normal, .margin-narrow, .margin-wide {
-                padding: 1.25rem !important;
-            }
+            .editor-page-container { width: 100% !important; min-height: auto !important; margin: 10px 0; }
+            .margin-normal, .margin-narrow, .margin-wide { padding: 1.25rem !important; }
             .watermark-overlay { font-size: 2.5rem; }
         }
 
@@ -99,7 +100,7 @@
     <!-- Mobile Sidebar Overlay -->
     <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
 
-    <!-- Sidebar: Folder & File Management -->
+    <!-- Sidebar -->
     <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-50 w-64 bg-[#111827] text-white flex flex-col h-full shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none">
         <div class="p-5 border-b border-gray-800 flex justify-between items-center">
             <h2 class="text-xl font-bold tracking-wide">SAHAL TEC</h2>
@@ -138,13 +139,11 @@
         </div>
     </aside>
 
-    <!-- Main Content Area -->
+    <!-- Main Workspace Area -->
     <main class="flex-1 flex flex-col h-full min-w-0 w-full relative z-10">
         
-        <!-- Top Toolbar Header -->
+        <!-- Header -->
         <header class="bg-white border-b border-gray-200 shadow-sm z-30 shrink-0 w-full relative">
-            
-            <!-- Top Row: File Name & Action Menu -->
             <div class="flex justify-between items-center px-3 md:px-6 py-2 border-b border-gray-100">
                 <div class="flex items-center gap-2 w-full md:w-auto">
                     <button onclick="toggleSidebar()" class="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded focus:outline-none">
@@ -153,7 +152,7 @@
                     <input type="text" id="doc-title" value="Untitled Document" class="text-base md:text-xl font-bold text-gray-700 outline-none hover:bg-gray-50 px-2 py-1 rounded w-full md:w-64 border-b border-transparent focus:border-blue-500 transition">
                 </div>
                 
-                <!-- 3 Dots Action Menu -->
+                <!-- Action Dropdown Button -->
                 <div class="relative inline-block text-left shrink-0 ml-2 md:ml-4">
                     <button onclick="toggleDropdown(event)" class="p-2 md:p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition focus:outline-none shadow-sm border border-gray-200">
                         <i class="fas fa-ellipsis-v md:fa-bars text-xl px-1"></i>
@@ -166,9 +165,6 @@
                             </button>
                         </div>
                         <div class="py-1">
-                            <button onclick="togglePageSettingsModal()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-semibold transition">
-                                <i class="fas fa-sliders-h w-5 text-center text-lg text-gray-500"></i> পেজ সেটআপ
-                            </button>
                             <button class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 font-semibold transition">
                                 <i class="fas fa-save w-5 text-center text-lg"></i> সেভ করুন
                             </button>
@@ -185,31 +181,28 @@
                 </div>
             </div>
 
-            <!-- Row 2: Page Setup & Layout Toolbar (Direct Editor Mode) -->
+            <!-- Page Setup Toolbar -->
             <div id="page-setup-toolbar" class="flex items-center gap-2 px-3 md:px-6 py-1.5 bg-slate-50 text-xs text-gray-700 border-b border-gray-200 overflow-x-auto whitespace-nowrap hide-scrollbar">
                 <span class="font-bold text-gray-500 flex items-center gap-1 shrink-0"><i class="fas fa-file-alt"></i> পেজ লেআউট:</span>
                 
-                <!-- Page Size -->
                 <select id="pageSizeSelect" onchange="applyPageLayout()" class="border border-gray-300 rounded px-1.5 py-1 bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
                     <option value="a4">A4 Size</option>
                     <option value="letter">Letter</option>
                     <option value="legal">Legal</option>
                 </select>
 
-                <!-- Orientation -->
                 <select id="pageOrientationSelect" onchange="applyPageLayout()" class="border border-gray-300 rounded px-1.5 py-1 bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
                     <option value="portrait">পোর্ট্রেট (Portrait)</option>
                     <option value="landscape">ল্যান্ডস্কেপ (Landscape)</option>
                 </select>
 
-                <!-- Margins -->
                 <select id="pageMarginSelect" onchange="applyPageLayout()" class="border border-gray-300 rounded px-1.5 py-1 bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
                     <option value="normal">মার্জিন: Normal (1")</option>
                     <option value="narrow">মার্জিন: Narrow (0.5")</option>
                     <option value="wide">মার্জিন: Wide (1.5")</option>
                 </select>
 
-                <!-- Borders -->
+                <!-- Border Selector with Inner Box Fix -->
                 <select id="pageBorderSelect" onchange="applyPageLayout()" class="border border-gray-300 rounded px-1.5 py-1 bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
                     <option value="none">বর্ডার: নেই</option>
                     <option value="solid">বর্ডার: সলিড লাইন</option>
@@ -217,36 +210,29 @@
                     <option value="dashed">বর্ডার: ড্যাশড</option>
                 </select>
 
-                <!-- Page Background Color -->
                 <label class="flex items-center gap-1 px-2 py-1 bg-white border border-gray-300 rounded cursor-pointer shrink-0 hover:bg-gray-100" title="কাগজের ব্যাকগ্রাউন্ড কালার">
                     <i class="fas fa-fill-drip text-slate-600"></i> কাগজের রঙ
                     <input type="color" value="#ffffff" oninput="changePageBgColor(this.value)" class="hidden">
                 </label>
 
-                <!-- Watermark Button -->
                 <button onclick="setWatermarkPrompt()" class="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100 flex items-center gap-1 shrink-0">
                     <i class="fas fa-stamp text-amber-600"></i> ওয়াটারমার্ক
                 </button>
             </div>
 
-            <!-- Row 3: Professional Rich Formatting Tools -->
+            <!-- Rich Formatting Toolbar -->
             <div id="formatting-toolbar" class="flex items-center gap-1.5 px-3 md:px-6 py-1.5 bg-white text-gray-700 border-b border-gray-200 overflow-x-auto whitespace-nowrap hide-scrollbar">
-                
-                <!-- Undo / Redo -->
                 <button onclick="formatDoc('undo')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Undo"><i class="fas fa-undo"></i></button>
                 <button onclick="formatDoc('redo')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Redo"><i class="fas fa-redo"></i></button>
                 <div class="w-px h-5 bg-gray-300 mx-1 shrink-0"></div>
 
-                <!-- Font Family -->
                 <select onchange="formatDoc('fontName', this.value)" class="border border-gray-300 rounded px-2 py-0.5 text-xs bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
                     <option value="Noto Sans Bengali">Noto Sans Bengali</option>
                     <option value="Hind Siliguri">Hind Siliguri</option>
                     <option value="Roboto">Roboto (English)</option>
                     <option value="Times New Roman">Times New Roman</option>
-                    <option value="Courier New">Courier (Code)</option>
                 </select>
 
-                <!-- Heading Selector -->
                 <select onchange="formatHeading(this.value)" class="border border-gray-300 rounded px-2 py-0.5 text-xs bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
                     <option value="p">সাধারণ টেক্সট</option>
                     <option value="h1">Heading 1</option>
@@ -254,83 +240,78 @@
                     <option value="h3">Heading 3</option>
                 </select>
 
-                <!-- Font Size -->
                 <select onchange="formatDoc('fontSize', this.value)" class="border border-gray-300 rounded px-2 py-0.5 text-xs bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
-                    <option value="3">সাইজ: 12pt (স্বাভাবিক)</option>
-                    <option value="2">সাইজ: 10pt (ছোট)</option>
-                    <option value="4">সাইজ: 14pt (বড়)</option>
-                    <option value="5">সাইজ: 18pt (শিরোনাম)</option>
-                    <option value="6">সাইজ: 24pt (ব্যানার)</option>
+                    <option value="3">সাইজ: 12pt</option>
+                    <option value="2">সাইজ: 10pt</option>
+                    <option value="4">সাইজ: 14pt</option>
+                    <option value="5">সাইজ: 18pt</option>
                 </select>
                 
                 <div class="w-px h-5 bg-gray-300 mx-1 shrink-0"></div>
                 
-                <!-- Formatting Buttons -->
                 <button onclick="formatDoc('bold')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-bold text-sm transition" title="Bold">B</button>
                 <button onclick="formatDoc('italic')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center italic text-sm transition" title="Italic">I</button>
                 <button onclick="formatDoc('underline')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center underline text-sm transition" title="Underline">U</button>
-                
-                <!-- Subscript & Superscript -->
                 <button onclick="formatDoc('subscript')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition" title="Subscript (X₂)"><i class="fas fa-subscript"></i></button>
                 <button onclick="formatDoc('superscript')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition" title="Superscript (X²)"><i class="fas fa-superscript"></i></button>
 
-                <!-- Color Pickers with Selection Memory -->
                 <label onmousedown="saveSelection()" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center cursor-pointer text-red-500 font-serif text-sm font-bold transition border border-gray-200" title="টেক্সট কালার">
                     A
-                    <input type="color" oninput="formatColor(this.value)" onchange="formatColor(this.value)" class="hidden">
+                    <input type="color" oninput="formatColor(this.value)" class="hidden">
                 </label>
 
                 <label onmousedown="saveSelection()" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center cursor-pointer text-yellow-500 text-xs transition border border-gray-200" title="টেক্সট হাইলাইটার">
                     <i class="fas fa-highlighter"></i>
-                    <input type="color" value="#fef08a" oninput="formatHighlight(this.value)" onchange="formatHighlight(this.value)" class="hidden">
+                    <input type="color" value="#fef08a" oninput="formatHighlight(this.value)" class="hidden">
                 </label>
                 
                 <div class="w-px h-5 bg-gray-300 mx-1 shrink-0"></div>
 
-                <!-- Text Alignments -->
-                <button onclick="formatDoc('justifyLeft')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition" title="Align Left"><i class="fas fa-align-left"></i></button>
-                <button onclick="formatDoc('justifyCenter')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition" title="Align Center"><i class="fas fa-align-center"></i></button>
-                <button onclick="formatDoc('justifyRight')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition" title="Align Right"><i class="fas fa-align-right"></i></button>
-                <button onclick="formatDoc('justifyFull')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition" title="Justify"><i class="fas fa-align-justify"></i></button>
+                <button onclick="formatDoc('justifyLeft')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition"><i class="fas fa-align-left"></i></button>
+                <button onclick="formatDoc('justifyCenter')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition"><i class="fas fa-align-center"></i></button>
+                <button onclick="formatDoc('justifyRight')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition"><i class="fas fa-align-right"></i></button>
+                <button onclick="formatDoc('justifyFull')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition"><i class="fas fa-align-justify"></i></button>
 
                 <div class="w-px h-5 bg-gray-300 mx-1 shrink-0"></div>
 
-                <!-- Lists & Divider -->
-                <button onclick="formatDoc('insertUnorderedList')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition" title="Bullet List"><i class="fas fa-list-ul"></i></button>
-                <button onclick="formatDoc('insertOrderedList')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition" title="Numbered List"><i class="fas fa-list-ol"></i></button>
-                <button onclick="formatDoc('insertHorizontalRule')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition" title="Horizontal Line"><i class="fas fa-minus"></i></button>
+                <button onclick="formatDoc('insertUnorderedList')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition"><i class="fas fa-list-ul"></i></button>
+                <button onclick="formatDoc('insertOrderedList')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition"><i class="fas fa-list-ol"></i></button>
+                <button onclick="formatDoc('insertHorizontalRule')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition"><i class="fas fa-minus"></i></button>
 
                 <div class="w-px h-5 bg-gray-300 mx-1 shrink-0"></div>
                 
-                <!-- Equations, Special Elements & Clear -->
-                <button onclick="insertMathEquation()" class="px-2 py-0.5 shrink-0 text-xs font-bold bg-blue-50 text-blue-600 rounded hover:bg-blue-100 flex items-center gap-1 transition">
-                    <i class="fas fa-square-root-variable"></i> সমীকরণ
+                <!-- Equation & Drawing Modals Trigger Buttons -->
+                <button onclick="openMathModal()" class="px-2 py-0.5 shrink-0 text-xs font-bold bg-blue-50 text-blue-600 rounded hover:bg-blue-100 flex items-center gap-1 transition">
+                    <i class="fas fa-square-root-variable"></i> উন্নত সমীকরণ
+                </button>
+                <button onclick="openDrawModal()" class="px-2 py-0.5 shrink-0 text-xs font-bold bg-purple-50 text-purple-600 rounded hover:bg-purple-100 flex items-center gap-1 transition">
+                    <i class="fas fa-paint-brush"></i> চিত্র/ড্রয়িং
                 </button>
                 <button onclick="insertTable()" class="px-2 py-0.5 shrink-0 text-xs font-bold bg-teal-50 text-teal-600 rounded hover:bg-teal-100 flex items-center gap-1 transition">
                     <i class="fas fa-table"></i> টেবিল
                 </button>
-                <button onclick="formatDoc('removeFormat')" class="w-7 h-7 shrink-0 rounded hover:bg-red-50 text-red-500 flex items-center justify-center text-xs transition" title="Clear Formatting">
-                    <i class="fas fa-remove-format"></i>
-                </button>
             </div>
         </header>
 
-        <!-- Workspace Area -->
+        <!-- Main Workspace -->
         <div class="flex-1 relative bg-[#cbd5e1] overflow-hidden w-full z-0">
             
-            <!-- MODE 1: Direct Editor View (Simulated Physical Paper) -->
+            <!-- MODE 1: Direct Editor View -->
             <div id="editor-view" class="h-full w-full overflow-y-auto flex flex-col items-center py-6 px-2 md:px-4">
                 
-                <!-- The Paper Page Container -->
-                <div id="paper-page" class="editor-page-container page-a4-portrait margin-normal border-none">
+                <!-- Paper Page with Outer Margins -->
+                <div id="paper-page" class="editor-page-container page-a4-portrait margin-normal">
                     
-                    <!-- Watermark Container -->
-                    <div id="watermark-layer" class="watermark-overlay hidden">SAHAL TEC</div>
+                    <!-- Inner Margin Frame with Borders -->
+                    <div id="paper-inner-frame" class="page-inner-frame border-none">
+                        <!-- Watermark -->
+                        <div id="watermark-layer" class="watermark-overlay hidden">লাভলু</div>
 
-                    <!-- Editable Document Body -->
-                    <div id="editor-content" contenteditable="true" class="editor-content text-base md:text-lg leading-relaxed text-justify" placeholder="এখানে সরাসরি টাইপ করা শুরু করুন...">
-                        <h1 style="font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 20px;">পদার্থবিজ্ঞান: গতির সমীকরণ ও বিশ্লেষণ</h1>
-                        <p>এখানে আপনি সরাসরি এমএস ওয়ার্ড বা গুগল ডকসের মতো সকল কাজ সম্পন্ন করতে পারবেন। উপরের টুলবার থেকে পেজ সাইজ, মার্জিন, বর্ডার এবং লেখার ফন্ট বা সমীকরণ সাজিয়ে নিন।</p>
+                        <!-- Editable Content -->
+                        <div id="editor-content" contenteditable="true" class="editor-content text-base md:text-lg leading-relaxed text-justify">
+                            <h1 style="font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 20px;">পদার্থবিজ্ঞান: গতির সমীকরণ ও বিশ্লেষণ</h1>
+                            <p>এখানে আপনি সরাসরি এমএস ওয়ার্ড বা গুগল ডকসের মতো সকল কাজ সম্পন্ন করতে পারবেন। উপরের টুলবার থেকে পেজ সাইজ, মার্জিন, ভেতরের বর্ডার এবং ড্রয়িং বা উন্নত সমীকরণ যুক্ত করে নিন।</p>
+                        </div>
                     </div>
 
                 </div>
@@ -339,8 +320,6 @@
 
             <!-- MODE 2: AI Chat Converter View -->
             <div id="converter-view" class="hidden h-full w-full flex-col md:flex-row gap-4 p-2 md:p-4 overflow-y-auto md:overflow-hidden">
-                
-                <!-- Left: Input Area -->
                 <div class="w-full md:w-1/2 h-[45vh] md:h-full flex flex-col bg-white rounded-xl shadow border border-gray-300 overflow-hidden shrink-0 md:shrink">
                     <div class="bg-gray-100 p-2 md:p-3 border-b border-gray-300 flex justify-between items-center shrink-0">
                         <label class="font-bold text-gray-700 text-xs md:text-sm ml-1">📝 পেস্ট করুন</label>
@@ -352,7 +331,6 @@
                     <textarea id="ai-input" class="w-full h-full flex-grow p-3 md:p-4 focus:outline-none resize-none font-mono text-sm md:text-base bg-gray-50 overflow-y-auto" placeholder="ChatGPT বা AI থেকে কপি করা টেক্সট এখানে দিন..."></textarea>
                 </div>
 
-                <!-- Right: Live Preview -->
                 <div class="w-full md:w-1/2 h-[50vh] md:h-full flex flex-col bg-[#cbd5e1] rounded-xl shadow-inner border border-gray-300 overflow-hidden shrink-0 md:shrink">
                     <div class="bg-gray-200 p-2 border-b border-gray-300 flex justify-center items-center shrink-0 shadow-sm z-10">
                         <label class="font-bold text-gray-700 text-xs md:text-sm">👁️ লাইভ আউটপুট প্রিভিউ</label>
@@ -361,40 +339,123 @@
                         <div id="ai-output" class="editor-page-container page-a4-portrait margin-normal p-6 text-base md:text-lg leading-relaxed text-justify h-auto min-h-full"></div>
                     </div>
                 </div>
-
             </div>
 
         </div>
     </main>
 
+    <!-- 1. ADVANCED MATH MODAL DIALOG -->
+    <div id="math-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-3 hidden">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-xl overflow-hidden border border-gray-200 flex flex-col">
+            <div class="bg-blue-600 text-white px-4 py-3 flex justify-between items-center">
+                <h3 class="font-bold text-base flex items-center gap-2"><i class="fas fa-square-root-variable"></i> সমীকরণ বিল্ডার</h3>
+                <button onclick="closeMathModal()" class="text-white hover:text-gray-200"><i class="fas fa-times text-lg"></i></button>
+            </div>
+            
+            <div class="p-4 space-y-3">
+                <!-- Equation Palette Buttons -->
+                <div class="bg-slate-100 p-2.5 rounded-lg border border-slate-200">
+                    <p class="text-xs font-bold text-slate-500 mb-1.5">চিহ্ন বা ফর্মুলায় ক্লিক করুন:</p>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button onclick="insertLatexSnippet('\\frac{a}{b}')" class="px-2 py-1 bg-white border border-slate-300 rounded font-serif text-sm hover:bg-blue-50">$\frac{a}{b}$</button>
+                        <button onclick="insertLatexSnippet('\\sqrt{x}')" class="px-2 py-1 bg-white border border-slate-300 rounded font-serif text-sm hover:bg-blue-50">$\sqrt{x}$</button>
+                        <button onclick="insertLatexSnippet('x^{2}')" class="px-2 py-1 bg-white border border-slate-300 rounded font-serif text-sm hover:bg-blue-50">$x^2$</button>
+                        <button onclick="insertLatexSnippet('x_{i}')" class="px-2 py-1 bg-white border border-slate-300 rounded font-serif text-sm hover:bg-blue-50">$x_i$</button>
+                        <button onclick="insertLatexSnippet('\\int_{a}^{b} f(x)dx')" class="px-2 py-1 bg-white border border-slate-300 rounded font-serif text-sm hover:bg-blue-50">$\int$</button>
+                        <button onclick="insertLatexSnippet('\\sum_{i=1}^{n} x_i')" class="px-2 py-1 bg-white border border-slate-300 rounded font-serif text-sm hover:bg-blue-50">$\sum$</button>
+                        <button onclick="insertLatexSnippet('\\alpha')" class="px-2 py-1 bg-white border border-slate-300 rounded font-serif text-sm hover:bg-blue-50">$\alpha$</button>
+                        <button onclick="insertLatexSnippet('\\beta')" class="px-2 py-1 bg-white border border-slate-300 rounded font-serif text-sm hover:bg-blue-50">$\beta$</button>
+                        <button onclick="insertLatexSnippet('\\theta')" class="px-2 py-1 bg-white border border-slate-300 rounded font-serif text-sm hover:bg-blue-50">$\theta$</button>
+                        <button onclick="insertLatexSnippet('\\lambda')" class="px-2 py-1 bg-white border border-slate-300 rounded font-serif text-sm hover:bg-blue-50">$\lambda$</button>
+                        <button onclick="insertLatexSnippet('\\pi')" class="px-2 py-1 bg-white border border-slate-300 rounded font-serif text-sm hover:bg-blue-50">$\pi$</button>
+                        <button onclick="insertLatexSnippet('\\Delta')" class="px-2 py-1 bg-white border border-slate-300 rounded font-serif text-sm hover:bg-blue-50">$\Delta$</button>
+                        <button onclick="insertLatexSnippet('\\vec{v}')" class="px-2 py-1 bg-white border border-slate-300 rounded font-serif text-sm hover:bg-blue-50">$\vec{v}$</button>
+                        <button onclick="insertLatexSnippet('\\times')" class="px-2 py-1 bg-white border border-slate-300 rounded font-serif text-sm hover:bg-blue-50">$\times$</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">LaTeX কোড এডিটর:</label>
+                    <textarea id="modal-latex-input" rows="3" class="w-full border border-gray-300 rounded-lg p-2 font-mono text-sm focus:ring-2 focus:ring-blue-500 outline-none" oninput="updateModalMathPreview()">E = mc^2</textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">লাইভ সমীকরণ প্রিভিউ:</label>
+                    <div id="modal-math-preview" class="border border-slate-200 bg-slate-50 rounded-lg p-3 min-h-[50px] flex items-center justify-center text-lg">
+                        $E = mc^2$
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-100 px-4 py-3 flex justify-end gap-2 border-t">
+                <button onclick="closeMathModal()" class="px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300">বাতিল</button>
+                <button onclick="confirmInsertMath()" class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700">সমীকরণ যুক্ত করুন</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. DRAWING / SKETCH MODAL DIALOG -->
+    <div id="draw-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-3 hidden">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden border border-gray-200 flex flex-col">
+            <div class="bg-purple-700 text-white px-4 py-3 flex justify-between items-center">
+                <h3 class="font-bold text-base flex items-center gap-2"><i class="fas fa-paint-brush"></i> চিত্র ও গ্রাফ ড্রয়িং বোর্ড</h3>
+                <button onclick="closeDrawModal()" class="text-white hover:text-gray-200"><i class="fas fa-times text-lg"></i></button>
+            </div>
+            
+            <!-- Drawing Canvas Controls -->
+            <div class="bg-slate-100 p-2 flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 text-xs">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-gray-600">টুল:</span>
+                    <button id="tool-free" onclick="setDrawTool('free')" class="px-2 py-1 bg-purple-100 text-purple-700 font-bold rounded border border-purple-300">পেনসিল</button>
+                    <button id="tool-line" onclick="setDrawTool('line')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">সরলরেখা</button>
+                    <button id="tool-circle" onclick="setDrawTool('circle')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">বৃত্ত</button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-gray-600">রঙ:</span>
+                    <input type="color" id="drawColor" value="#000000" class="w-6 h-6 border rounded cursor-pointer">
+                    <span class="font-bold text-gray-600 ml-2">পুরুত্ব:</span>
+                    <select id="drawLineWidth" class="border border-gray-300 rounded p-1 bg-white">
+                        <option value="2">চিকন (2px)</option>
+                        <option value="4" selected>মাঝারি (4px)</option>
+                        <option value="8">মোটা (8px)</option>
+                    </select>
+                </div>
+                <button onclick="clearCanvas()" class="px-2.5 py-1 bg-red-100 text-red-700 rounded font-bold hover:bg-red-200"><i class="fas fa-trash-alt"></i> মুছুন</button>
+            </div>
+
+            <!-- The Drawing Canvas -->
+            <div class="p-3 bg-gray-200 flex justify-center">
+                <canvas id="sketchCanvas" width="600" height="320" class="bg-white rounded border border-gray-400 shadow-inner cursor-crosshair"></canvas>
+            </div>
+
+            <div class="bg-gray-100 px-4 py-3 flex justify-end gap-2 border-t">
+                <button onclick="closeDrawModal()" class="px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300">বাতিল</button>
+                <button onclick="insertDrawingToDoc()" class="px-4 py-2 text-sm bg-purple-700 text-white rounded-lg font-bold hover:bg-purple-800">ডকুমেন্টে চিত্র যুক্ত করুন</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Sidebar Toggle Logic for Mobile
+        // Sidebar & UI Controls
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.toggle('hidden');
         }
 
-        // Dropdown Toggle Logic
         function toggleDropdown(event) {
-            if(event) event.stopPropagation(); 
-            const dropdown = document.getElementById('action-dropdown');
-            dropdown.classList.toggle('hidden');
+            if(event) event.stopPropagation();
+            document.getElementById('action-dropdown').classList.toggle('hidden');
         }
 
         window.onclick = function(event) {
             const dropdown = document.getElementById('action-dropdown');
             if (!event.target.closest('.relative')) {
-                if (dropdown && !dropdown.classList.contains('hidden')) {
-                    dropdown.classList.add('hidden');
-                }
+                if (dropdown && !dropdown.classList.contains('hidden')) dropdown.classList.add('hidden');
             }
         }
 
-        // Mode Toggle Logic
+        // Mode Switching
         let isEditorMode = true;
-
         function toggleMode() {
             const editorView = document.getElementById('editor-view');
             const converterView = document.getElementById('converter-view');
@@ -403,33 +464,23 @@
             const toggleBtn = document.getElementById('mode-toggle-btn');
 
             isEditorMode = !isEditorMode;
-
             if (isEditorMode) {
-                editorView.classList.remove('hidden');
-                editorView.classList.add('flex');
-                converterView.classList.add('hidden');
-                converterView.classList.remove('flex');
-                pageSetupToolbar.classList.remove('hidden'); 
-                formattingToolbar.classList.remove('hidden'); 
-                
+                editorView.classList.replace('hidden', 'flex');
+                converterView.classList.replace('flex', 'hidden');
+                pageSetupToolbar.classList.remove('hidden');
+                formattingToolbar.classList.remove('hidden');
                 toggleBtn.innerHTML = '<i class="fas fa-robot w-5 text-center text-lg"></i> এআই কনভার্টার চালু';
-                toggleBtn.className = "w-full flex items-center gap-3 px-4 py-2.5 text-sm text-indigo-700 hover:bg-indigo-100 font-bold transition";
             } else {
-                editorView.classList.add('hidden');
-                editorView.classList.remove('flex');
-                converterView.classList.remove('hidden');
-                converterView.classList.add('flex');
-                pageSetupToolbar.classList.add('hidden'); 
-                formattingToolbar.classList.add('hidden'); 
-                
+                editorView.classList.replace('flex', 'hidden');
+                converterView.classList.replace('hidden', 'flex');
+                pageSetupToolbar.classList.add('hidden');
+                formattingToolbar.classList.add('hidden');
                 toggleBtn.innerHTML = '<i class="fas fa-pen w-5 text-center text-lg"></i> সরাসরি এডিটরে ফিরুন';
-                toggleBtn.className = "w-full flex items-center gap-3 px-4 py-2.5 text-sm text-yellow-700 hover:bg-yellow-100 font-bold transition";
             }
-            
             document.getElementById('action-dropdown').classList.add('hidden');
         }
 
-        // --- PAGE SETUP & LAYOUT LOGIC ---
+        // Page Layout and Border Fix
         function applyPageLayout() {
             const size = document.getElementById('pageSizeSelect').value;
             const orientation = document.getElementById('pageOrientationSelect').value;
@@ -437,21 +488,17 @@
             const border = document.getElementById('pageBorderSelect').value;
 
             const page = document.getElementById('paper-page');
+            const innerFrame = document.getElementById('paper-inner-frame');
 
-            // Reset size & orientation classes
-            page.className = 'editor-page-container';
+            // Set size and margins on outer page
+            page.className = `editor-page-container page-${size}-${orientation} margin-${margin}`;
 
-            // Add size + orientation
-            page.classList.add(`page-${size}-${orientation}`);
-
-            // Add margin
-            page.classList.add(`margin-${margin}`);
-
-            // Add border
-            if (border === 'solid') page.classList.add('border-solid-thin');
-            else if (border === 'double') page.classList.add('border-double-thick');
-            else if (border === 'dashed') page.classList.add('border-dashed-thin');
-            else page.classList.add('border-none');
+            // Apply border to inner frame inside margins
+            innerFrame.className = 'page-inner-frame';
+            if (border === 'solid') innerFrame.classList.add('border-solid-thin');
+            else if (border === 'double') innerFrame.classList.add('border-double-thick');
+            else if (border === 'dashed') innerFrame.classList.add('border-dashed-thin');
+            else innerFrame.classList.add('border-none');
         }
 
         function changePageBgColor(color) {
@@ -460,7 +507,7 @@
 
         function setWatermarkPrompt() {
             const currentWatermark = document.getElementById('watermark-layer');
-            const text = prompt("ওয়াটারমার্ক টেক্সট লিখুন (খালি রাখলে মুছে যাবে):", currentWatermark.innerText !== 'SAHAL TEC' ? currentWatermark.innerText : '');
+            const text = prompt("ওয়াটারমার্ক টেক্সট লিখুন (খালি রাখলে মুছে যাবে):", currentWatermark.innerText);
             if (text !== null) {
                 if (text.trim() === '') {
                     currentWatermark.classList.add('hidden');
@@ -471,14 +518,11 @@
             }
         }
 
-        // --- SELECTION RETENTION LOGIC FOR COLOR & FORMATTING ---
+        // Selection Retention
         let savedRange = null;
-
         function saveSelection() {
             const sel = window.getSelection();
-            if (sel.rangeCount > 0) {
-                savedRange = sel.getRangeAt(0);
-            }
+            if (sel.rangeCount > 0) savedRange = sel.getRangeAt(0);
         }
 
         function restoreSelection() {
@@ -489,43 +533,34 @@
             }
         }
 
-        // --- TEXT FORMATTING FUNCTIONS ---
+        // Rich Formatting
         function formatDoc(command, value = null) {
             document.execCommand(command, false, value);
-            const editorContent = document.getElementById('editor-content');
-            if (editorContent) editorContent.focus();
+            document.getElementById('editor-content').focus();
         }
 
         function formatHeading(tag) {
-            if (tag === 'p') {
-                document.execCommand('formatBlock', false, '<p>');
-            } else {
-                document.execCommand('formatBlock', false, `<${tag}>`);
-            }
-            const editorContent = document.getElementById('editor-content');
-            if (editorContent) editorContent.focus();
+            document.execCommand('formatBlock', false, tag === 'p' ? '<p>' : `<${tag}>`);
+            document.getElementById('editor-content').focus();
         }
 
         function formatColor(color) {
             restoreSelection();
             document.execCommand('styleWithCSS', false, true);
             document.execCommand('foreColor', false, color);
-            const editorContent = document.getElementById('editor-content');
-            if (editorContent) editorContent.focus();
+            document.getElementById('editor-content').focus();
         }
 
         function formatHighlight(color) {
             restoreSelection();
             document.execCommand('styleWithCSS', false, true);
             document.execCommand('hiliteColor', false, color);
-            const editorContent = document.getElementById('editor-content');
-            if (editorContent) editorContent.focus();
+            document.getElementById('editor-content').focus();
         }
 
         function insertTable() {
             const rows = prompt("কতগুলো রো (Rows) চান?", "3");
             const cols = prompt("কতগুলো কলাম (Columns) চান?", "3");
-            
             if (rows && cols && !isNaN(rows) && !isNaN(cols)) {
                 let tableHtml = '<table border="1" style="width:100%; border-collapse: collapse; margin: 15px 0;">';
                 for (let r = 0; r < rows; r++) {
@@ -538,13 +573,36 @@
                 tableHtml += '</table><p><br></p>';
                 document.execCommand('insertHTML', false, tableHtml);
             }
-            const editorContent = document.getElementById('editor-content');
-            if (editorContent) editorContent.focus();
         }
 
-        function insertMathEquation() {
+        // ================= MATH MODAL BUILDER =================
+        function openMathModal() {
             saveSelection();
-            const latex = prompt("LaTeX সমীকরণটি লিখুন (যেমন: E = mc^2 বা \\frac{a}{b}):", "E = mc^2");
+            document.getElementById('math-modal').classList.remove('hidden');
+            updateModalMathPreview();
+        }
+
+        function closeMathModal() {
+            document.getElementById('math-modal').classList.add('hidden');
+        }
+
+        function insertLatexSnippet(snippet) {
+            const input = document.getElementById('modal-latex-input');
+            input.value += (input.value ? ' ' : '') + snippet;
+            updateModalMathPreview();
+        }
+
+        function updateModalMathPreview() {
+            const input = document.getElementById('modal-latex-input').value;
+            const preview = document.getElementById('modal-math-preview');
+            preview.innerHTML = `$${input}$`;
+            if (window.MathJax) {
+                MathJax.typesetPromise([preview]).catch((err) => console.log(err));
+            }
+        }
+
+        function confirmInsertMath() {
+            const latex = document.getElementById('modal-latex-input').value.trim();
             if (latex) {
                 restoreSelection();
                 const span = document.createElement("span");
@@ -557,28 +615,134 @@
                     range.deleteContents();
                     range.insertNode(span);
                     range.setStartAfter(span);
-                    range.setEndAfter(span);
-                    sel.removeAllRanges();
-                    sel.addRange(range);
                 } else {
                     document.getElementById('editor-content').appendChild(span);
                 }
 
                 if (window.MathJax) {
-                    MathJax.typesetPromise([span]).catch((err) => console.log(err.message));
+                    MathJax.typesetPromise([span]).catch((err) => console.log(err));
                 }
+            }
+            closeMathModal();
+        }
+
+        // ================= DRAWING CANVAS MODAL =================
+        let canvas, ctx, isDrawing = false, drawTool = 'free', startX, startY, snapshot;
+
+        function openDrawModal() {
+            saveSelection();
+            document.getElementById('draw-modal').classList.remove('hidden');
+            if (!canvas) initCanvas();
+        }
+
+        function closeDrawModal() {
+            document.getElementById('draw-modal').classList.add('hidden');
+        }
+
+        function initCanvas() {
+            canvas = document.getElementById('sketchCanvas');
+            ctx = canvas.getContext('2d');
+            
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('mousemove', drawing);
+            canvas.addEventListener('mouseup', endDraw);
+            
+            // Touch support for mobile/tablets
+            canvas.addEventListener('touchstart', (e) => {
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                startDraw({ clientX: touch.clientX, clientY: touch.clientY, preventDefault: () => e.preventDefault() });
+            });
+            canvas.addEventListener('touchmove', (e) => {
+                const touch = e.touches[0];
+                drawing({ clientX: touch.clientX, clientY: touch.clientY, preventDefault: () => e.preventDefault() });
+            });
+            canvas.addEventListener('touchend', endDraw);
+        }
+
+        function setDrawTool(tool) {
+            drawTool = tool;
+            document.getElementById('tool-free').className = tool === 'free' ? 'px-2 py-1 bg-purple-100 text-purple-700 font-bold rounded border border-purple-300' : 'px-2 py-1 bg-white text-gray-700 rounded border border-gray-300';
+            document.getElementById('tool-line').className = tool === 'line' ? 'px-2 py-1 bg-purple-100 text-purple-700 font-bold rounded border border-purple-300' : 'px-2 py-1 bg-white text-gray-700 rounded border border-gray-300';
+            document.getElementById('tool-circle').className = tool === 'circle' ? 'px-2 py-1 bg-purple-100 text-purple-700 font-bold rounded border border-purple-300' : 'px-2 py-1 bg-white text-gray-700 rounded border border-gray-300';
+        }
+
+        function clearCanvas() {
+            if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function startDraw(e) {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+            ctx.strokeStyle = document.getElementById('drawColor').value;
+            ctx.lineWidth = document.getElementById('drawLineWidth').value;
+            ctx.lineCap = 'round';
+            snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            if (drawTool === 'free') {
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
             }
         }
 
-        // Live Preview for AI Converter
+        function drawing(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const currentX = e.clientX - rect.left;
+            const currentY = e.clientY - rect.top;
+
+            if (drawTool === 'free') {
+                ctx.lineTo(currentX, currentY);
+                ctx.stroke();
+            } else if (drawTool === 'line') {
+                ctx.putImageData(snapshot, 0, 0);
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(currentX, currentY);
+                ctx.stroke();
+            } else if (drawTool === 'circle') {
+                ctx.putImageData(snapshot, 0, 0);
+                ctx.beginPath();
+                const radius = Math.sqrt(Math.pow(startX - currentX, 2) + Math.pow(startY - currentY, 2));
+                ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+                ctx.stroke();
+            }
+        }
+
+        function endDraw() {
+            isDrawing = false;
+        }
+
+        function insertDrawingToDoc() {
+            const dataUrl = canvas.toDataURL('image/png');
+            restoreSelection();
+            const img = document.createElement('img');
+            img.src = dataUrl;
+            img.style.maxWidth = '100%';
+            img.style.margin = '15px auto';
+            img.style.display = 'block';
+            img.style.borderRadius = '6px';
+            img.style.boxShadow = '0 2px 6px rgba(0,0,0,0.1)';
+
+            const sel = window.getSelection();
+            if (sel.rangeCount > 0) {
+                const range = sel.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(img);
+                range.setStartAfter(img);
+            } else {
+                document.getElementById('editor-content').appendChild(img);
+            }
+            closeDrawModal();
+        }
+
+        // Live Preview for Converter
         const aiInput = document.getElementById('ai-input');
         const aiOutput = document.getElementById('ai-output');
-
         aiInput.addEventListener('input', () => {
             aiOutput.innerHTML = aiInput.value.replace(/\n/g, '<br>');
-            if(window.MathJax) {
-                MathJax.typesetPromise([aiOutput]).catch((err) => console.log(err.message));
-            }
+            if (window.MathJax) MathJax.typesetPromise([aiOutput]).catch((err) => console.log(err));
         });
 
         async function pasteText() {
@@ -591,16 +755,10 @@
             }
         }
 
-        // Backend Connection for DOCX Download
+        // DOCX Downloader Backend Connection
         async function downloadDocx() {
-            const text = isEditorMode ? 
-                         document.getElementById('editor-content').innerText : 
-                         document.getElementById('ai-input').value;         
-
-            if (!text.trim()) {
-                alert('কোনো লেখা নেই! আগে কিছু টাইপ বা পেস্ট করুন।');
-                return;
-            }
+            const text = isEditorMode ? document.getElementById('editor-content').innerText : document.getElementById('ai-input').value;
+            if (!text.trim()) return alert('কোনো লেখা নেই!');
 
             const docTitle = document.getElementById('doc-title').value.trim() || 'SAHAL_TEC_Document';
             const btn = document.getElementById('download-btn');
@@ -616,7 +774,6 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ text })
                 });
-
                 if (!response.ok) throw new Error('সার্ভার এরর!');
 
                 const blob = await response.blob();
@@ -628,7 +785,6 @@
                 a.click();
                 a.remove();
                 window.URL.revokeObjectURL(url);
-                
             } catch (error) {
                 alert('ডাউনলোড ব্যর্থ হয়েছে: ' + error.message);
             } finally {
