@@ -54,7 +54,7 @@
         .margin-narrow { padding: 1.27cm; }
         .margin-wide { padding: 3.81cm; }
 
-        /* Mobile Optimization: Prevent horizontal overflow */
+        /* Mobile Optimization */
         @media (max-width: 768px) {
             .editor-page-container {
                 width: 95vw !important;
@@ -324,7 +324,7 @@
     <!-- Main Workspace Area -->
     <main class="flex-1 flex flex-col h-full min-w-0 w-full relative z-10 overflow-hidden">
         
-        <!-- Header (Fixed at the top, guaranteed visibility on mobile) -->
+        <!-- Header -->
         <header class="bg-white border-b border-gray-200 shadow-sm z-30 shrink-0 w-full relative">
             <div class="flex justify-between items-center px-3 md:px-6 py-2 border-b border-gray-100">
                 <div class="flex items-center gap-2 flex-grow min-w-0">
@@ -338,7 +338,7 @@
                     </span>
                 </div>
                 
-                <!-- Action Dropdown Button (Always Visible) -->
+                <!-- Action Dropdown Button -->
                 <div class="relative inline-block text-left shrink-0 ml-2">
                     <button onclick="toggleDropdown(event)" class="p-2 md:p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition focus:outline-none shadow-sm border border-gray-200">
                         <i class="fas fa-ellipsis-v md:fa-bars text-xl"></i>
@@ -370,7 +370,7 @@
                 </div>
             </div>
 
-            <!-- Page Setup Toolbar -->
+            <!-- Page Setup Toolbar (Direct Editor Mode) -->
             <div id="page-setup-toolbar" class="flex items-center gap-2 px-3 md:px-6 py-1.5 bg-slate-50 text-xs text-gray-700 border-b border-gray-200 overflow-x-auto whitespace-nowrap hide-scrollbar">
                 <span class="font-bold text-gray-500 flex items-center gap-1 shrink-0"><i class="fas fa-file-alt"></i> পেজ লেআউট:</span>
                 
@@ -533,27 +533,78 @@
 
             </div>
 
-            <!-- MODE 2: AI Chat Converter View -->
-            <div id="converter-view" class="hidden h-full w-full flex-col md:flex-row gap-4 p-2 md:p-4 overflow-y-auto md:overflow-hidden">
-                <div class="w-full md:w-1/2 h-[45vh] md:h-full flex flex-col bg-white rounded-xl shadow border border-gray-300 overflow-hidden shrink-0 md:shrink">
-                    <div class="bg-gray-100 p-2 md:p-3 border-b border-gray-300 flex justify-between items-center shrink-0">
-                        <label class="font-bold text-gray-700 text-xs md:text-sm ml-1">📝 পেস্ট করুন</label>
-                        <div class="flex gap-1 md:gap-2">
-                            <button onclick="pasteText()" class="text-xs bg-blue-100 text-blue-700 px-2 md:px-3 py-1 md:py-1.5 rounded font-bold hover:bg-blue-200 transition">পেস্ট</button>
-                            <button onclick="document.getElementById('ai-input').value=''; document.getElementById('ai-output').innerHTML=''" class="text-xs bg-red-100 text-red-700 px-2 md:px-3 py-1 md:py-1.5 rounded font-bold hover:bg-red-200 transition">ক্লিয়ার</button>
+            <!-- MODE 2: AI Chat Converter View (Enhanced & Connected) -->
+            <div id="converter-view" class="hidden h-full w-full flex-col md:flex-row gap-3 p-2 md:p-4 overflow-y-auto md:overflow-hidden">
+                
+                <!-- Left/Top: Input Area with Enhanced Quick Tools -->
+                <div class="w-full md:w-1/2 h-[48vh] md:h-full flex flex-col bg-white rounded-xl shadow border border-gray-300 overflow-hidden shrink-0 md:shrink">
+                    
+                    <!-- Input Header Toolbar -->
+                    <div class="bg-slate-100 p-2 md:p-2.5 border-b border-gray-300 flex justify-between items-center shrink-0">
+                        <span class="font-bold text-gray-700 text-xs md:text-sm flex items-center gap-1.5">
+                            <i class="fas fa-edit text-blue-600"></i> ইনপুট (LaTeX & Text)
+                        </span>
+                        
+                        <!-- Tool Actions -->
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="cleanAndFixMath()" class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded font-bold hover:bg-purple-200 transition flex items-center gap-1" title="চিহ্ন ও ফর্মুলা ব্র্যাকেট অটো-ক্লিন করুন">
+                                <i class="fas fa-magic"></i> অটো-ক্লিন
+                            </button>
+                            <button onclick="pasteText()" class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded font-bold hover:bg-blue-200 transition flex items-center gap-1">
+                                <i class="fas fa-paste"></i> পেস্ট
+                            </button>
+                            <button onclick="document.getElementById('ai-input').value=''; document.getElementById('ai-output').innerHTML=''; updateTextCounter();" class="text-xs bg-red-100 text-red-700 px-2.5 py-1 rounded font-bold hover:bg-red-200 transition flex items-center gap-1">
+                                <i class="fas fa-trash-alt"></i> ক্লিয়ার
+                            </button>
                         </div>
                     </div>
-                    <textarea id="ai-input" class="w-full h-full flex-grow p-3 md:p-4 focus:outline-none resize-none font-mono text-sm md:text-base bg-gray-50 overflow-y-auto" placeholder="ChatGPT বা AI থেকে কপি করা টেক্সট এখানে দিন..."></textarea>
+
+                    <textarea id="ai-input" class="w-full h-full flex-grow p-3 md:p-4 focus:outline-none resize-none font-mono text-sm md:text-base bg-gray-50 overflow-y-auto" placeholder="ChatGPT বা AI থেকে কপি করা টেক্সট ও সমীকরণ এখানে দিন..." oninput="handleConverterInput()"></textarea>
+
+                    <!-- Input Live Stats Footer -->
+                    <div class="bg-slate-50 px-3 py-1 border-t border-gray-200 flex justify-between items-center text-[11px] text-gray-500 shrink-0 font-medium">
+                        <span id="char-word-count">শব্দ: 0 | অক্ষর: 0 | সমীকরণ: 0</span>
+                        <span class="text-emerald-600 flex items-center gap-1"><i class="fas fa-bolt"></i> রিয়েলটাইম রেন্ডার</span>
+                    </div>
                 </div>
 
+                <!-- Right/Bottom: Live Output Preview with "Send to Editor" Engine -->
                 <div class="w-full md:w-1/2 h-[50vh] md:h-full flex flex-col bg-[#cbd5e1] rounded-xl shadow-inner border border-gray-300 overflow-hidden shrink-0 md:shrink">
-                    <div class="bg-gray-200 p-2 border-b border-gray-300 flex justify-center items-center shrink-0 shadow-sm z-10">
-                        <label class="font-bold text-gray-700 text-xs md:text-sm">👁️ লাইভ আউটপুট প্রিভিউ</label>
+                    
+                    <!-- Preview Header with Controls and "Send to Editor" -->
+                    <div class="bg-gray-200 px-3 py-2 border-b border-gray-300 flex justify-between items-center shrink-0 shadow-sm z-10">
+                        <span class="font-bold text-gray-700 text-xs md:text-sm flex items-center gap-1.5">
+                            <i class="fas fa-eye text-emerald-600"></i> লাইভ আউটপুট প্রিভিউ
+                        </span>
+
+                        <div class="flex items-center gap-1.5">
+                            <!-- Zoom Controls -->
+                            <div class="hidden sm:flex items-center bg-white border border-gray-300 rounded px-1 text-xs">
+                                <button onclick="adjustPreviewZoom(-0.1)" class="px-1.5 py-0.5 hover:text-blue-600 font-bold" title="ছোট করুন">-</button>
+                                <span id="preview-zoom-val" class="px-1 text-[10px] text-gray-500">100%</span>
+                                <button onclick="adjustPreviewZoom(0.1)" class="px-1.5 py-0.5 hover:text-blue-600 font-bold" title="বড় করুন">+</button>
+                            </div>
+
+                            <button onclick="copyPreviewText()" class="text-xs bg-white text-gray-700 border border-gray-300 px-2 py-1 rounded font-semibold hover:bg-gray-100 transition" title="রেন্ডার করা টেক্সট কপি করুন">
+                                <i class="fas fa-copy"></i>
+                            </button>
+
+                            <!-- SEND TO DIRECT EDITOR BUTTON -->
+                            <button onclick="sendPreviewToEditor()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded font-bold transition flex items-center gap-1 shadow-sm" title="এই সম্পূর্ণ লেখাটি মূল এডিটরে পাঠিয়ে এডিট করুন">
+                                <i class="fas fa-paper-plane"></i> এডিটরে পাঠান
+                            </button>
+                        </div>
                     </div>
+
+                    <!-- Scrollable Preview Sheet Container -->
                     <div class="flex-grow overflow-y-auto p-2 md:p-4 flex justify-center pb-10">
-                        <div id="ai-output" class="editor-page-container page-a4-portrait margin-normal p-6 text-base md:text-lg leading-relaxed text-justify h-auto min-h-full"></div>
+                        <div id="ai-output-wrapper" class="w-full flex justify-center origin-top transition-transform duration-200">
+                            <div id="ai-output" class="editor-page-container page-a4-portrait margin-normal p-6 text-base md:text-lg leading-relaxed text-justify h-auto min-h-full"></div>
+                        </div>
                     </div>
+
                 </div>
+
             </div>
 
         </div>
@@ -746,8 +797,6 @@
 
         function checkAndAutoPaginate(editable) {
             handleAutoSave();
-            
-            // Check overflow strictly
             if (editable.scrollHeight > editable.clientHeight + 4) {
                 splitContentToNextPage(editable);
             }
@@ -869,6 +918,82 @@
                     headerNo.classList.remove('hidden');
                 }
             });
+        }
+
+        // --- ENHANCED CONVERTER LOGIC & "SEND TO EDITOR" ENGINE ---
+        let previewZoomLevel = 1.0;
+
+        function handleConverterInput() {
+            const aiInput = document.getElementById('ai-input');
+            const aiOutput = document.getElementById('ai-output');
+            
+            aiOutput.innerHTML = aiInput.value.replace(/\n/g, '<br>');
+            if (window.MathJax) {
+                MathJax.typesetPromise([aiOutput]).catch((err) => console.log(err));
+            }
+            updateTextCounter();
+        }
+
+        function updateTextCounter() {
+            const text = document.getElementById('ai-input').value;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            const chars = text.length;
+            const equations = (text.match(/\$|\\\(|\\\[/g) || []).length / 2;
+            
+            document.getElementById('char-word-count').innerText = `শব্দ: ${words} | অক্ষর: ${chars} | সমীকরণ: ${Math.floor(equations)}`;
+        }
+
+        function cleanAndFixMath() {
+            const input = document.getElementById('ai-input');
+            let val = input.value;
+            if (!val) return;
+
+            // Auto converts LaTeX brackets to standard dollar math notation
+            val = val.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$');
+            val = val.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
+            val = val.replace(/\n{3,}/g, '\n\n');
+
+            input.value = val;
+            handleConverterInput();
+        }
+
+        function adjustPreviewZoom(delta) {
+            previewZoomLevel = Math.min(Math.max(0.6, previewZoomLevel + delta), 1.6);
+            document.getElementById('ai-output-wrapper').style.transform = `scale(${previewZoomLevel})`;
+            document.getElementById('preview-zoom-val').innerText = `${Math.round(previewZoomLevel * 100)}%`;
+        }
+
+        function copyPreviewText() {
+            const aiOutput = document.getElementById('ai-output');
+            if (!aiOutput.innerText.trim()) return alert("কপি করার মতো কোনো লেখা নেই!");
+            navigator.clipboard.writeText(aiOutput.innerText).then(() => {
+                alert("প্রিভিউয়ের টেক্সট সফলভাবে কপি হয়েছে!");
+            });
+        }
+
+        function sendPreviewToEditor() {
+            const aiOutput = document.getElementById('ai-output');
+            if (!aiOutput.innerHTML.trim()) {
+                alert("কোনো কনটেন্ট নেই! আগে ইনপুট দিন।");
+                return;
+            }
+
+            // Transfer directly into the active direct editor
+            const firstEditable = document.querySelector('#editor-pages-container .page-content-editable');
+            if (firstEditable) {
+                firstEditable.innerHTML = aiOutput.innerHTML;
+                if (window.MathJax) {
+                    MathJax.typesetPromise([firstEditable]).catch(() => {});
+                }
+            }
+
+            // Automatically switch back to Direct Editor mode
+            if (!isEditorMode) {
+                toggleMode();
+            }
+
+            handleAutoSave();
+            alert("কনটেন্ট সফলভাবে সরাসরি এডিটরে স্থানান্তরিত হয়েছে!");
         }
 
         // --- FOLDER MANAGEMENT SYSTEM ---
@@ -1533,23 +1658,19 @@
                 pageSetupToolbar.classList.add('hidden');
                 formattingToolbar.classList.add('hidden');
                 toggleBtn.innerHTML = '<i class="fas fa-pen w-5 text-center text-lg"></i> সরাসরি এডিটরে ফিরুন';
+                
+                // Trigger math preview once opened
+                handleConverterInput();
             }
             document.getElementById('action-dropdown').classList.add('hidden');
         }
 
-        // Live Converter Preview
-        const aiInput = document.getElementById('ai-input');
-        const aiOutput = document.getElementById('ai-output');
-        aiInput.addEventListener('input', () => {
-            aiOutput.innerHTML = aiInput.value.replace(/\n/g, '<br>');
-            if (window.MathJax) MathJax.typesetPromise([aiOutput]).catch(() => {});
-        });
-
         async function pasteText() {
             try {
                 const text = await navigator.clipboard.readText();
-                aiInput.value += text;
-                aiInput.dispatchEvent(new Event('input'));
+                const input = document.getElementById('ai-input');
+                input.value += text;
+                handleConverterInput();
             } catch (err) {
                 alert('ব্রাউজার ব্লক করেছে। দয়া করে পেস্ট করুন।');
             }
