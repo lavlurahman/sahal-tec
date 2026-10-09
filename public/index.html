@@ -11,7 +11,7 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- MathJax Configuration for Converter & Editor -->
+    <!-- MathJax Configuration -->
     <script>
         window.MathJax = {
             tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['[', ']']] },
@@ -47,10 +47,10 @@
 <body class="flex h-screen w-screen overflow-hidden bg-gray-200">
 
     <!-- Mobile Sidebar Overlay -->
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden" onclick="toggleSidebar()"></div>
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
 
     <!-- Sidebar: Folder & File Management -->
-    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-40 w-64 bg-[#111827] text-white flex flex-col h-full shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none">
+    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-50 w-64 bg-[#111827] text-white flex flex-col h-full shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none">
         <div class="p-5 border-b border-gray-800 flex justify-between items-center">
             <h2 class="text-xl font-bold tracking-wide">SAHAL TEC</h2>
             <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
@@ -89,13 +89,13 @@
     </aside>
 
     <!-- Main Content Area -->
-    <main class="flex-1 flex flex-col h-full min-w-0 w-full relative">
+    <main class="flex-1 flex flex-col h-full min-w-0 w-full relative z-10">
         
-        <!-- Top Toolbar -->
-        <header class="bg-white border-b border-gray-200 shadow-sm z-10 shrink-0 w-full">
-            <!-- Top Row: File Name & Action Buttons -->
+        <!-- Top Toolbar Header -->
+        <header class="bg-white border-b border-gray-200 shadow-sm z-30 shrink-0 w-full relative">
+            
+            <!-- Top Row: File Name & Action Menu -->
             <div class="flex justify-between items-center px-3 md:px-6 py-2 md:py-3 border-b border-gray-100">
-                
                 <div class="flex items-center gap-2 w-full md:w-auto">
                     <!-- Mobile Sidebar Toggle -->
                     <button onclick="toggleSidebar()" class="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded focus:outline-none">
@@ -104,13 +104,14 @@
                     <input type="text" value="Untitled Document" class="text-base md:text-xl font-bold text-gray-700 outline-none hover:bg-gray-50 px-2 py-1 rounded w-full md:w-64 border-b border-transparent focus:border-blue-500 transition">
                 </div>
                 
-                <!-- Action Menu (3 Dots on mobile, bars on desktop) -->
+                <!-- 3 Dots Action Menu -->
                 <div class="relative inline-block text-left shrink-0 ml-2 md:ml-4">
                     <button onclick="toggleDropdown(event)" class="p-2 md:p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition focus:outline-none shadow-sm border border-gray-200">
                         <i class="fas fa-ellipsis-v md:fa-bars text-xl px-1"></i>
                     </button>
                     
-                    <div id="action-dropdown" class="hidden absolute right-0 mt-2 w-56 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-lg shadow-xl outline-none z-50 overflow-hidden">
+                    <!-- Fixed Z-Index & Overlay Dropdown Menu -->
+                    <div id="action-dropdown" class="hidden absolute right-0 mt-2 w-56 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-lg shadow-2xl outline-none z-50 overflow-hidden">
                         <div class="py-1 bg-gray-50">
                             <button id="mode-toggle-btn" onclick="toggleMode()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-indigo-700 hover:bg-indigo-100 font-bold transition">
                                 <i class="fas fa-robot w-5 text-center text-lg"></i> এআই কনভার্টার চালু
@@ -125,7 +126,6 @@
                             </button>
                         </div>
                         <div class="py-1">
-                            <!-- Download Button connected to Backend -->
                             <button id="download-btn" onclick="downloadDocx()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-green-600 hover:bg-green-50 font-semibold transition">
                                 <i class="fas fa-download w-5 text-center text-lg"></i> <span id="download-text">ডাউনলোড</span>
                             </button>
@@ -150,26 +150,26 @@
                 
                 <div class="w-px h-6 bg-gray-300 mx-1 shrink-0"></div>
                 
-                <!-- Text Styling Buttons -->
+                <!-- Formatting Buttons -->
                 <button onclick="formatDoc('bold')" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg font-bold transition" title="Bold">B</button>
                 <button onclick="formatDoc('italic')" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg italic transition" title="Italic">I</button>
                 <button onclick="formatDoc('underline')" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg underline transition" title="Underline">U</button>
                 
-                <!-- Text Color (Selection Fix) -->
-                <label onmousedown="saveSelection()" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center cursor-pointer text-red-500 font-serif text-lg font-bold transition" title="Text Color">
+                <!-- Text Color Picker with Selection Retention -->
+                <label onmousedown="saveSelection()" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center cursor-pointer text-red-500 font-serif text-lg font-bold transition border border-gray-200" title="Text Color">
                     A
                     <input type="color" oninput="formatColor(this.value)" onchange="formatColor(this.value)" class="hidden">
                 </label>
 
-                <!-- Highlight Color -->
-                <label onmousedown="saveSelection()" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center cursor-pointer text-yellow-500 transition" title="Highlight Color">
+                <!-- Highlight Color Picker -->
+                <label onmousedown="saveSelection()" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center cursor-pointer text-yellow-500 transition border border-gray-200" title="Highlight Color">
                     <i class="fas fa-highlighter"></i>
                     <input type="color" value="#fef08a" oninput="formatHighlight(this.value)" onchange="formatHighlight(this.value)" class="hidden">
                 </label>
                 
                 <div class="w-px h-6 bg-gray-300 mx-1 shrink-0"></div>
 
-                <!-- Alignment Tools -->
+                <!-- Text Alignments -->
                 <button onclick="formatDoc('justifyLeft')" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Align Left"><i class="fas fa-align-left"></i></button>
                 <button onclick="formatDoc('justifyCenter')" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Align Center"><i class="fas fa-align-center"></i></button>
                 <button onclick="formatDoc('justifyRight')" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Align Right"><i class="fas fa-align-right"></i></button>
@@ -188,7 +188,7 @@
         </header>
 
         <!-- Workspace Area -->
-        <div class="flex-1 relative bg-[#cbd5e1] overflow-hidden w-full">
+        <div class="flex-1 relative bg-[#cbd5e1] overflow-hidden w-full z-0">
             
             <!-- MODE 1: Direct Editor View -->
             <div id="editor-view" class="h-full w-full overflow-y-auto flex justify-center py-4 md:py-8 px-2 md:px-4">
@@ -201,7 +201,7 @@
             <!-- MODE 2: AI Chat Converter View -->
             <div id="converter-view" class="hidden h-full w-full flex-col md:flex-row gap-4 p-2 md:p-4 overflow-y-auto md:overflow-hidden">
                 
-                <!-- Left/Top: Input Area -->
+                <!-- Left: Input Area -->
                 <div class="w-full md:w-1/2 h-[45vh] md:h-full flex flex-col bg-white rounded-xl shadow border border-gray-300 overflow-hidden shrink-0 md:shrink">
                     <div class="bg-gray-100 p-2 md:p-3 border-b border-gray-300 flex justify-between items-center shrink-0">
                         <label class="font-bold text-gray-700 text-xs md:text-sm ml-1">📝 পেস্ট করুন</label>
@@ -213,7 +213,7 @@
                     <textarea id="ai-input" class="w-full h-full flex-grow p-3 md:p-4 focus:outline-none resize-none font-mono text-sm md:text-base bg-gray-50 overflow-y-auto" placeholder="ChatGPT বা AI থেকে কপি করা টেক্সট এখানে দিন..."></textarea>
                 </div>
 
-                <!-- Right/Bottom: Live Preview -->
+                <!-- Right: Live Preview -->
                 <div class="w-full md:w-1/2 h-[50vh] md:h-full flex flex-col bg-[#cbd5e1] rounded-xl shadow-inner border border-gray-300 overflow-hidden shrink-0 md:shrink">
                     <div class="bg-gray-200 p-2 border-b border-gray-300 flex justify-center items-center shrink-0 shadow-sm z-10">
                         <label class="font-bold text-gray-700 text-xs md:text-sm">👁️ লাইভ আউটপুট প্রিভিউ</label>
@@ -247,7 +247,7 @@
         window.onclick = function(event) {
             const dropdown = document.getElementById('action-dropdown');
             if (!event.target.closest('.relative')) {
-                if (!dropdown.classList.contains('hidden')) {
+                if (dropdown && !dropdown.classList.contains('hidden')) {
                     dropdown.classList.add('hidden');
                 }
             }
@@ -287,7 +287,7 @@
             document.getElementById('action-dropdown').classList.add('hidden');
         }
 
-        // --- SELECTION PRESERVATION LOGIC FOR COLOR PICKER ---
+        // Selection Preservation Logic for Color Picker
         let savedRange = null;
 
         function saveSelection() {
@@ -305,7 +305,7 @@
             }
         }
 
-        // --- DIRECT EDITOR FORMATTING FUNCTIONS ---
+        // Formatting Functions
         function formatDoc(command, value = null) {
             document.execCommand(command, false, value);
             const editorPage = document.querySelector('#editor-view .editor-page');
@@ -397,7 +397,6 @@
             }
         });
 
-        // Helper for pasting text
         async function pasteText() {
             try {
                 const text = await navigator.clipboard.readText();
