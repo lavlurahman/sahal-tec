@@ -67,6 +67,11 @@
         .border-double-thick { border: 4px double #1e293b !important; padding: 15px; }
         .border-dashed-thin { border: 2px dashed #64748b !important; padding: 15px; }
 
+        /* Column Layouts */
+        .cols-1 { column-count: 1; }
+        .cols-2 { column-count: 2; column-gap: 24px; column-rule: 1px dashed #cbd5e1; }
+        .cols-3 { column-count: 3; column-gap: 18px; column-rule: 1px dashed #cbd5e1; }
+
         /* Header and Footer Areas */
         .page-header-area {
             border-bottom: 1px dashed #cbd5e1;
@@ -128,18 +133,9 @@
             vertical-align: middle;
             transition: all 0.25s ease;
         }
-        .image-wrapper img {
-            width: 100%;
-            height: auto;
-            display: block;
-            border-radius: 4px;
-        }
-        .image-wrapper.selected {
-            outline: 2px dashed #2563eb;
-            outline-offset: 4px;
-        }
+        .image-wrapper img { width: 100%; height: auto; display: block; border-radius: 4px; }
+        .image-wrapper.selected { outline: 2px dashed #2563eb; outline-offset: 4px; }
         
-        /* Image View Styles (3D, Polaroid, Glow) */
         .img-style-default img { box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .img-style-3d img { 
             transform: perspective(600px) rotateY(-8deg) rotateX(4deg); 
@@ -186,17 +182,38 @@
         }
         .image-wrapper.selected .img-toolbar { display: flex; }
 
-        /* Advanced Table Styles */
+        /* Advanced Table Resizing and Positioning */
+        .table-container {
+            position: relative;
+            margin: 15px 0;
+            display: block;
+            width: 100%;
+        }
+        .table-move-handle {
+            display: inline-flex;
+            cursor: move;
+            background: #0f172a;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px 4px 0 0;
+            font-size: 10px;
+            user-select: none;
+        }
         .styled-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 15px 0;
+            table-layout: auto;
             position: relative;
         }
         .styled-table td, .styled-table th {
             padding: 8px 12px;
-            min-width: 40px;
+            min-width: 45px;
             position: relative;
+            resize: horizontal;
+            overflow: auto;
+        }
+        .styled-table td:focus, .styled-table th:focus {
+            outline: 2px solid #2563eb;
         }
         .table-theme-classic td, .table-theme-classic th { border: 1px solid #64748b; }
         .table-theme-striped tr:nth-child(even) { background-color: #f8fafc; }
@@ -204,10 +221,33 @@
         .table-theme-modern th { background-color: #1e293b; color: white; font-weight: bold; }
         .table-theme-modern td { border-bottom: 1px solid #e2e8f0; }
 
-        @media (max-width: 768px) {
-            .editor-page-container { width: 100% !important; min-height: auto !important; margin: 10px 0; }
-            .margin-normal, .margin-narrow, .margin-wide { padding: 1.25rem !important; }
-            .watermark-overlay { font-size: 2.5rem; }
+        /* STRICT PRINT STYLES (No dropdown, no background, strictly document paper) */
+        @media print {
+            body, html {
+                background: transparent !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+            body * {
+                visibility: hidden !important;
+            }
+            #editor-view, #paper-page, #paper-page * {
+                visibility: visible !important;
+            }
+            #paper-page {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                margin: 0 !important;
+                padding: 1.5cm !important;
+                width: 100% !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+            #action-dropdown, header, aside, .table-move-handle, .img-toolbar, .resize-handle {
+                display: none !important;
+            }
         }
 
         /* Custom Scrollbar */
@@ -273,6 +313,11 @@
                         <i class="fas fa-bars text-xl"></i>
                     </button>
                     <input type="text" id="doc-title" value="Untitled Document" class="text-base md:text-xl font-bold text-gray-700 outline-none hover:bg-gray-50 px-2 py-1 rounded w-full md:w-64 border-b border-transparent focus:border-blue-500 transition">
+                    
+                    <!-- Auto-save notification badge -->
+                    <span id="save-status-badge" class="hidden text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <i class="fas fa-check-circle"></i> অটো-সেভড
+                    </span>
                 </div>
                 
                 <!-- Action Dropdown Button -->
@@ -288,15 +333,15 @@
                             </button>
                         </div>
                         <div class="py-1">
-                            <button class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 font-semibold transition">
-                                <i class="fas fa-save w-5 text-center text-lg"></i> সেভ করুন
+                            <button onclick="manualSaveDoc()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 font-semibold transition">
+                                <i class="fas fa-save w-5 text-center text-lg"></i> সেভ করুন (Manual)
                             </button>
                         </div>
                         <div class="py-1">
                             <button id="download-btn" onclick="downloadDocx()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-green-600 hover:bg-green-50 font-semibold transition">
                                 <i class="fas fa-download w-5 text-center text-lg"></i> <span id="download-text">ডাউনলোড (DOCX)</span>
                             </button>
-                            <button onclick="window.print()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-800 hover:bg-gray-100 font-semibold transition">
+                            <button onclick="triggerPrintClean()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-800 hover:bg-gray-100 font-semibold transition">
                                 <i class="fas fa-print w-5 text-center text-lg"></i> প্রিন্ট
                             </button>
                         </div>
@@ -304,7 +349,7 @@
                 </div>
             </div>
 
-            <!-- Page Setup Toolbar -->
+            <!-- Page Setup Toolbar (Including Multi-Columns) -->
             <div id="page-setup-toolbar" class="flex items-center gap-2 px-3 md:px-6 py-1.5 bg-slate-50 text-xs text-gray-700 border-b border-gray-200 overflow-x-auto whitespace-nowrap hide-scrollbar">
                 <span class="font-bold text-gray-500 flex items-center gap-1 shrink-0"><i class="fas fa-file-alt"></i> পেজ লেআউট:</span>
                 
@@ -332,7 +377,13 @@
                     <option value="dashed">বর্ডার: ড্যাশড</option>
                 </select>
 
-                <!-- Page Numbering Style -->
+                <!-- Column Layout Selector -->
+                <select id="pageColumnSelect" onchange="applyPageLayout()" class="border border-gray-300 rounded px-1.5 py-1 bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0 font-medium text-slate-800">
+                    <option value="1">কলাম: ১টি (স্বাভাবিক)</option>
+                    <option value="2">কলাম: ২টি (প্রশ্নপত্র/নোট)</option>
+                    <option value="3">কলাম: ৩টি</option>
+                </select>
+
                 <select id="pageNumberSelect" onchange="applyPageNumbering(this.value)" class="border border-gray-300 rounded px-1.5 py-1 bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0 font-medium text-blue-700">
                     <option value="none">পেজ নম্বর: বন্ধ</option>
                     <option value="bottom-center" selected>পেজ নং: নিচে মাঝে (Page 1)</option>
@@ -404,19 +455,18 @@
 
                 <div class="w-px h-5 bg-gray-300 mx-1 shrink-0"></div>
 
-                <!-- Equation, Drawing & Table Modals -->
                 <button onclick="openMathModal()" class="px-2.5 py-0.5 shrink-0 text-xs font-bold bg-blue-50 text-blue-700 rounded hover:bg-blue-100 flex items-center gap-1 transition">
                     <i class="fas fa-square-root-variable"></i> সমীকরণ
                 </button>
                 <button onclick="openDrawModal()" class="px-2.5 py-0.5 shrink-0 text-xs font-bold bg-purple-50 text-purple-700 rounded hover:bg-purple-100 flex items-center gap-1 transition">
-                    <i class="fas fa-paint-brush"></i> চিত্র/ড্রয়িং
+                    <i class="fas fa-paint-brush"></i> চিত্র/জ্যামিতি
                 </button>
                 <button onclick="openTableModal()" class="px-2.5 py-0.5 shrink-0 text-xs font-bold bg-teal-50 text-teal-700 rounded hover:bg-teal-100 flex items-center gap-1 transition">
                     <i class="fas fa-table"></i> টেবিল
                 </button>
             </div>
 
-            <!-- Table Dynamic Edit Ribbon (Appears contextually or as quick tools) -->
+            <!-- Dynamic Table Control Ribbon -->
             <div id="table-tools-ribbon" class="hidden flex items-center gap-2 px-3 md:px-6 py-1 bg-teal-900 text-white text-xs overflow-x-auto whitespace-nowrap">
                 <span class="font-bold flex items-center gap-1"><i class="fas fa-tools"></i> টেবিল কন্ট্রোল:</span>
                 <button onclick="addTableRow('above')" class="px-2 py-0.5 bg-teal-800 hover:bg-teal-700 rounded">+ রো উপরে</button>
@@ -427,11 +477,6 @@
                 <button onclick="getTableCol('right')" class="px-2 py-0.5 bg-teal-800 hover:bg-teal-700 rounded">+ কলাম ডানে</button>
                 <button onclick="deleteTableCol()" class="px-2 py-0.5 bg-red-800 hover:bg-red-700 rounded">- কলাম মুছুন</button>
                 <div class="w-px h-4 bg-teal-700"></div>
-                <select onchange="changeTableTheme(this.value)" class="bg-teal-800 text-white border border-teal-600 rounded px-1.5 py-0.5 outline-none">
-                    <option value="table-theme-classic">ক্লাসিক বর্ডার</option>
-                    <option value="table-theme-striped">স্ট্রাইপড থিম</option>
-                    <option value="table-theme-modern">মডার্ন ডার্ক হেড</option>
-                </select>
                 <button onclick="deleteWholeTable()" class="px-2 py-0.5 bg-red-600 hover:bg-red-700 rounded font-bold ml-auto"><i class="fas fa-trash"></i> টেবিল রিমুভ</button>
             </div>
         </header>
@@ -442,33 +487,29 @@
             <!-- MODE 1: Direct Editor View -->
             <div id="editor-view" class="h-full w-full overflow-y-auto flex flex-col items-center py-6 px-2 md:px-4" onclick="deselectImages(event)">
                 
-                <!-- Paper Container with outer margins -->
+                <!-- Paper Container -->
                 <div id="paper-page" class="editor-page-container page-a4-portrait margin-normal">
                     
-                    <!-- Paper Inner Frame -->
                     <div id="paper-inner-frame" class="page-inner-frame border-solid-thin">
-                        
-                        <!-- Watermark -->
                         <div id="watermark-layer" class="watermark-overlay hidden">লাভলু</div>
 
-                        <!-- Editable Header Area -->
+                        <!-- Editable Header -->
                         <div id="page-header" class="page-header-area">
-                            <span contenteditable="true" class="outline-none" placeholder="কাস্টম হেডার লিখুন...">SAHAL TEC পাবলিকেশন নোটস</span>
+                            <span contenteditable="true" class="outline-none" placeholder="কাস্টম হেডার...">SAHAL TEC পাবলিকেশন নোটস</span>
                             <span id="header-page-no" class="hidden font-mono font-semibold">Page 1</span>
                         </div>
 
-                        <!-- ContentEditable Area with word wrapping -->
-                        <div id="editor-content" contenteditable="true" class="editor-content text-base md:text-lg leading-relaxed text-justify" oninput="recordHistory()">
+                        <!-- Content Area with Multi-Column Support -->
+                        <div id="editor-content" contenteditable="true" class="editor-content text-base md:text-lg leading-relaxed text-justify cols-1" oninput="handleContentInput()">
                             <h1 style="font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 20px;">উচ্চতর গণিত ও পদার্থবিজ্ঞান নোটস</h1>
-                            <p>এখানে আপনি সরাসরি টাইপ করতে পারবেন। ক্যালকুলাস, ম্যাট্রিক্স, ড্রয়িং এবং টেবিল টুলবার থেকে সহজেই যোগ ও কাস্টমাইজ করা যাবে।</p>
+                            <p>এখানে আপনি সরাসরি টাইপ করতে পারবেন। উপরে পেজ লেআউট থেকে ২ কলাম বা ৩ কলামে রূপান্তর করা যাবে এবং লেখা স্বয়ংক্রিয়ভাবে অটো-সেভ হবে।</p>
                         </div>
 
-                        <!-- Editable Footer Area -->
+                        <!-- Editable Footer -->
                         <div id="page-footer" class="page-footer-area">
                             <span contenteditable="true" class="outline-none" placeholder="ফুটার তথ্য...">গোপনীয় ও স্বত্বাধিকার সংরক্ষিত</span>
                             <span id="footer-page-no" class="font-mono font-semibold">Page 1</span>
                         </div>
-
                     </div>
 
                 </div>
@@ -501,7 +542,7 @@
         </div>
     </main>
 
-    <!-- 1. COMPREHENSIVE MATH & CALCULUS & MATRIX MODAL -->
+    <!-- 1. ADVANCED MATH MODAL -->
     <div id="math-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-3 hidden">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden border border-gray-200 flex flex-col max-h-[90vh]">
             <div class="bg-blue-700 text-white px-5 py-3 flex justify-between items-center shrink-0">
@@ -509,16 +550,14 @@
                 <button onclick="closeMathModal()" class="text-white hover:text-gray-200"><i class="fas fa-times text-lg"></i></button>
             </div>
 
-            <!-- Mathematical Category Tabs -->
             <div class="flex border-b border-gray-200 bg-slate-100 text-xs font-semibold overflow-x-auto shrink-0">
-                <button onclick="switchMathTab('basic')" id="tab-btn-basic" class="px-4 py-2 text-blue-700 border-b-2 border-blue-700 bg-white">সাধারণ ও বীজগণিত</button>
+                <button onclick="switchMathTab('basic')" id="tab-btn-basic" class="px-4 py-2 text-blue-700 border-b-2 border-blue-700 bg-white font-bold">সাধারণ ও বীজগণিত</button>
                 <button onclick="switchMathTab('calculus')" id="tab-btn-calculus" class="px-4 py-2 text-gray-600 hover:text-blue-700">ক্যালকুলাস ও লিমিট</button>
                 <button onclick="switchMathTab('matrix')" id="tab-btn-matrix" class="px-4 py-2 text-gray-600 hover:text-blue-700">ম্যাট্রিক্স ও ভেক্টর</button>
                 <button onclick="switchMathTab('greek')" id="tab-btn-greek" class="px-4 py-2 text-gray-600 hover:text-blue-700">গ্রিক বর্ণমালা ও অপারেটর</button>
             </div>
             
             <div class="p-4 space-y-3 overflow-y-auto">
-                <!-- Tab 1: Basic Math -->
                 <div id="tab-content-basic" class="math-tab-panel flex flex-wrap gap-1.5 p-2 bg-slate-50 border rounded-lg">
                     <button onclick="insertLatexSnippet('\\frac{a}{b}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\frac{a}{b}$</button>
                     <button onclick="insertLatexSnippet('\\sqrt{x}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\sqrt{x}$</button>
@@ -533,7 +572,6 @@
                     <button onclick="insertLatexSnippet('\\infty')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\infty$</button>
                 </div>
 
-                <!-- Tab 2: Calculus -->
                 <div id="tab-content-calculus" class="math-tab-panel hidden flex flex-wrap gap-1.5 p-2 bg-slate-50 border rounded-lg">
                     <button onclick="insertLatexSnippet('\\frac{d}{dx}f(x)')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\frac{d}{dx}$</button>
                     <button onclick="insertLatexSnippet('\\frac{\\partial f}{\\partial x}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\frac{\partial}{\partial x}$</button>
@@ -547,7 +585,6 @@
                     <button onclick="insertLatexSnippet('\\prod_{i=1}^{n} x_i')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\prod_{i=1}^n$</button>
                 </div>
 
-                <!-- Tab 3: Matrix & Vectors -->
                 <div id="tab-content-matrix" class="math-tab-panel hidden flex flex-wrap gap-1.5 p-2 bg-slate-50 border rounded-lg">
                     <button onclick="insertLatexSnippet('\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\begin{pmatrix}a&b\\c&d\end{pmatrix}$</button>
                     <button onclick="insertLatexSnippet('\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\begin{bmatrix}a&b\\c&d\end{bmatrix}$</button>
@@ -555,23 +592,16 @@
                     <button onclick="insertLatexSnippet('\\begin{pmatrix} x \\\\ y \\\\ z \\end{pmatrix}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">কলাম ভেক্টর</button>
                     <button onclick="insertLatexSnippet('\\vec{v}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\vec{v}$</button>
                     <button onclick="insertLatexSnippet('\\hat{i} + \\hat{j} + \\hat{k}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\hat{i},\hat{j},\hat{k}$</button>
-                    <button onclick="insertLatexSnippet('\\nabla \\cdot \\vec{E}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\nabla \cdot$</button>
-                    <button onclick="insertLatexSnippet('\\nabla \\times \\vec{B}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\nabla \times$</button>
                 </div>
 
-                <!-- Tab 4: Greek & Operators -->
                 <div id="tab-content-greek" class="math-tab-panel hidden flex flex-wrap gap-1.5 p-2 bg-slate-50 border rounded-lg">
                     <button onclick="insertLatexSnippet('\\alpha')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\alpha$</button>
                     <button onclick="insertLatexSnippet('\\beta')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\beta$</button>
-                    <button onclick="insertLatexSnippet('\\gamma')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\gamma$</button>
                     <button onclick="insertLatexSnippet('\\theta')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\theta$</button>
                     <button onclick="insertLatexSnippet('\\lambda')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\lambda$</button>
-                    <button onclick="insertLatexSnippet('\\mu')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\mu$</button>
                     <button onclick="insertLatexSnippet('\\pi')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\pi$</button>
-                    <button onclick="insertLatexSnippet('\\sigma')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\sigma$</button>
                     <button onclick="insertLatexSnippet('\\omega')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\omega$</button>
                     <button onclick="insertLatexSnippet('\\Delta')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\Delta$</button>
-                    <button onclick="insertLatexSnippet('\\Omega')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\Omega$</button>
                 </div>
 
                 <div>
@@ -594,49 +624,48 @@
         </div>
     </div>
 
-    <!-- 2. ADVANCED DRAWING & SKETCH MODAL WITH SHAPES & STYLES -->
+    <!-- 2. ADVANCED GEOMETRY & SKETCH BOARD -->
     <div id="draw-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-3 hidden">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden border border-gray-200 flex flex-col">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden border border-gray-200 flex flex-col">
             <div class="bg-purple-800 text-white px-5 py-3 flex justify-between items-center">
-                <h3 class="font-bold text-base flex items-center gap-2"><i class="fas fa-paint-brush"></i> চিত্র ও ডায়াগ্রাম আর্টবোর্ড</h3>
+                <h3 class="font-bold text-base flex items-center gap-2"><i class="fas fa-shapes"></i> জ্যামিতি ও গ্রাফিক্স ড্রয়িং বোর্ড</h3>
                 <button onclick="closeDrawModal()" class="text-white hover:text-gray-200"><i class="fas fa-times text-lg"></i></button>
             </div>
             
-            <!-- Complete Shape & Line Styles Ribbon -->
             <div class="bg-slate-100 p-2.5 flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 text-xs">
-                <div class="flex items-center gap-1.5 flex-wrap">
-                    <span class="font-bold text-gray-600">টুল:</span>
+                <div class="flex items-center gap-1 flex-wrap">
+                    <span class="font-bold text-gray-600">টুলস:</span>
                     <button id="draw-tool-free" onclick="setDrawTool('free')" class="px-2 py-1 bg-purple-100 text-purple-700 font-bold rounded border border-purple-300">পেনসিল</button>
-                    <button id="draw-tool-line" onclick="setDrawTool('line')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">রেখা</button>
-                    <button id="draw-tool-arrow" onclick="setDrawTool('arrow')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">তীর/ভেক্টর</button>
+                    <button id="draw-tool-line" onclick="setDrawTool('line')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">সরলরেখা</button>
+                    <button id="draw-tool-arrow" onclick="setDrawTool('arrow')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">ভেক্টর তীর</button>
+                    <button id="draw-tool-triangle" onclick="setDrawTool('triangle')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">ত্রিভুজ</button>
                     <button id="draw-tool-rect" onclick="setDrawTool('rect')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">আয়তক্ষেত্র</button>
                     <button id="draw-tool-circle" onclick="setDrawTool('circle')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">বৃত্ত</button>
+                    <button id="draw-tool-axis" onclick="setDrawTool('axis')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">X-Y অক্ষ</button>
                     <button id="draw-tool-text" onclick="setDrawTool('text')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">টেক্সট</button>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <span class="font-bold text-gray-600">স্টাইল:</span>
                     <select id="drawLineStyle" class="border border-gray-300 rounded p-1 bg-white outline-none">
                         <option value="solid">সলিড লাইন</option>
                         <option value="dashed">ড্যাশড লাইন</option>
                         <option value="dotted">ডটেড লাইন</option>
                     </select>
 
-                    <span class="font-bold text-gray-600 ml-1">পুরুত্ব:</span>
                     <select id="drawLineWidth" class="border border-gray-300 rounded p-1 bg-white outline-none">
                         <option value="2">2px</option>
                         <option value="4" selected>4px</option>
                         <option value="6">6px</option>
                     </select>
 
-                    <input type="color" id="drawColor" value="#000000" class="w-6 h-6 border rounded cursor-pointer ml-1">
+                    <input type="color" id="drawColor" value="#000000" class="w-6 h-6 border rounded cursor-pointer">
                 </div>
 
                 <button onclick="clearCanvas()" class="px-2.5 py-1 bg-red-100 text-red-700 rounded font-bold hover:bg-red-200"><i class="fas fa-trash-alt"></i> মুছুন</button>
             </div>
 
             <div class="p-4 bg-gray-200 flex justify-center">
-                <canvas id="sketchCanvas" width="650" height="340" class="bg-white rounded border border-gray-400 shadow cursor-crosshair"></canvas>
+                <canvas id="sketchCanvas" width="700" height="350" class="bg-white rounded border border-gray-400 shadow cursor-crosshair"></canvas>
             </div>
 
             <div class="bg-gray-100 px-5 py-3 flex justify-between items-center border-t">
@@ -657,7 +686,7 @@
         </div>
     </div>
 
-    <!-- 3. TABLE CREATION MODAL -->
+    <!-- 3. TABLE MODAL -->
     <div id="table-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-3 hidden">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-200 flex flex-col">
             <div class="bg-teal-700 text-white px-5 py-3 flex justify-between items-center">
@@ -669,7 +698,7 @@
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">সারি (Rows):</label>
-                        <input type="number" id="newTableRows" value="3" min="1" max="20" class="w-full border rounded p-2 text-center text-sm">
+                        <input type="number" id="newTableRows" value="3" min="1" max="25" class="w-full border rounded p-2 text-center text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">কলাম (Cols):</label>
@@ -695,7 +724,62 @@
     </div>
 
     <script>
-        // --- CUSTOM HISTORY & SELECTION MANAGEMENT ---
+        // --- AUTO-SAVE ENGINE & LOCAL STORAGE ---
+        let autoSaveTimer = null;
+
+        function handleContentInput() {
+            recordHistory();
+            const badge = document.getElementById('save-status-badge');
+            badge.classList.remove('hidden');
+            badge.innerHTML = '<i class="fas fa-sync fa-spin"></i> সেভ হচ্ছে...';
+
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                const docData = {
+                    title: document.getElementById('doc-title').value,
+                    content: document.getElementById('editor-content').innerHTML,
+                    pageSize: document.getElementById('pageSizeSelect').value,
+                    pageOrientation: document.getElementById('pageOrientationSelect').value,
+                    pageMargin: document.getElementById('pageMarginSelect').value,
+                    pageBorder: document.getElementById('pageBorderSelect').value,
+                    pageColumn: document.getElementById('pageColumnSelect').value
+                };
+                localStorage.setItem('sahal_tec_doc_autosave', JSON.stringify(docData));
+                badge.innerHTML = '<i class="fas fa-check-circle"></i> অটো-সেভড';
+            }, 1200);
+        }
+
+        function restoreAutoSavedData() {
+            const saved = localStorage.getItem('sahal_tec_doc_autosave');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    if (data.title) document.getElementById('doc-title').value = data.title;
+                    if (data.content) document.getElementById('editor-content').innerHTML = data.content;
+                    if (data.pageSize) document.getElementById('pageSizeSelect').value = data.pageSize;
+                    if (data.pageOrientation) document.getElementById('pageOrientationSelect').value = data.pageOrientation;
+                    if (data.pageMargin) document.getElementById('pageMarginSelect').value = data.pageMargin;
+                    if (data.pageBorder) document.getElementById('pageBorderSelect').value = data.pageBorder;
+                    if (data.pageColumn) document.getElementById('pageColumnSelect').value = data.pageColumn;
+                    applyPageLayout();
+                } catch(e) {}
+            }
+        }
+
+        function manualSaveDoc() {
+            handleContentInput();
+            alert('ডকুমেন্টটি সফলভাবে ব্রাউজারে সংরক্ষিত হয়েছে!');
+            document.getElementById('action-dropdown').classList.add('hidden');
+        }
+
+        // --- STRICT CLEAN PRINT ENGINE ---
+        function triggerPrintClean() {
+            document.getElementById('action-dropdown').classList.add('hidden');
+            deselectImages();
+            window.print();
+        }
+
+        // --- HISTORY STACK ---
         let undoStack = [];
         let redoStack = [];
         const MAX_HISTORY = 40;
@@ -733,6 +817,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            restoreAutoSavedData();
             recordHistory();
             initTableFocusListeners();
         });
@@ -750,15 +835,17 @@
             }
         }
 
-        // --- PAGE LAYOUT & NUMBERING LOGIC ---
+        // --- PAGE LAYOUT & COLUMN ENGINE ---
         function applyPageLayout() {
             const size = document.getElementById('pageSizeSelect').value;
             const orientation = document.getElementById('pageOrientationSelect').value;
             const margin = document.getElementById('pageMarginSelect').value;
             const border = document.getElementById('pageBorderSelect').value;
+            const columnCount = document.getElementById('pageColumnSelect').value;
 
             const page = document.getElementById('paper-page');
             const innerFrame = document.getElementById('paper-inner-frame');
+            const content = document.getElementById('editor-content');
 
             page.className = `editor-page-container page-${size}-${orientation} margin-${margin}`;
 
@@ -767,12 +854,14 @@
             else if (border === 'double') innerFrame.classList.add('border-double-thick');
             else if (border === 'dashed') innerFrame.classList.add('border-dashed-thin');
             else innerFrame.classList.add('border-none');
+
+            content.classList.remove('cols-1', 'cols-2', 'cols-3');
+            content.classList.add(`cols-${columnCount}`);
         }
 
         function applyPageNumbering(style) {
             const footerNo = document.getElementById('footer-page-no');
             const headerNo = document.getElementById('header-page-no');
-            
             footerNo.classList.add('hidden');
             headerNo.classList.add('hidden');
 
@@ -811,13 +900,13 @@
         function formatDoc(command, value = null) {
             document.execCommand(command, false, value);
             document.getElementById('editor-content').focus();
-            recordHistory();
+            handleContentInput();
         }
 
         function formatHeading(tag) {
             document.execCommand('formatBlock', false, tag === 'p' ? '<p>' : `<${tag}>`);
             document.getElementById('editor-content').focus();
-            recordHistory();
+            handleContentInput();
         }
 
         function formatColor(color) {
@@ -825,7 +914,7 @@
             document.execCommand('styleWithCSS', false, true);
             document.execCommand('foreColor', false, color);
             document.getElementById('editor-content').focus();
-            recordHistory();
+            handleContentInput();
         }
 
         function formatHighlight(color) {
@@ -833,7 +922,7 @@
             document.execCommand('styleWithCSS', false, true);
             document.execCommand('hiliteColor', false, color);
             document.getElementById('editor-content').focus();
-            recordHistory();
+            handleContentInput();
         }
 
         // --- MATH MODAL SYSTEM ---
@@ -850,14 +939,9 @@
         function switchMathTab(tab) {
             document.querySelectorAll('.math-tab-panel').forEach(p => p.classList.add('hidden'));
             document.getElementById(`tab-content-${tab}`).classList.remove('hidden');
-            
             ['basic', 'calculus', 'matrix', 'greek'].forEach(t => {
                 const btn = document.getElementById(`tab-btn-${t}`);
-                if (t === tab) {
-                    btn.className = "px-4 py-2 text-blue-700 border-b-2 border-blue-700 bg-white font-bold";
-                } else {
-                    btn.className = "px-4 py-2 text-gray-600 hover:text-blue-700";
-                }
+                btn.className = t === tab ? "px-4 py-2 text-blue-700 border-b-2 border-blue-700 bg-white font-bold" : "px-4 py-2 text-gray-600 hover:text-blue-700";
             });
         }
 
@@ -893,12 +977,12 @@
                 }
 
                 if (window.MathJax) MathJax.typesetPromise([span]).catch(() => {});
-                recordHistory();
+                handleContentInput();
             }
             closeMathModal();
         }
 
-        // --- DRAWING CANVAS WITH SHAPES, TEXT & 3D STYLES ---
+        // --- GEOMETRY & SKETCH BOARD ---
         let canvas, ctx, isDrawing = false, drawTool = 'free', startX, startY, snapshot;
 
         function openDrawModal() {
@@ -914,7 +998,6 @@
         function initCanvas() {
             canvas = document.getElementById('sketchCanvas');
             ctx = canvas.getContext('2d');
-            
             canvas.addEventListener('mousedown', startDraw);
             canvas.addEventListener('mousemove', drawing);
             canvas.addEventListener('mouseup', endDraw);
@@ -922,7 +1005,7 @@
 
         function setDrawTool(tool) {
             drawTool = tool;
-            ['free', 'line', 'arrow', 'rect', 'circle', 'text'].forEach(t => {
+            ['free', 'line', 'arrow', 'triangle', 'rect', 'circle', 'axis', 'text'].forEach(t => {
                 const btn = document.getElementById(`draw-tool-${t}`);
                 if (btn) btn.className = t === tool ? 'px-2 py-1 bg-purple-100 text-purple-700 font-bold rounded border border-purple-300' : 'px-2 py-1 bg-white text-gray-700 rounded border border-gray-300';
             });
@@ -938,7 +1021,7 @@
             startY = e.clientY - rect.top;
 
             if (drawTool === 'text') {
-                const txt = prompt("চিত্রের টেক্সট লিখুন:", "A");
+                const txt = prompt("চিত্রের টেক্সট বা লেবেল লিখুন:", "A");
                 if (txt) {
                     ctx.fillStyle = document.getElementById('drawColor').value;
                     ctx.font = "bold 18px 'Hind Siliguri', sans-serif";
@@ -982,6 +1065,14 @@
             } else if (drawTool === 'arrow') {
                 ctx.putImageData(snapshot, 0, 0);
                 drawVectorArrow(startX, startY, currentX, currentY);
+            } else if (drawTool === 'triangle') {
+                ctx.putImageData(snapshot, 0, 0);
+                ctx.beginPath();
+                ctx.moveTo(startX + (currentX - startX)/2, startY);
+                ctx.lineTo(startX, currentY);
+                ctx.lineTo(currentX, currentY);
+                ctx.closePath();
+                ctx.stroke();
             } else if (drawTool === 'rect') {
                 ctx.putImageData(snapshot, 0, 0);
                 ctx.beginPath();
@@ -991,6 +1082,16 @@
                 ctx.beginPath();
                 const radius = Math.sqrt(Math.pow(startX - currentX, 2) + Math.pow(startY - currentY, 2));
                 ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+                ctx.stroke();
+            } else if (drawTool === 'axis') {
+                ctx.putImageData(snapshot, 0, 0);
+                ctx.beginPath();
+                // X axis
+                ctx.moveTo(startX, startY + (currentY - startY)/2);
+                ctx.lineTo(currentX, startY + (currentY - startY)/2);
+                // Y axis
+                ctx.moveTo(startX + (currentX - startX)/2, startY);
+                ctx.lineTo(startX + (currentX - startX)/2, currentY);
                 ctx.stroke();
             }
         }
@@ -1031,10 +1132,9 @@
                 <img src="${dataUrl}">
                 <div class="resize-handle"></div>
                 <div class="img-toolbar">
-                    <button onclick="alignImg(this, 'left')" class="text-white hover:text-blue-400 px-1 text-xs" title="বামপাশে"><i class="fas fa-align-left"></i></button>
-                    <button onclick="alignImg(this, 'center')" class="text-white hover:text-blue-400 px-1 text-xs" title="মাঝখানে"><i class="fas fa-align-center"></i></button>
-                    <button onclick="alignImg(this, 'right')" class="text-white hover:text-blue-400 px-1 text-xs" title="ডানপাশে"><i class="fas fa-align-right"></i></button>
-                    <button onclick="toggle3DView(this)" class="text-yellow-400 hover:text-yellow-300 px-1 text-xs" title="৩ডি ভিউ"><i class="fas fa-cube"></i></button>
+                    <button onclick="alignImg(this, 'left')" class="text-white hover:text-blue-400 px-1 text-xs" title="বামে"><i class="fas fa-align-left"></i></button>
+                    <button onclick="alignImg(this, 'center')" class="text-white hover:text-blue-400 px-1 text-xs" title="মাঝে"><i class="fas fa-align-center"></i></button>
+                    <button onclick="alignImg(this, 'right')" class="text-white hover:text-blue-400 px-1 text-xs" title="ডানে"><i class="fas fa-align-right"></i></button>
                     <button onclick="removeImg(this)" class="text-red-400 hover:text-red-500 px-1 text-xs" title="মুছুন"><i class="fas fa-trash"></i></button>
                 </div>
             `;
@@ -1059,7 +1159,7 @@
             }
 
             closeDrawModal();
-            recordHistory();
+            handleContentInput();
         }
 
         function deselectImages() {
@@ -1081,18 +1181,12 @@
                 wrapper.style.float = 'right';
                 wrapper.style.margin = '5px 0 5px 15px';
             }
-            recordHistory();
-        }
-
-        function toggle3DView(btn) {
-            const wrapper = btn.closest('.image-wrapper');
-            wrapper.classList.toggle('img-style-3d');
-            recordHistory();
+            handleContentInput();
         }
 
         function removeImg(btn) {
             btn.closest('.image-wrapper').remove();
-            recordHistory();
+            handleContentInput();
         }
 
         function initImageResize(e) {
@@ -1112,14 +1206,14 @@
             function stopResize() {
                 window.removeEventListener('mousemove', doResize);
                 window.removeEventListener('mouseup', stopResize);
-                recordHistory();
+                handleContentInput();
             }
 
             window.addEventListener('mousemove', doResize);
             window.addEventListener('mouseup', stopResize);
         }
 
-        // --- COMPREHENSIVE TABLE ENGINE ---
+        // --- ENHANCED TABLE CONTROLLER ---
         let currentActiveTable = null;
         let currentActiveCell = null;
 
@@ -1138,21 +1232,37 @@
             const theme = document.getElementById('newTableTheme').value;
             restoreSelection();
 
-            let tableHtml = `<table class="styled-table ${theme}">`;
+            let tableHtml = `
+                <div class="table-container" contenteditable="false">
+                    <span class="table-move-handle" onclick="toggleTableAlign(this)"><i class="fas fa-arrows-alt"></i> টেবিল পজিশন</span>
+                    <table class="styled-table ${theme}" contenteditable="true">
+            `;
             for (let r = 0; r < rows; r++) {
                 tableHtml += '<tr>';
                 for (let c = 0; c < cols; c++) {
                     const tag = (r === 0 && theme === 'table-theme-modern') ? 'th' : 'td';
-                    tableHtml += `<${tag} contenteditable="true">সেল ${r+1},${c+1}</${tag}>`;
+                    tableHtml += `<${tag} contenteditable="true">তথ্য</${tag}>`;
                 }
                 tableHtml += '</tr>';
             }
-            tableHtml += '</table><p><br></p>';
+            tableHtml += '</table></div><p><br></p>';
 
             document.execCommand('insertHTML', false, tableHtml);
             closeTableModal();
-            recordHistory();
+            handleContentInput();
             initTableFocusListeners();
+        }
+
+        function toggleTableAlign(btn) {
+            const container = btn.closest('.table-container');
+            if (container.style.marginLeft === 'auto' && container.style.marginRight === 'auto') {
+                container.style.marginLeft = '0';
+                container.style.marginRight = 'auto';
+            } else {
+                container.style.marginLeft = 'auto';
+                container.style.marginRight = 'auto';
+            }
+            handleContentInput();
         }
 
         function initTableFocusListeners() {
@@ -1175,16 +1285,16 @@
             for (let i = 0; i < colCount; i++) {
                 const cell = newRow.insertCell(i);
                 cell.contentEditable = "true";
-                cell.innerText = "নতুন তথ্য";
+                cell.innerText = "তথ্য";
             }
-            recordHistory();
+            handleContentInput();
         }
 
         function deleteTableRow() {
             if (!currentActiveTable || !currentActiveCell) return;
             const row = currentActiveCell.parentElement;
             currentActiveTable.deleteRow(row.rowIndex);
-            recordHistory();
+            handleContentInput();
         }
 
         function getTableCol(position) {
@@ -1194,9 +1304,9 @@
             for (let r = 0; r < currentActiveTable.rows.length; r++) {
                 const cell = currentActiveTable.rows[r].insertCell(targetIndex);
                 cell.contentEditable = "true";
-                cell.innerText = "নতুন কলাম";
+                cell.innerText = "তথ্য";
             }
-            recordHistory();
+            handleContentInput();
         }
 
         function deleteTableCol() {
@@ -1205,23 +1315,17 @@
             for (let r = 0; r < currentActiveTable.rows.length; r++) {
                 currentActiveTable.rows[r].deleteCell(colIndex);
             }
-            recordHistory();
-        }
-
-        function changeTableTheme(themeClass) {
-            if (!currentActiveTable) return;
-            currentActiveTable.className = `styled-table ${themeClass}`;
-            recordHistory();
+            handleContentInput();
         }
 
         function deleteWholeTable() {
             if (!currentActiveTable) return;
-            currentActiveTable.remove();
+            currentActiveTable.closest('.table-container').remove();
             document.getElementById('table-tools-ribbon').classList.add('hidden');
-            recordHistory();
+            handleContentInput();
         }
 
-        // --- SHELL & MODE CONTROLS ---
+        // --- UI & WORKSPACE CONTROLS ---
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
             document.getElementById('sidebar-overlay').classList.toggle('hidden');
@@ -1237,7 +1341,7 @@
             if (!event.target.closest('.relative')) {
                 if (dropdown && !dropdown.classList.contains('hidden')) dropdown.classList.add('hidden');
             }
-            if (!event.target.closest('table') && !event.target.closest('#table-tools-ribbon')) {
+            if (!event.target.closest('table') && !event.target.closest('#table-tools-ribbon') && !event.target.closest('.table-move-handle')) {
                 document.getElementById('table-tools-ribbon').classList.add('hidden');
             }
         }
