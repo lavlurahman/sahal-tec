@@ -32,20 +32,20 @@
             position: relative;
             background-color: #ffffff;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
-            margin: 20px auto 60px auto;
-            transition: all 0.3s ease;
+            margin: 20px auto 40px auto;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
+            overflow: hidden; /* Prevents overflow outside page border */
         }
 
-        /* Standard Dimensions */
-        .page-a4-portrait { width: 21cm; min-height: 29.7cm; }
-        .page-a4-landscape { width: 29.7cm; min-height: 21cm; }
-        .page-letter-portrait { width: 21.59cm; min-height: 27.94cm; }
-        .page-letter-landscape { width: 27.94cm; min-height: 21.59cm; }
-        .page-legal-portrait { width: 21.59cm; min-height: 35.56cm; }
-        .page-legal-landscape { width: 35.56cm; min-height: 21.59cm; }
+        /* Fixed Standard Page Heights and Widths */
+        .page-a4-portrait { width: 21cm; height: 29.7cm; }
+        .page-a4-landscape { width: 29.7cm; height: 21cm; }
+        .page-letter-portrait { width: 21.59cm; height: 27.94cm; }
+        .page-letter-landscape { width: 27.94cm; height: 21.59cm; }
+        .page-legal-portrait { width: 21.59cm; height: 35.56cm; }
+        .page-legal-landscape { width: 35.56cm; height: 21.59cm; }
 
         /* Outer Margin Spacing */
         .margin-normal { padding: 2.54cm; }
@@ -55,17 +55,18 @@
         /* Integrated Border Frame */
         .page-inner-frame {
             width: 100%;
-            flex-grow: 1;
+            height: 100%;
             position: relative;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         .border-none { border: none !important; }
-        .border-solid-thin { border: 1.5px solid #334155 !important; padding: 15px; }
-        .border-double-thick { border: 4px double #1e293b !important; padding: 15px; }
-        .border-dashed-thin { border: 2px dashed #64748b !important; padding: 15px; }
+        .border-solid-thin { border: 1.5px solid #334155 !important; padding: 12px; }
+        .border-double-thick { border: 4px double #1e293b !important; padding: 12px; }
+        .border-dashed-thin { border: 2px dashed #64748b !important; padding: 12px; }
 
         /* Column Layouts */
         .cols-1 { column-count: 1; }
@@ -75,18 +76,20 @@
         /* Header and Footer Areas */
         .page-header-area {
             border-bottom: 1px dashed #cbd5e1;
-            padding-bottom: 6px;
-            margin-bottom: 15px;
+            padding-bottom: 4px;
+            margin-bottom: 10px;
             font-size: 11px;
             color: #64748b;
             display: flex;
             justify-content: space-between;
             align-items: center;
             outline: none;
+            flex-shrink: 0;
+            user-select: none;
         }
         .page-footer-area {
             border-top: 1px dashed #cbd5e1;
-            padding-top: 6px;
+            padding-top: 4px;
             margin-top: auto;
             font-size: 11px;
             color: #64748b;
@@ -94,6 +97,8 @@
             justify-content: space-between;
             align-items: center;
             outline: none;
+            flex-shrink: 0;
+            user-select: none;
         }
 
         /* Watermark styling */
@@ -111,8 +116,8 @@
             z-index: 1;
         }
 
-        /* Content Area */
-        .editor-content {
+        /* Content Area (Page Slice) */
+        .page-content-editable {
             position: relative;
             z-index: 2;
             outline: none;
@@ -121,6 +126,7 @@
             word-break: break-word;
             overflow-wrap: break-word;
             white-space: normal;
+            overflow: hidden;
         }
 
         /* Interactive Resizable & Styled Image Container */
@@ -128,7 +134,7 @@
             display: inline-block;
             position: relative;
             max-width: 100%;
-            margin: 15px 0;
+            margin: 10px 0;
             user-select: none;
             vertical-align: middle;
             transition: all 0.25s ease;
@@ -185,7 +191,7 @@
         /* Advanced Table Resizing and Positioning */
         .table-container {
             position: relative;
-            margin: 15px 0;
+            margin: 10px 0;
             display: block;
             width: 100%;
         }
@@ -206,22 +212,18 @@
             position: relative;
         }
         .styled-table td, .styled-table th {
-            padding: 8px 12px;
+            padding: 6px 10px;
             min-width: 45px;
             position: relative;
-            resize: horizontal;
-            overflow: auto;
         }
-        .styled-table td:focus, .styled-table th:focus {
-            outline: 2px solid #2563eb;
-        }
+        .styled-table td:focus, .styled-table th:focus { outline: 2px solid #2563eb; }
         .table-theme-classic td, .table-theme-classic th { border: 1px solid #64748b; }
         .table-theme-striped tr:nth-child(even) { background-color: #f8fafc; }
         .table-theme-striped td, .table-theme-striped th { border: 1px solid #cbd5e1; }
         .table-theme-modern th { background-color: #1e293b; color: white; font-weight: bold; }
         .table-theme-modern td { border-bottom: 1px solid #e2e8f0; }
 
-        /* STRICT PRINT STYLES (No dropdown, no background, strictly document paper) */
+        /* STRICT PRINT STYLES */
         @media print {
             body, html {
                 background: transparent !important;
@@ -229,21 +231,14 @@
                 padding: 0 !important;
                 overflow: visible !important;
             }
-            body * {
-                visibility: hidden !important;
-            }
-            #editor-view, #paper-page, #paper-page * {
-                visibility: visible !important;
-            }
-            #paper-page {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
+            body * { visibility: hidden !important; }
+            #editor-pages-container, #editor-pages-container * { visibility: visible !important; }
+            .editor-page-container {
+                page-break-after: always !important;
                 margin: 0 !important;
-                padding: 1.5cm !important;
-                width: 100% !important;
                 box-shadow: none !important;
-                border: none !important;
+                width: 100% !important;
+                height: 100% !important;
             }
             #action-dropdown, header, aside, .table-move-handle, .img-toolbar, .resize-handle {
                 display: none !important;
@@ -314,7 +309,6 @@
                     </button>
                     <input type="text" id="doc-title" value="Untitled Document" class="text-base md:text-xl font-bold text-gray-700 outline-none hover:bg-gray-50 px-2 py-1 rounded w-full md:w-64 border-b border-transparent focus:border-blue-500 transition">
                     
-                    <!-- Auto-save notification badge -->
                     <span id="save-status-badge" class="hidden text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
                         <i class="fas fa-check-circle"></i> অটো-সেভড
                     </span>
@@ -333,6 +327,9 @@
                             </button>
                         </div>
                         <div class="py-1">
+                            <button onclick="addNewManualPage()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-semibold transition">
+                                <i class="fas fa-file-circle-plus w-5 text-center text-lg text-blue-500"></i> নতুন পেজ যুক্ত করুন
+                            </button>
                             <button onclick="manualSaveDoc()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 font-semibold transition">
                                 <i class="fas fa-save w-5 text-center text-lg"></i> সেভ করুন (Manual)
                             </button>
@@ -349,7 +346,7 @@
                 </div>
             </div>
 
-            <!-- Page Setup Toolbar (Including Multi-Columns) -->
+            <!-- Page Setup Toolbar -->
             <div id="page-setup-toolbar" class="flex items-center gap-2 px-3 md:px-6 py-1.5 bg-slate-50 text-xs text-gray-700 border-b border-gray-200 overflow-x-auto whitespace-nowrap hide-scrollbar">
                 <span class="font-bold text-gray-500 flex items-center gap-1 shrink-0"><i class="fas fa-file-alt"></i> পেজ লেআউট:</span>
                 
@@ -386,8 +383,8 @@
 
                 <select id="pageNumberSelect" onchange="applyPageNumbering(this.value)" class="border border-gray-300 rounded px-1.5 py-1 bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0 font-medium text-blue-700">
                     <option value="none">পেজ নম্বর: বন্ধ</option>
-                    <option value="bottom-center" selected>পেজ নং: নিচে মাঝে (Page 1)</option>
-                    <option value="bottom-right">পেজ নং: নিচে ডানে (— 1 —)</option>
+                    <option value="bottom-center" selected>পেজ নং: নিচে মাঝে</option>
+                    <option value="bottom-right">পেজ নং: নিচে ডানে</option>
                     <option value="top-right">পেজ নং: উপরে ডানে</option>
                 </select>
 
@@ -484,34 +481,31 @@
         <!-- Main Workspace -->
         <div class="flex-1 relative bg-[#cbd5e1] overflow-hidden w-full z-0">
             
-            <!-- MODE 1: Direct Editor View -->
+            <!-- MODE 1: Direct Editor View (Multi-Page Container) -->
             <div id="editor-view" class="h-full w-full overflow-y-auto flex flex-col items-center py-6 px-2 md:px-4" onclick="deselectImages(event)">
                 
-                <!-- Paper Container -->
-                <div id="paper-page" class="editor-page-container page-a4-portrait margin-normal">
-                    
-                    <div id="paper-inner-frame" class="page-inner-frame border-solid-thin">
-                        <div id="watermark-layer" class="watermark-overlay hidden">লাভলু</div>
+                <div id="editor-pages-container" class="w-full flex flex-col items-center">
+                    <!-- Page 1 (Default Master Page) -->
+                    <div class="editor-page-container page-a4-portrait margin-normal" data-page-index="1">
+                        <div class="page-inner-frame border-solid-thin">
+                            <div class="watermark-overlay hidden">লাভলু</div>
 
-                        <!-- Editable Header -->
-                        <div id="page-header" class="page-header-area">
-                            <span contenteditable="true" class="outline-none" placeholder="কাস্টম হেডার...">SAHAL TEC পাবলিকেশন নোটস</span>
-                            <span id="header-page-no" class="hidden font-mono font-semibold">Page 1</span>
-                        </div>
+                            <div class="page-header-area">
+                                <span contenteditable="true" class="outline-none" placeholder="কাস্টম হেডার...">SAHAL TEC পাবলিকেশন নোটস</span>
+                                <span class="header-page-no hidden font-mono font-semibold">Page 1</span>
+                            </div>
 
-                        <!-- Content Area with Multi-Column Support -->
-                        <div id="editor-content" contenteditable="true" class="editor-content text-base md:text-lg leading-relaxed text-justify cols-1" oninput="handleContentInput()">
-                            <h1 style="font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 20px;">উচ্চতর গণিত ও পদার্থবিজ্ঞান নোটস</h1>
-                            <p>এখানে আপনি সরাসরি টাইপ করতে পারবেন। উপরে পেজ লেআউট থেকে ২ কলাম বা ৩ কলামে রূপান্তর করা যাবে এবং লেখা স্বয়ংক্রিয়ভাবে অটো-সেভ হবে।</p>
-                        </div>
+                            <div contenteditable="true" class="page-content-editable text-base md:text-lg leading-relaxed text-justify cols-1" oninput="handlePaginationInput(this)" onkeydown="handleKeyDownPagination(event, this)">
+                                <h1 style="font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 20px;">উচ্চতর গণিত ও পদার্থবিজ্ঞান নোটস</h1>
+                                <p>এখানে আপনি সরাসরি টাইপ করতে পারবেন। পেজ ভর্তি হয়ে গেলে স্বয়ংক্রিয়ভাবে ২য় ও ৩য় পেজ তৈরি হবে এবং কার্সর নতুন পেজে চলে যাবে।</p>
+                            </div>
 
-                        <!-- Editable Footer -->
-                        <div id="page-footer" class="page-footer-area">
-                            <span contenteditable="true" class="outline-none" placeholder="ফুটার তথ্য...">গোপনীয় ও স্বত্বাধিকার সংরক্ষিত</span>
-                            <span id="footer-page-no" class="font-mono font-semibold">Page 1</span>
+                            <div class="page-footer-area">
+                                <span contenteditable="true" class="outline-none" placeholder="ফুটার তথ্য...">গোপনীয় ও স্বত্বাধিকার সংরক্ষিত</span>
+                                <span class="footer-page-no font-mono font-semibold">Page 1</span>
+                            </div>
                         </div>
                     </div>
-
                 </div>
 
             </div>
@@ -724,10 +718,138 @@
     </div>
 
     <script>
-        // --- AUTO-SAVE ENGINE & LOCAL STORAGE ---
+        // --- MULTI-PAGE ENGINE & AUTOMATIC PAGINATION ---
         let autoSaveTimer = null;
 
-        function handleContentInput() {
+        function handlePaginationInput(activeEditable) {
+            handleAutoSave();
+            
+            // Check if content overflows current page's height limit
+            if (activeEditable.scrollHeight > activeEditable.clientHeight + 5) {
+                splitToNextPage(activeEditable);
+            }
+        }
+
+        function handleKeyDownPagination(e, activeEditable) {
+            if (e.key === "Backspace" && activeEditable.innerText.trim() === "") {
+                const currentPage = activeEditable.closest('.editor-page-container');
+                const prevPage = currentPage.previousElementSibling;
+                if (prevPage && prevPage.classList.contains('editor-page-container')) {
+                    e.preventDefault();
+                    const prevEditable = prevPage.querySelector('.page-content-editable');
+                    currentPage.remove();
+                    updateAllPageNumbers();
+                    prevEditable.focus();
+                    
+                    // Move cursor to end of prev page
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    range.selectNodeContents(prevEditable);
+                    range.collapse(false);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    handleAutoSave();
+                }
+            }
+        }
+
+        function splitToNextPage(currentEditable) {
+            const currentPage = currentEditable.closest('.editor-page-container');
+            let nextPage = currentPage.nextElementSibling;
+
+            // If next page doesn't exist, create one
+            if (!nextPage || !nextPage.classList.contains('editor-page-container')) {
+                nextPage = createNewPageElement();
+                currentPage.after(nextPage);
+            }
+
+            const nextEditable = nextPage.querySelector('.page-content-editable');
+
+            // Move the last block node to the next page
+            while (currentEditable.scrollHeight > currentEditable.clientHeight + 5 && currentEditable.childNodes.length > 1) {
+                const lastNode = currentEditable.lastChild;
+                nextEditable.insertBefore(lastNode, nextEditable.firstChild);
+            }
+
+            updateAllPageNumbers();
+            nextEditable.focus();
+
+            // Set cursor to start of new page
+            const range = document.createRange();
+            const sel = window.getSelection();
+            range.setStart(nextEditable, 0);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+
+        function addNewManualPage() {
+            const container = document.getElementById('editor-pages-container');
+            const newPage = createNewPageElement();
+            container.appendChild(newPage);
+            updateAllPageNumbers();
+            newPage.querySelector('.page-content-editable').focus();
+            handleAutoSave();
+            document.getElementById('action-dropdown').classList.add('hidden');
+        }
+
+        function createNewPageElement() {
+            const masterPage = document.querySelector('.editor-page-container');
+            const newPage = document.createElement('div');
+            
+            // Retain identical classes as current page layout
+            newPage.className = masterPage.className;
+            newPage.innerHTML = `
+                <div class="page-inner-frame ${masterPage.querySelector('.page-inner-frame').className.replace('page-inner-frame', '').trim()}">
+                    <div class="watermark-overlay ${masterPage.querySelector('.watermark-overlay').classList.contains('hidden') ? 'hidden' : ''}">${masterPage.querySelector('.watermark-overlay').innerText}</div>
+                    <div class="page-header-area">
+                        <span contenteditable="true" class="outline-none">${masterPage.querySelector('.page-header-area span:first-child').innerText}</span>
+                        <span class="header-page-no font-mono font-semibold ${masterPage.querySelector('.header-page-no').classList.contains('hidden') ? 'hidden' : ''}">Page</span>
+                    </div>
+                    <div contenteditable="true" class="page-content-editable text-base md:text-lg leading-relaxed text-justify ${document.getElementById('pageColumnSelect').value === '2' ? 'cols-2' : (document.getElementById('pageColumnSelect').value === '3' ? 'cols-3' : 'cols-1')}" oninput="handlePaginationInput(this)" onkeydown="handleKeyDownPagination(event, this)">
+                        <p><br></p>
+                    </div>
+                    <div class="page-footer-area">
+                        <span contenteditable="true" class="outline-none">${masterPage.querySelector('.page-footer-area span:first-child').innerText}</span>
+                        <span class="footer-page-no font-mono font-semibold ${masterPage.querySelector('.footer-page-no').classList.contains('hidden') ? 'hidden' : ''}">Page</span>
+                    </div>
+                </div>
+            `;
+            return newPage;
+        }
+
+        function updateAllPageNumbers() {
+            const pages = document.querySelectorAll('#editor-pages-container .editor-page-container');
+            const total = pages.length;
+            const style = document.getElementById('pageNumberSelect').value;
+
+            pages.forEach((page, index) => {
+                const pageNo = index + 1;
+                page.setAttribute('data-page-index', pageNo);
+                const headerNo = page.querySelector('.header-page-no');
+                const footerNo = page.querySelector('.footer-page-no');
+
+                headerNo.classList.add('hidden');
+                footerNo.classList.add('hidden');
+
+                if (style === 'bottom-center') {
+                    footerNo.innerText = `Page ${pageNo} of ${total}`;
+                    footerNo.className = 'footer-page-no font-mono font-semibold mx-auto';
+                    footerNo.classList.remove('hidden');
+                } else if (style === 'bottom-right') {
+                    footerNo.innerText = `— ${pageNo} —`;
+                    footerNo.className = 'footer-page-no font-mono font-semibold ml-auto';
+                    footerNo.classList.remove('hidden');
+                } else if (style === 'top-right') {
+                    headerNo.innerText = `Page ${pageNo}`;
+                    headerNo.className = 'header-page-no font-mono font-semibold ml-auto';
+                    headerNo.classList.remove('hidden');
+                }
+            });
+        }
+
+        // --- AUTO-SAVE ENGINE & LOCAL STORAGE ---
+        function handleAutoSave() {
             recordHistory();
             const badge = document.getElementById('save-status-badge');
             badge.classList.remove('hidden');
@@ -737,42 +859,43 @@
             autoSaveTimer = setTimeout(() => {
                 const docData = {
                     title: document.getElementById('doc-title').value,
-                    content: document.getElementById('editor-content').innerHTML,
+                    pagesHtml: document.getElementById('editor-pages-container').innerHTML,
                     pageSize: document.getElementById('pageSizeSelect').value,
                     pageOrientation: document.getElementById('pageOrientationSelect').value,
                     pageMargin: document.getElementById('pageMarginSelect').value,
                     pageBorder: document.getElementById('pageBorderSelect').value,
-                    pageColumn: document.getElementById('pageColumnSelect').value
+                    pageColumn: document.getElementById('pageColumnSelect').value,
+                    pageNumber: document.getElementById('pageNumberSelect').value
                 };
-                localStorage.setItem('sahal_tec_doc_autosave', JSON.stringify(docData));
+                localStorage.setItem('sahal_tec_doc_autosave_v2', JSON.stringify(docData));
                 badge.innerHTML = '<i class="fas fa-check-circle"></i> অটো-সেভড';
             }, 1200);
         }
 
         function restoreAutoSavedData() {
-            const saved = localStorage.getItem('sahal_tec_doc_autosave');
+            const saved = localStorage.getItem('sahal_tec_doc_autosave_v2');
             if (saved) {
                 try {
                     const data = JSON.parse(saved);
                     if (data.title) document.getElementById('doc-title').value = data.title;
-                    if (data.content) document.getElementById('editor-content').innerHTML = data.content;
+                    if (data.pagesHtml) document.getElementById('editor-pages-container').innerHTML = data.pagesHtml;
                     if (data.pageSize) document.getElementById('pageSizeSelect').value = data.pageSize;
                     if (data.pageOrientation) document.getElementById('pageOrientationSelect').value = data.pageOrientation;
                     if (data.pageMargin) document.getElementById('pageMarginSelect').value = data.pageMargin;
                     if (data.pageBorder) document.getElementById('pageBorderSelect').value = data.pageBorder;
                     if (data.pageColumn) document.getElementById('pageColumnSelect').value = data.pageColumn;
+                    if (data.pageNumber) document.getElementById('pageNumberSelect').value = data.pageNumber;
                     applyPageLayout();
                 } catch(e) {}
             }
         }
 
         function manualSaveDoc() {
-            handleContentInput();
-            alert('ডকুমেন্টটি সফলভাবে ব্রাউজারে সংরক্ষিত হয়েছে!');
+            handleAutoSave();
+            alert('ডকুমেন্টটি সফলভাবে সংরক্ষিত হয়েছে!');
             document.getElementById('action-dropdown').classList.add('hidden');
         }
 
-        // --- STRICT CLEAN PRINT ENGINE ---
         function triggerPrintClean() {
             document.getElementById('action-dropdown').classList.add('hidden');
             deselectImages();
@@ -786,7 +909,7 @@
         let savedRange = null;
 
         function recordHistory() {
-            const content = document.getElementById('editor-content').innerHTML;
+            const content = document.getElementById('editor-pages-container').innerHTML;
             if (undoStack.length === 0 || undoStack[undoStack.length - 1] !== content) {
                 undoStack.push(content);
                 if (undoStack.length > MAX_HISTORY) undoStack.shift();
@@ -795,31 +918,34 @@
         }
 
         function handleUndo() {
-            const editor = document.getElementById('editor-content');
+            const container = document.getElementById('editor-pages-container');
             if (undoStack.length > 1) {
                 redoStack.push(undoStack.pop());
-                editor.innerHTML = undoStack[undoStack.length - 1];
+                container.innerHTML = undoStack[undoStack.length - 1];
             } else if (undoStack.length === 1) {
                 redoStack.push(undoStack.pop());
-                editor.innerHTML = "";
+                container.innerHTML = "";
             }
-            if (window.MathJax) MathJax.typesetPromise([editor]).catch(() => {});
+            if (window.MathJax) MathJax.typesetPromise([container]).catch(() => {});
+            updateAllPageNumbers();
         }
 
         function handleRedo() {
-            const editor = document.getElementById('editor-content');
+            const container = document.getElementById('editor-pages-container');
             if (redoStack.length > 0) {
                 const restored = redoStack.pop();
                 undoStack.push(restored);
-                editor.innerHTML = restored;
+                container.innerHTML = restored;
             }
-            if (window.MathJax) MathJax.typesetPromise([editor]).catch(() => {});
+            if (window.MathJax) MathJax.typesetPromise([container]).catch(() => {});
+            updateAllPageNumbers();
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             restoreAutoSavedData();
             recordHistory();
             initTableFocusListeners();
+            updateAllPageNumbers();
         });
 
         function saveSelection() {
@@ -843,86 +969,70 @@
             const border = document.getElementById('pageBorderSelect').value;
             const columnCount = document.getElementById('pageColumnSelect').value;
 
-            const page = document.getElementById('paper-page');
-            const innerFrame = document.getElementById('paper-inner-frame');
-            const content = document.getElementById('editor-content');
+            const pages = document.querySelectorAll('#editor-pages-container .editor-page-container');
+            pages.forEach(page => {
+                page.className = `editor-page-container page-${size}-${orientation} margin-${margin}`;
+                const innerFrame = page.querySelector('.page-inner-frame');
+                innerFrame.className = 'page-inner-frame';
+                if (border === 'solid') innerFrame.classList.add('border-solid-thin');
+                else if (border === 'double') innerFrame.classList.add('border-double-thick');
+                else if (border === 'dashed') innerFrame.classList.add('border-dashed-thin');
+                else innerFrame.classList.add('border-none');
 
-            page.className = `editor-page-container page-${size}-${orientation} margin-${margin}`;
-
-            innerFrame.className = 'page-inner-frame';
-            if (border === 'solid') innerFrame.classList.add('border-solid-thin');
-            else if (border === 'double') innerFrame.classList.add('border-double-thick');
-            else if (border === 'dashed') innerFrame.classList.add('border-dashed-thin');
-            else innerFrame.classList.add('border-none');
-
-            content.classList.remove('cols-1', 'cols-2', 'cols-3');
-            content.classList.add(`cols-${columnCount}`);
+                const content = page.querySelector('.page-content-editable');
+                content.classList.remove('cols-1', 'cols-2', 'cols-3');
+                content.classList.add(`cols-${columnCount}`);
+            });
+            updateAllPageNumbers();
         }
 
-        function applyPageNumbering(style) {
-            const footerNo = document.getElementById('footer-page-no');
-            const headerNo = document.getElementById('header-page-no');
-            footerNo.classList.add('hidden');
-            headerNo.classList.add('hidden');
-
-            if (style === 'bottom-center') {
-                footerNo.innerText = 'Page 1';
-                footerNo.className = 'font-mono font-semibold mx-auto';
-                footerNo.classList.remove('hidden');
-            } else if (style === 'bottom-right') {
-                footerNo.innerText = '— 1 —';
-                footerNo.className = 'font-mono font-semibold ml-auto';
-                footerNo.classList.remove('hidden');
-            } else if (style === 'top-right') {
-                headerNo.innerText = 'Page 1';
-                headerNo.className = 'font-mono font-semibold ml-auto';
-                headerNo.classList.remove('hidden');
-            }
+        function applyPageNumbering() {
+            updateAllPageNumbers();
         }
 
         function changePageBgColor(color) {
-            document.getElementById('paper-page').style.backgroundColor = color;
+            document.querySelectorAll('#editor-pages-container .editor-page-container').forEach(p => {
+                p.style.backgroundColor = color;
+            });
         }
 
         function setWatermarkPrompt() {
-            const currentWatermark = document.getElementById('watermark-layer');
-            const text = prompt("ওয়াটারমার্ক টেক্সট লিখুন (খালি রাখলে মুছে যাবে):", currentWatermark.innerText);
+            const text = prompt("ওয়াটারমার্ক টেক্সট লিখুন (খালি রাখলে মুছে যাবে):", "লাভলু");
             if (text !== null) {
-                if (text.trim() === '') currentWatermark.classList.add('hidden');
-                else {
-                    currentWatermark.innerText = text;
-                    currentWatermark.classList.remove('hidden');
-                }
+                document.querySelectorAll('.watermark-overlay').forEach(w => {
+                    if (text.trim() === '') {
+                        w.classList.add('hidden');
+                    } else {
+                        w.innerText = text;
+                        w.classList.remove('hidden');
+                    }
+                });
             }
         }
 
         // --- FORMATTING ACTIONS ---
         function formatDoc(command, value = null) {
             document.execCommand(command, false, value);
-            document.getElementById('editor-content').focus();
-            handleContentInput();
+            handleAutoSave();
         }
 
         function formatHeading(tag) {
             document.execCommand('formatBlock', false, tag === 'p' ? '<p>' : `<${tag}>`);
-            document.getElementById('editor-content').focus();
-            handleContentInput();
+            handleAutoSave();
         }
 
         function formatColor(color) {
             restoreSelection();
             document.execCommand('styleWithCSS', false, true);
             document.execCommand('foreColor', false, color);
-            document.getElementById('editor-content').focus();
-            handleContentInput();
+            handleAutoSave();
         }
 
         function formatHighlight(color) {
             restoreSelection();
             document.execCommand('styleWithCSS', false, true);
             document.execCommand('hiliteColor', false, color);
-            document.getElementById('editor-content').focus();
-            handleContentInput();
+            handleAutoSave();
         }
 
         // --- MATH MODAL SYSTEM ---
@@ -973,11 +1083,11 @@
                     range.insertNode(span);
                     range.setStartAfter(span);
                 } else {
-                    document.getElementById('editor-content').appendChild(span);
+                    document.querySelector('.page-content-editable').appendChild(span);
                 }
 
                 if (window.MathJax) MathJax.typesetPromise([span]).catch(() => {});
-                handleContentInput();
+                handleAutoSave();
             }
             closeMathModal();
         }
@@ -1086,10 +1196,8 @@
             } else if (drawTool === 'axis') {
                 ctx.putImageData(snapshot, 0, 0);
                 ctx.beginPath();
-                // X axis
                 ctx.moveTo(startX, startY + (currentY - startY)/2);
                 ctx.lineTo(currentX, startY + (currentY - startY)/2);
-                // Y axis
                 ctx.moveTo(startX + (currentX - startX)/2, startY);
                 ctx.lineTo(startX + (currentX - startX)/2, currentY);
                 ctx.stroke();
@@ -1126,16 +1234,16 @@
             const wrapper = document.createElement('span');
             wrapper.className = `image-wrapper ${viewStyle}`;
             wrapper.contentEditable = 'false';
-            wrapper.style.width = '300px';
+            wrapper.style.width = '280px';
 
             wrapper.innerHTML = `
                 <img src="${dataUrl}">
                 <div class="resize-handle"></div>
                 <div class="img-toolbar">
-                    <button onclick="alignImg(this, 'left')" class="text-white hover:text-blue-400 px-1 text-xs" title="বামে"><i class="fas fa-align-left"></i></button>
-                    <button onclick="alignImg(this, 'center')" class="text-white hover:text-blue-400 px-1 text-xs" title="মাঝে"><i class="fas fa-align-center"></i></button>
-                    <button onclick="alignImg(this, 'right')" class="text-white hover:text-blue-400 px-1 text-xs" title="ডানে"><i class="fas fa-align-right"></i></button>
-                    <button onclick="removeImg(this)" class="text-red-400 hover:text-red-500 px-1 text-xs" title="মুছুন"><i class="fas fa-trash"></i></button>
+                    <button onclick="alignImg(this, 'left')" class="text-white hover:text-blue-400 px-1 text-xs"><i class="fas fa-align-left"></i></button>
+                    <button onclick="alignImg(this, 'center')" class="text-white hover:text-blue-400 px-1 text-xs"><i class="fas fa-align-center"></i></button>
+                    <button onclick="alignImg(this, 'right')" class="text-white hover:text-blue-400 px-1 text-xs"><i class="fas fa-align-right"></i></button>
+                    <button onclick="removeImg(this)" class="text-red-400 hover:text-red-500 px-1 text-xs"><i class="fas fa-trash"></i></button>
                 </div>
             `;
 
@@ -1155,11 +1263,11 @@
                 range.insertNode(wrapper);
                 range.setStartAfter(wrapper);
             } else {
-                document.getElementById('editor-content').appendChild(wrapper);
+                document.querySelector('.page-content-editable').appendChild(wrapper);
             }
 
             closeDrawModal();
-            handleContentInput();
+            handleAutoSave();
         }
 
         function deselectImages() {
@@ -1170,7 +1278,7 @@
             const wrapper = btn.closest('.image-wrapper');
             if (alignment === 'center') {
                 wrapper.style.display = 'block';
-                wrapper.style.margin = '15px auto';
+                wrapper.style.margin = '10px auto';
                 wrapper.style.float = 'none';
             } else if (alignment === 'left') {
                 wrapper.style.display = 'inline-block';
@@ -1181,12 +1289,12 @@
                 wrapper.style.float = 'right';
                 wrapper.style.margin = '5px 0 5px 15px';
             }
-            handleContentInput();
+            handleAutoSave();
         }
 
         function removeImg(btn) {
             btn.closest('.image-wrapper').remove();
-            handleContentInput();
+            handleAutoSave();
         }
 
         function initImageResize(e) {
@@ -1198,7 +1306,7 @@
 
             function doResize(moveEvent) {
                 const newWidth = startWidth + (moveEvent.clientX - startMouseX);
-                if (newWidth > 80 && newWidth < 750) {
+                if (newWidth > 80 && newWidth < 700) {
                     wrapper.style.width = newWidth + 'px';
                 }
             }
@@ -1206,7 +1314,7 @@
             function stopResize() {
                 window.removeEventListener('mousemove', doResize);
                 window.removeEventListener('mouseup', stopResize);
-                handleContentInput();
+                handleAutoSave();
             }
 
             window.addEventListener('mousemove', doResize);
@@ -1249,7 +1357,7 @@
 
             document.execCommand('insertHTML', false, tableHtml);
             closeTableModal();
-            handleContentInput();
+            handleAutoSave();
             initTableFocusListeners();
         }
 
@@ -1262,12 +1370,11 @@
                 container.style.marginLeft = 'auto';
                 container.style.marginRight = 'auto';
             }
-            handleContentInput();
+            handleAutoSave();
         }
 
         function initTableFocusListeners() {
-            const editor = document.getElementById('editor-content');
-            editor.addEventListener('focusin', (e) => {
+            document.getElementById('editor-pages-container').addEventListener('focusin', (e) => {
                 const cell = e.target.closest('td, th');
                 if (cell) {
                     currentActiveCell = cell;
@@ -1287,14 +1394,14 @@
                 cell.contentEditable = "true";
                 cell.innerText = "তথ্য";
             }
-            handleContentInput();
+            handleAutoSave();
         }
 
         function deleteTableRow() {
             if (!currentActiveTable || !currentActiveCell) return;
             const row = currentActiveCell.parentElement;
             currentActiveTable.deleteRow(row.rowIndex);
-            handleContentInput();
+            handleAutoSave();
         }
 
         function getTableCol(position) {
@@ -1306,7 +1413,7 @@
                 cell.contentEditable = "true";
                 cell.innerText = "তথ্য";
             }
-            handleContentInput();
+            handleAutoSave();
         }
 
         function deleteTableCol() {
@@ -1315,14 +1422,14 @@
             for (let r = 0; r < currentActiveTable.rows.length; r++) {
                 currentActiveTable.rows[r].deleteCell(colIndex);
             }
-            handleContentInput();
+            handleAutoSave();
         }
 
         function deleteWholeTable() {
             if (!currentActiveTable) return;
             currentActiveTable.closest('.table-container').remove();
             document.getElementById('table-tools-ribbon').classList.add('hidden');
-            handleContentInput();
+            handleAutoSave();
         }
 
         // --- UI & WORKSPACE CONTROLS ---
@@ -1389,9 +1496,16 @@
             }
         }
 
-        // DOCX Downloader
+        // DOCX Downloader (Extracts content from all pages)
         async function downloadDocx() {
-            const text = isEditorMode ? document.getElementById('editor-content').innerText : document.getElementById('ai-input').value;
+            let text = "";
+            if (isEditorMode) {
+                const pages = document.querySelectorAll('#editor-pages-container .page-content-editable');
+                pages.forEach(p => text += p.innerText + "\n\n");
+            } else {
+                text = document.getElementById('ai-input').value;
+            }
+
             if (!text.trim()) return alert('কোনো লেখা নেই!');
 
             const docTitle = document.getElementById('doc-title').value.trim() || 'SAHAL_TEC_Document';
