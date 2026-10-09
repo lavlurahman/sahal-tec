@@ -2,7 +2,7 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SAHAL TEC - Professional Workspace</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -32,7 +32,7 @@
             position: relative;
             background-color: #ffffff;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
-            margin: 20px auto 40px auto;
+            margin: 15px auto 30px auto;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
@@ -47,6 +47,18 @@
         .page-letter-landscape { width: 27.94cm; height: 21.59cm; }
         .page-legal-portrait { width: 21.59cm; height: 35.56cm; }
         .page-legal-landscape { width: 35.56cm; height: 21.59cm; }
+
+        /* Responsive scaling on small screens */
+        @media (max-width: 768px) {
+            .page-a4-portrait, .page-letter-portrait, .page-legal-portrait {
+                width: 95% !important;
+                height: auto !important;
+                min-height: 120vw !important;
+            }
+            .margin-normal, .margin-narrow, .margin-wide {
+                padding: 1.25rem !important;
+            }
+        }
 
         /* Margins */
         .margin-normal { padding: 2.54cm; }
@@ -71,14 +83,14 @@
 
         /* Multi Columns */
         .cols-1 { column-count: 1; }
-        .cols-2 { column-count: 2; column-gap: 24px; column-rule: 1px dashed #cbd5e1; }
-        .cols-3 { column-count: 3; column-gap: 18px; column-rule: 1px dashed #cbd5e1; }
+        .cols-2 { column-count: 2; column-gap: 20px; column-rule: 1px dashed #cbd5e1; }
+        .cols-3 { column-count: 3; column-gap: 15px; column-rule: 1px dashed #cbd5e1; }
 
         /* Header / Footer */
         .page-header-area {
             border-bottom: 1px dashed #cbd5e1;
             padding-bottom: 4px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-size: 11px;
             color: #64748b;
             display: flex;
@@ -108,7 +120,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 5rem;
+            font-size: 4rem;
             color: rgba(148, 163, 184, 0.16);
             font-weight: 800;
             pointer-events: none;
@@ -130,126 +142,17 @@
             overflow: hidden;
         }
 
-        /* Resizable Image Container */
-        .image-wrapper {
-            display: inline-block;
-            position: relative;
-            max-width: 100%;
-            margin: 10px 0;
-            user-select: none;
-            vertical-align: middle;
-            transition: all 0.25s ease;
-        }
-        .image-wrapper img { width: 100%; height: auto; display: block; border-radius: 4px; }
-        .image-wrapper.selected { outline: 2px dashed #2563eb; outline-offset: 4px; }
-        
-        .img-style-default img { box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .img-style-3d img { 
-            transform: perspective(600px) rotateY(-8deg) rotateX(4deg); 
-            box-shadow: 12px 16px 25px -4px rgba(0, 0, 0, 0.35); 
-            transition: transform 0.3s ease;
-        }
-        .img-style-3d:hover img { transform: perspective(600px) rotateY(0deg) rotateX(0deg); }
-        .img-style-polaroid { 
-            background: #fff; 
-            padding: 8px 8px 24px 8px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.18); 
-            border: 1px solid #e2e8f0; 
-        }
-        .img-style-glow img { box-shadow: 0 0 18px rgba(37, 99, 235, 0.45); border-radius: 8px; }
-
-        .resize-handle {
-            display: none;
-            position: absolute;
-            bottom: -6px;
-            right: -6px;
-            width: 14px;
-            height: 14px;
-            background-color: #2563eb;
-            border: 2px solid white;
-            border-radius: 50%;
-            cursor: se-resize;
-            z-index: 10;
-        }
-        .image-wrapper.selected .resize-handle { display: block; }
-        
-        .img-toolbar {
-            display: none;
-            position: absolute;
-            top: -42px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #0f172a;
-            padding: 4px 8px;
-            border-radius: 6px;
-            gap: 6px;
-            z-index: 20;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-            white-space: nowrap;
-        }
-        .image-wrapper.selected .img-toolbar { display: flex; }
-
-        /* Tables */
-        .table-container {
-            position: relative;
-            margin: 10px 0;
-            display: block;
-            width: 100%;
-        }
-        .table-move-handle {
-            display: inline-flex;
-            cursor: move;
-            background: #0f172a;
-            color: #fff;
-            padding: 2px 6px;
-            border-radius: 4px 4px 0 0;
-            font-size: 10px;
-            user-select: none;
-        }
-        .styled-table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: auto;
-            position: relative;
-        }
-        .styled-table td, .styled-table th {
-            padding: 6px 10px;
-            min-width: 45px;
-            position: relative;
-        }
-        .styled-table td:focus, .styled-table th:focus { outline: 2px solid #2563eb; }
-        .table-theme-classic td, .table-theme-classic th { border: 1px solid #64748b; }
-        .table-theme-striped tr:nth-child(even) { background-color: #f8fafc; }
-        .table-theme-striped td, .table-theme-striped th { border: 1px solid #cbd5e1; }
-        .table-theme-modern th { background-color: #1e293b; color: white; font-weight: bold; }
-        .table-theme-modern td { border-bottom: 1px solid #e2e8f0; }
-
         /* Clean Print Settings */
         @media print {
-            body, html {
-                background: transparent !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                overflow: visible !important;
-            }
+            body, html { background: transparent !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; }
             body * { visibility: hidden !important; }
             #editor-pages-container, #editor-pages-container * { visibility: visible !important; }
-            .editor-page-container {
-                page-break-after: always !important;
-                margin: 0 !important;
-                box-shadow: none !important;
-                width: 100% !important;
-                height: 100% !important;
-            }
-            #action-dropdown, header, aside, .table-move-handle, .img-toolbar, .resize-handle {
-                display: none !important;
-            }
+            .editor-page-container { page-break-after: always !important; margin: 0 !important; box-shadow: none !important; width: 100% !important; height: 100% !important; }
+            #action-dropdown, header, aside, .table-move-handle, .img-toolbar, .resize-handle { display: none !important; }
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -261,13 +164,13 @@
 
     <!-- Sidebar: Folder & File Management -->
     <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-50 w-64 bg-[#111827] text-white flex flex-col h-full shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none">
-        <div class="p-5 border-b border-gray-800 flex justify-between items-center">
+        <div class="p-4 border-b border-gray-800 flex justify-between items-center">
             <h2 class="text-xl font-bold tracking-wide">SAHAL TEC</h2>
             <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
         </div>
         
-        <div class="p-4 border-b border-gray-800 flex items-center gap-3 cursor-pointer hover:bg-gray-800 transition">
-            <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center font-bold text-white shadow-md">MR</div>
+        <div class="p-3 border-b border-gray-800 flex items-center gap-3 cursor-pointer hover:bg-gray-800 transition">
+            <div class="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center font-bold text-white shadow-md text-sm">MR</div>
             <div>
                 <p class="text-sm font-semibold">Mas Lavlu Rahman</p>
                 <p class="text-xs text-gray-400">Pro Plan</p>
@@ -286,17 +189,13 @@
             </div>
 
             <p class="text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">আমার ফোল্ডারসমূহ</p>
-            <ul id="folder-list" class="space-y-1.5 text-sm">
+            <ul id="folder-list" class="space-y-1 text-sm">
                 <li class="cursor-pointer hover:bg-gray-800 p-2 rounded flex items-center justify-between text-gray-300 transition group">
                     <span class="flex items-center gap-2 truncate"><i class="fas fa-folder text-yellow-500 text-base"></i> Physics Notes (HSC)</span>
                     <button onclick="deleteFolderItem(this)" class="hidden group-hover:block text-gray-500 hover:text-red-400 text-xs"><i class="fas fa-times"></i></button>
                 </li>
                 <li class="cursor-pointer hover:bg-gray-800 p-2 rounded flex items-center justify-between text-gray-300 transition group">
                     <span class="flex items-center gap-2 truncate"><i class="fas fa-folder text-yellow-500 text-base"></i> Math Question Bank</span>
-                    <button onclick="deleteFolderItem(this)" class="hidden group-hover:block text-gray-500 hover:text-red-400 text-xs"><i class="fas fa-times"></i></button>
-                </li>
-                <li class="cursor-pointer hover:bg-gray-800 p-2 rounded flex items-center justify-between text-gray-300 transition group">
-                    <span class="flex items-center gap-2 truncate"><i class="fas fa-folder text-yellow-500 text-base"></i> Chemistry Diagrams</span>
                     <button onclick="deleteFolderItem(this)" class="hidden group-hover:block text-gray-500 hover:text-red-400 text-xs"><i class="fas fa-times"></i></button>
                 </li>
             </ul>
@@ -310,28 +209,31 @@
     </aside>
 
     <!-- Main Workspace Area -->
-    <main class="flex-1 flex flex-col h-full min-w-0 w-full relative z-10">
+    <main class="flex-1 flex flex-col h-full min-w-0 w-full relative z-10 overflow-hidden">
         
-        <!-- Header -->
-        <header class="bg-white border-b border-gray-200 shadow-sm z-30 shrink-0 w-full relative">
-            <div class="flex justify-between items-center px-3 md:px-6 py-2 border-b border-gray-100">
-                <div class="flex items-center gap-2 w-full md:w-auto">
-                    <button onclick="toggleSidebar()" class="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded focus:outline-none">
-                        <i class="fas fa-bars text-xl"></i>
+        <!-- Sticky Header (Never hides on mobile scroll) -->
+        <header class="bg-white border-b border-gray-200 shadow-sm z-30 shrink-0 w-full sticky top-0">
+            
+            <!-- Row 1: Navbar with 3-dot Menu & Sidebar Toggle -->
+            <div class="flex justify-between items-center px-2 md:px-6 py-2 border-b border-gray-100 bg-white">
+                <div class="flex items-center gap-1.5 flex-1 min-w-0">
+                    <button onclick="toggleSidebar()" class="p-1.5 text-gray-700 hover:bg-gray-100 rounded focus:outline-none">
+                        <i class="fas fa-bars text-lg"></i>
                     </button>
-                    <input type="text" id="doc-title" value="Untitled Document" class="text-base md:text-xl font-bold text-gray-700 outline-none hover:bg-gray-50 px-2 py-1 rounded w-full md:w-64 border-b border-transparent focus:border-blue-500 transition">
+                    <input type="text" id="doc-title" value="Untitled Document" class="text-sm md:text-lg font-bold text-gray-700 outline-none hover:bg-gray-50 px-1 py-0.5 rounded flex-1 md:w-64 border-b border-transparent focus:border-blue-500 transition truncate">
                     
-                    <span id="save-status-badge" class="hidden text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <span id="save-status-badge" class="hidden text-[10px] md:text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded-full flex items-center gap-1 shrink-0">
                         <i class="fas fa-check-circle"></i> অটো-সেভড
                     </span>
                 </div>
                 
-                <!-- Action Dropdown Button -->
-                <div class="relative inline-block text-left shrink-0 ml-2 md:ml-4">
-                    <button onclick="toggleDropdown(event)" class="p-2 md:p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition focus:outline-none shadow-sm border border-gray-200">
-                        <i class="fas fa-ellipsis-v md:fa-bars text-xl px-1"></i>
+                <!-- Action Menu Button (3 Dots) -->
+                <div class="relative inline-block text-left shrink-0 ml-1">
+                    <button onclick="toggleDropdown(event)" class="p-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg transition focus:outline-none shadow-sm border border-gray-300">
+                        <i class="fas fa-ellipsis-v text-base px-1"></i>
                     </button>
                     
+                    <!-- Action Dropdown Menu -->
                     <div id="action-dropdown" class="hidden absolute right-0 mt-2 w-56 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-lg shadow-2xl outline-none z-50 overflow-hidden">
                         <div class="py-1 bg-gray-50">
                             <button id="mode-toggle-btn" onclick="toggleMode()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-indigo-700 hover:bg-indigo-100 font-bold transition">
@@ -343,7 +245,7 @@
                                 <i class="fas fa-file-circle-plus w-5 text-center text-lg"></i> নতুন পেজ যুক্ত করুন
                             </button>
                             <button onclick="manualSaveDoc()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-semibold transition">
-                                <i class="fas fa-save w-5 text-center text-lg"></i> সেভ করুন (Manual)
+                                <i class="fas fa-save w-5 text-center text-lg text-green-600"></i> সেভ করুন (Manual)
                             </button>
                         </div>
                         <div class="py-1">
@@ -358,9 +260,9 @@
                 </div>
             </div>
 
-            <!-- Page Setup Toolbar -->
-            <div id="page-setup-toolbar" class="flex items-center gap-2 px-3 md:px-6 py-1.5 bg-slate-50 text-xs text-gray-700 border-b border-gray-200 overflow-x-auto whitespace-nowrap hide-scrollbar">
-                <span class="font-bold text-gray-500 flex items-center gap-1 shrink-0"><i class="fas fa-file-alt"></i> পেজ লেআউট:</span>
+            <!-- Row 2: Page Setup Toolbar (Scrollable) -->
+            <div id="page-setup-toolbar" class="flex items-center gap-2 px-2 md:px-6 py-1.5 bg-slate-50 text-xs text-gray-700 border-b border-gray-200 overflow-x-auto whitespace-nowrap hide-scrollbar">
+                <span class="font-bold text-gray-500 flex items-center gap-1 shrink-0"><i class="fas fa-file-alt"></i> পেজ:</span>
                 
                 <select id="pageSizeSelect" onchange="applyPageLayout()" class="border border-gray-300 rounded px-1.5 py-1 bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
                     <option value="a4">A4 Size</option>
@@ -369,20 +271,20 @@
                 </select>
 
                 <select id="pageOrientationSelect" onchange="applyPageLayout()" class="border border-gray-300 rounded px-1.5 py-1 bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
-                    <option value="portrait">পোর্ট্রেট (Portrait)</option>
-                    <option value="landscape">ল্যান্ডস্কেপ (Landscape)</option>
+                    <option value="portrait">পোর্ট্রেট</option>
+                    <option value="landscape">ল্যান্ডস্কেপ</option>
                 </select>
 
                 <select id="pageMarginSelect" onchange="applyPageLayout()" class="border border-gray-300 rounded px-1.5 py-1 bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
-                    <option value="normal">মার্জিন: Normal (1")</option>
-                    <option value="narrow">মার্জিন: Narrow (0.5")</option>
-                    <option value="wide">মার্জিন: Wide (1.5")</option>
+                    <option value="normal">মার্জিন: Normal</option>
+                    <option value="narrow">মার্জিন: Narrow</option>
+                    <option value="wide">মার্জিন: Wide</option>
                 </select>
 
                 <select id="pageBorderSelect" onchange="applyPageLayout()" class="border border-gray-300 rounded px-1.5 py-1 bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
                     <option value="none">বর্ডার: নেই</option>
-                    <option value="solid" selected>বর্ডার: সলিড লাইন</option>
-                    <option value="double">বর্ডার: ডাবল লাইন</option>
+                    <option value="solid" selected>বর্ডার: সলিড</option>
+                    <option value="double">বর্ডার: ডাবল</option>
                     <option value="dashed">বর্ডার: ড্যাশড</option>
                 </select>
 
@@ -393,13 +295,13 @@
                 </select>
 
                 <select id="pageNumberSelect" onchange="applyPageNumbering()" class="border border-gray-300 rounded px-1.5 py-1 bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0 font-medium text-blue-700">
-                    <option value="none">পেজ নম্বর: বন্ধ</option>
+                    <option value="none">পেজ নং: বন্ধ</option>
                     <option value="bottom-center" selected>পেজ নং: নিচে মাঝে</option>
                     <option value="bottom-right">পেজ নং: নিচে ডানে</option>
                     <option value="top-right">পেজ নং: উপরে ডানে</option>
                 </select>
 
-                <label class="flex items-center gap-1 px-2 py-1 bg-white border border-gray-300 rounded cursor-pointer shrink-0 hover:bg-gray-100" title="কাগজের ব্যাকগ্রাউন্ড কালার">
+                <label class="flex items-center gap-1 px-2 py-1 bg-white border border-gray-300 rounded cursor-pointer shrink-0 hover:bg-gray-100" title="কাগজের রঙ">
                     <i class="fas fa-fill-drip text-slate-600"></i> কাগজের রঙ
                     <input type="color" value="#ffffff" oninput="changePageBgColor(this.value)" class="hidden">
                 </label>
@@ -409,91 +311,49 @@
                 </button>
             </div>
 
-            <!-- Rich Formatting Toolbar -->
-            <div id="formatting-toolbar" class="flex items-center gap-1.5 px-3 md:px-6 py-1.5 bg-white text-gray-700 border-b border-gray-200 overflow-x-auto whitespace-nowrap hide-scrollbar">
-                <button onclick="handleUndo()" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Undo"><i class="fas fa-undo"></i></button>
-                <button onclick="handleRedo()" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Redo"><i class="fas fa-redo"></i></button>
+            <!-- Row 3: Rich Formatting Toolbar (Scrollable) -->
+            <div id="formatting-toolbar" class="flex items-center gap-1 px-2 md:px-6 py-1.5 bg-white text-gray-700 border-b border-gray-200 overflow-x-auto whitespace-nowrap hide-scrollbar">
+                <button onclick="handleUndo()" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition" title="Undo"><i class="fas fa-undo"></i></button>
+                <button onclick="handleRedo()" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition" title="Redo"><i class="fas fa-redo"></i></button>
                 <div class="w-px h-5 bg-gray-300 mx-1 shrink-0"></div>
 
-                <select onchange="formatDoc('fontName', this.value)" class="border border-gray-300 rounded px-2 py-0.5 text-xs bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
-                    <option value="Noto Sans Bengali">Noto Sans Bengali</option>
-                    <option value="Hind Siliguri">Hind Siliguri</option>
-                    <option value="Roboto">Roboto (English)</option>
-                    <option value="Times New Roman">Times New Roman</option>
-                </select>
-
-                <select onchange="formatHeading(this.value)" class="border border-gray-300 rounded px-2 py-0.5 text-xs bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
+                <select onchange="formatHeading(this.value)" class="border border-gray-300 rounded px-1.5 py-0.5 text-xs bg-white outline-none cursor-pointer shrink-0">
                     <option value="p">সাধারণ টেক্সট</option>
                     <option value="h1">Heading 1</option>
                     <option value="h2">Heading 2</option>
-                    <option value="h3">Heading 3</option>
                 </select>
 
-                <select onchange="formatDoc('fontSize', this.value)" class="border border-gray-300 rounded px-2 py-0.5 text-xs bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
-                    <option value="3">সাইজ: 12pt</option>
-                    <option value="2">সাইজ: 10pt</option>
-                    <option value="4">সাইজ: 14pt</option>
-                    <option value="5">সাইজ: 18pt</option>
-                </select>
+                <button onclick="formatDoc('bold')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-bold text-xs transition" title="Bold">B</button>
+                <button onclick="formatDoc('italic')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center italic text-xs transition" title="Italic">I</button>
+                <button onclick="formatDoc('underline')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center underline text-xs transition" title="Underline">U</button>
                 
-                <div class="w-px h-5 bg-gray-300 mx-1 shrink-0"></div>
-                
-                <button onclick="formatDoc('bold')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-bold text-sm transition" title="Bold">B</button>
-                <button onclick="formatDoc('italic')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center italic text-sm transition" title="Italic">I</button>
-                <button onclick="formatDoc('underline')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center underline text-sm transition" title="Underline">U</button>
-                <button onclick="formatDoc('subscript')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition" title="Subscript (X₂)"><i class="fas fa-subscript"></i></button>
-                <button onclick="formatDoc('superscript')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition" title="Superscript (X²)"><i class="fas fa-superscript"></i></button>
-
-                <label onmousedown="saveSelection()" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center cursor-pointer text-red-500 font-serif text-sm font-bold transition border border-gray-200" title="টেক্সট কালার">
+                <label onmousedown="saveSelection()" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center cursor-pointer text-red-500 font-serif text-xs font-bold transition border border-gray-200" title="টেক্সট কালার">
                     A
                     <input type="color" oninput="formatColor(this.value)" class="hidden">
                 </label>
 
-                <label onmousedown="saveSelection()" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center cursor-pointer text-yellow-500 text-xs transition border border-gray-200" title="টেক্সট হাইলাইটার">
-                    <i class="fas fa-highlighter"></i>
-                    <input type="color" value="#fef08a" oninput="formatHighlight(this.value)" class="hidden">
-                </label>
-                
                 <div class="w-px h-5 bg-gray-300 mx-1 shrink-0"></div>
 
                 <button onclick="formatDoc('justifyLeft')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition"><i class="fas fa-align-left"></i></button>
                 <button onclick="formatDoc('justifyCenter')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition"><i class="fas fa-align-center"></i></button>
-                <button onclick="formatDoc('justifyRight')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition"><i class="fas fa-align-right"></i></button>
-                <button onclick="formatDoc('justifyFull')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-xs transition"><i class="fas fa-align-justify"></i></button>
 
-                <div class="w-px h-5 bg-gray-300 mx-1 shrink-0"></div>
-
-                <button onclick="openMathModal()" class="px-2.5 py-0.5 shrink-0 text-xs font-bold bg-blue-50 text-blue-700 rounded hover:bg-blue-100 flex items-center gap-1 transition">
+                <button onclick="openMathModal()" class="px-2 py-0.5 shrink-0 text-xs font-bold bg-blue-50 text-blue-700 rounded hover:bg-blue-100 flex items-center gap-1 transition">
                     <i class="fas fa-square-root-variable"></i> সমীকরণ
                 </button>
-                <button onclick="openDrawModal()" class="px-2.5 py-0.5 shrink-0 text-xs font-bold bg-purple-50 text-purple-700 rounded hover:bg-purple-100 flex items-center gap-1 transition">
+                <button onclick="openDrawModal()" class="px-2 py-0.5 shrink-0 text-xs font-bold bg-purple-50 text-purple-700 rounded hover:bg-purple-100 flex items-center gap-1 transition">
                     <i class="fas fa-paint-brush"></i> চিত্র/জ্যামিতি
                 </button>
-                <button onclick="openTableModal()" class="px-2.5 py-0.5 shrink-0 text-xs font-bold bg-teal-50 text-teal-700 rounded hover:bg-teal-100 flex items-center gap-1 transition">
+                <button onclick="openTableModal()" class="px-2 py-0.5 shrink-0 text-xs font-bold bg-teal-50 text-teal-700 rounded hover:bg-teal-100 flex items-center gap-1 transition">
                     <i class="fas fa-table"></i> টেবিল
                 </button>
             </div>
-
-            <!-- Dynamic Table Control Ribbon -->
-            <div id="table-tools-ribbon" class="hidden flex items-center gap-2 px-3 md:px-6 py-1 bg-teal-900 text-white text-xs overflow-x-auto whitespace-nowrap">
-                <span class="font-bold flex items-center gap-1"><i class="fas fa-tools"></i> টেবিল কন্ট্রোল:</span>
-                <button onclick="addTableRow('above')" class="px-2 py-0.5 bg-teal-800 hover:bg-teal-700 rounded">+ রো উপরে</button>
-                <button onclick="addTableRow('below')" class="px-2 py-0.5 bg-teal-800 hover:bg-teal-700 rounded">+ রো নিচে</button>
-                <button onclick="deleteTableRow()" class="px-2 py-0.5 bg-red-800 hover:bg-red-700 rounded">- রো মুছুন</button>
-                <div class="w-px h-4 bg-teal-700"></div>
-                <button onclick="getTableCol('left')" class="px-2 py-0.5 bg-teal-800 hover:bg-teal-700 rounded">+ কলাম বামে</button>
-                <button onclick="getTableCol('right')" class="px-2 py-0.5 bg-teal-800 hover:bg-teal-700 rounded">+ কলাম ডানে</button>
-                <button onclick="deleteTableCol()" class="px-2 py-0.5 bg-red-800 hover:bg-red-700 rounded">- কলাম মুছুন</button>
-                <div class="w-px h-4 bg-teal-700"></div>
-                <button onclick="deleteWholeTable()" class="px-2 py-0.5 bg-red-600 hover:bg-red-700 rounded font-bold ml-auto"><i class="fas fa-trash"></i> টেবিল রিমুভ</button>
-            </div>
         </header>
 
-        <!-- Main Workspace -->
+        <!-- Workspace Area -->
         <div class="flex-1 relative bg-[#cbd5e1] overflow-hidden w-full z-0">
             
             <!-- MODE 1: Direct Editor View (Multi-Page Scroll Container) -->
-            <div id="editor-view" class="h-full w-full overflow-y-auto flex flex-col items-center py-6 px-2 md:px-4" onclick="deselectImages(event)">
+            <div id="editor-view" class="h-full w-full overflow-y-auto flex flex-col items-center py-4 px-1 md:px-4" onclick="deselectImages(event)">
                 
                 <div id="editor-pages-container" class="w-full flex flex-col items-center">
                     <!-- Master Page 1 -->
@@ -507,8 +367,8 @@
                             </div>
 
                             <div contenteditable="true" class="page-content-editable text-base md:text-lg leading-relaxed text-justify cols-1" oninput="checkAndAutoPaginate(this)" onkeydown="handleKeyDownPagination(event, this)">
-                                <h1 style="font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 20px;">উচ্চতর গণিত ও পদার্থবিজ্ঞান নোটস</h1>
-                                <p>এখানে আপনি সরাসরি টাইপ করতে পারবেন। পেজটি পূর্ণ হলে স্বয়ংক্রিয়ভাবে পরবর্তী নতুন পাতা তৈরি হয়ে কার্সর স্থানান্তর হবে।</p>
+                                <h1 style="font-size: 20px; font-weight: bold; text-align: center; margin-bottom: 15px;">উচ্চতর গণিত ও পদার্থবিজ্ঞান নোটস</h1>
+                                <p>এখানে আপনি সরাসরি টাইপ করতে পারবেন। পেজটি পূর্ণ হলে স্বয়ংক্রিয়ভাবে পরবর্তী নতুন পাতা তৈরি হবে।</p>
                             </div>
 
                             <div class="page-footer-area">
@@ -524,22 +384,22 @@
             <!-- MODE 2: AI Chat Converter View -->
             <div id="converter-view" class="hidden h-full w-full flex-col md:flex-row gap-4 p-2 md:p-4 overflow-y-auto md:overflow-hidden">
                 <div class="w-full md:w-1/2 h-[45vh] md:h-full flex flex-col bg-white rounded-xl shadow border border-gray-300 overflow-hidden shrink-0 md:shrink">
-                    <div class="bg-gray-100 p-2 md:p-3 border-b border-gray-300 flex justify-between items-center shrink-0">
-                        <label class="font-bold text-gray-700 text-xs md:text-sm ml-1">📝 পেস্ট করুন</label>
-                        <div class="flex gap-1 md:gap-2">
-                            <button onclick="pasteText()" class="text-xs bg-blue-100 text-blue-700 px-2 md:px-3 py-1 md:py-1.5 rounded font-bold hover:bg-blue-200 transition">পেস্ট</button>
-                            <button onclick="document.getElementById('ai-input').value=''; document.getElementById('ai-output').innerHTML=''" class="text-xs bg-red-100 text-red-700 px-2 md:px-3 py-1 md:py-1.5 rounded font-bold hover:bg-red-200 transition">ক্লিয়ার</button>
+                    <div class="bg-gray-100 p-2 border-b border-gray-300 flex justify-between items-center shrink-0">
+                        <label class="font-bold text-gray-700 text-xs ml-1">📝 পেস্ট করুন</label>
+                        <div class="flex gap-1">
+                            <button onclick="pasteText()" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-bold hover:bg-blue-200 transition">পেস্ট</button>
+                            <button onclick="document.getElementById('ai-input').value=''; document.getElementById('ai-output').innerHTML=''" class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded font-bold hover:bg-red-200 transition">ক্লিয়ার</button>
                         </div>
                     </div>
-                    <textarea id="ai-input" class="w-full h-full flex-grow p-3 md:p-4 focus:outline-none resize-none font-mono text-sm md:text-base bg-gray-50 overflow-y-auto" placeholder="ChatGPT বা AI থেকে কপি করা টেক্সট এখানে দিন..."></textarea>
+                    <textarea id="ai-input" class="w-full h-full flex-grow p-3 focus:outline-none resize-none font-mono text-sm bg-gray-50 overflow-y-auto" placeholder="ChatGPT বা AI থেকে টেক্সট দিন..."></textarea>
                 </div>
 
                 <div class="w-full md:w-1/2 h-[50vh] md:h-full flex flex-col bg-[#cbd5e1] rounded-xl shadow-inner border border-gray-300 overflow-hidden shrink-0 md:shrink">
                     <div class="bg-gray-200 p-2 border-b border-gray-300 flex justify-center items-center shrink-0 shadow-sm z-10">
-                        <label class="font-bold text-gray-700 text-xs md:text-sm">👁️ লাইভ আউটপুট প্রিভিউ</label>
+                        <label class="font-bold text-gray-700 text-xs">👁️ লাইভ আউটপুট প্রিভিউ</label>
                     </div>
-                    <div class="flex-grow overflow-y-auto p-2 md:p-4 flex justify-center pb-10">
-                        <div id="ai-output" class="editor-page-container page-a4-portrait margin-normal p-6 text-base md:text-lg leading-relaxed text-justify h-auto min-h-full"></div>
+                    <div class="flex-grow overflow-y-auto p-2 flex justify-center pb-10">
+                        <div id="ai-output" class="editor-page-container page-a4-portrait margin-normal p-4 text-base leading-relaxed text-justify h-auto min-h-full"></div>
                     </div>
                 </div>
             </div>
@@ -549,193 +409,120 @@
 
     <!-- 1. ADVANCED MATH MODAL -->
     <div id="math-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-3 hidden">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden border border-gray-200 flex flex-col max-h-[90vh]">
-            <div class="bg-blue-700 text-white px-5 py-3 flex justify-between items-center shrink-0">
-                <h3 class="font-bold text-base flex items-center gap-2"><i class="fas fa-square-root-variable"></i> সমীকরণ ও গণিত সিম্বল বিল্ডার</h3>
-                <button onclick="closeMathModal()" class="text-white hover:text-gray-200"><i class="fas fa-times text-lg"></i></button>
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-xl overflow-hidden border border-gray-200 flex flex-col max-h-[90vh]">
+            <div class="bg-blue-700 text-white px-4 py-2.5 flex justify-between items-center shrink-0">
+                <h3 class="font-bold text-sm flex items-center gap-2"><i class="fas fa-square-root-variable"></i> সমীকরণ বিল্ডার</h3>
+                <button onclick="closeMathModal()" class="text-white hover:text-gray-200"><i class="fas fa-times text-base"></i></button>
             </div>
 
-            <div class="flex border-b border-gray-200 bg-slate-100 text-xs font-semibold overflow-x-auto shrink-0">
-                <button onclick="switchMathTab('basic')" id="tab-btn-basic" class="px-4 py-2 text-blue-700 border-b-2 border-blue-700 bg-white font-bold">সাধারণ ও বীজগণিত</button>
-                <button onclick="switchMathTab('calculus')" id="tab-btn-calculus" class="px-4 py-2 text-gray-600 hover:text-blue-700">ক্যালকুলাস ও লিমিট</button>
-                <button onclick="switchMathTab('matrix')" id="tab-btn-matrix" class="px-4 py-2 text-gray-600 hover:text-blue-700">ম্যাট্রিক্স ও ভেক্টর</button>
-                <button onclick="switchMathTab('greek')" id="tab-btn-greek" class="px-4 py-2 text-gray-600 hover:text-blue-700">গ্রিক বর্ণমালা ও অপারেটর</button>
-            </div>
-            
-            <div class="p-4 space-y-3 overflow-y-auto">
-                <div id="tab-content-basic" class="math-tab-panel flex flex-wrap gap-1.5 p-2 bg-slate-50 border rounded-lg">
-                    <button onclick="insertLatexSnippet('\\frac{a}{b}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\frac{a}{b}$</button>
-                    <button onclick="insertLatexSnippet('\\sqrt{x}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\sqrt{x}$</button>
-                    <button onclick="insertLatexSnippet('\\sqrt[n]{x}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\sqrt[n]{x}$</button>
-                    <button onclick="insertLatexSnippet('x^{n}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$x^n$</button>
-                    <button onclick="insertLatexSnippet('x_{i}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$x_i$</button>
-                    <button onclick="insertLatexSnippet('\\pm')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\pm$</button>
-                    <button onclick="insertLatexSnippet('\\times')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\times$</button>
-                    <button onclick="insertLatexSnippet('\\div')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\div$</button>
-                    <button onclick="insertLatexSnippet('\\neq')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\neq$</button>
-                    <button onclick="insertLatexSnippet('\\approx')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\approx$</button>
-                    <button onclick="insertLatexSnippet('\\infty')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\infty$</button>
-                </div>
-
-                <div id="tab-content-calculus" class="math-tab-panel hidden flex flex-wrap gap-1.5 p-2 bg-slate-50 border rounded-lg">
-                    <button onclick="insertLatexSnippet('\\frac{d}{dx}f(x)')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\frac{d}{dx}$</button>
-                    <button onclick="insertLatexSnippet('\\frac{\\partial f}{\\partial x}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\frac{\partial}{\partial x}$</button>
-                    <button onclick="insertLatexSnippet('\\int f(x) dx')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\int$</button>
-                    <button onclick="insertLatexSnippet('\\int_{a}^{b} f(x) dx')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\int_{a}^{b}$</button>
-                    <button onclick="insertLatexSnippet('\\iint_{D} f(x,y) dA')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\iint$</button>
-                    <button onclick="insertLatexSnippet('\\oint_C \\vec{F} \\cdot d\\vec{r}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\oint$</button>
-                    <button onclick="insertLatexSnippet('\\lim_{x \\to 0}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\lim_{x \to 0}$</button>
-                    <button onclick="insertLatexSnippet('\\lim_{n \\to \\infty}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\lim_{n \to \infty}$</button>
-                    <button onclick="insertLatexSnippet('\\sum_{i=1}^{n} x_i')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\sum_{i=1}^n$</button>
-                    <button onclick="insertLatexSnippet('\\prod_{i=1}^{n} x_i')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\prod_{i=1}^n$</button>
-                </div>
-
-                <div id="tab-content-matrix" class="math-tab-panel hidden flex flex-wrap gap-1.5 p-2 bg-slate-50 border rounded-lg">
-                    <button onclick="insertLatexSnippet('\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\begin{pmatrix}a&b\\c&d\end{pmatrix}$</button>
-                    <button onclick="insertLatexSnippet('\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\begin{bmatrix}a&b\\c&d\end{bmatrix}$</button>
-                    <button onclick="insertLatexSnippet('\\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\begin{vmatrix}a&b\\c&d\end{vmatrix}$</button>
-                    <button onclick="insertLatexSnippet('\\begin{pmatrix} x \\\\ y \\\\ z \\end{pmatrix}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">কলাম ভেক্টর</button>
-                    <button onclick="insertLatexSnippet('\\vec{v}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\vec{v}$</button>
-                    <button onclick="insertLatexSnippet('\\hat{i} + \\hat{j} + \\hat{k}')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\hat{i},\hat{j},\hat{k}$</button>
-                </div>
-
-                <div id="tab-content-greek" class="math-tab-panel hidden flex flex-wrap gap-1.5 p-2 bg-slate-50 border rounded-lg">
-                    <button onclick="insertLatexSnippet('\\alpha')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\alpha$</button>
-                    <button onclick="insertLatexSnippet('\\beta')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\beta$</button>
-                    <button onclick="insertLatexSnippet('\\theta')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\theta$</button>
-                    <button onclick="insertLatexSnippet('\\lambda')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\lambda$</button>
-                    <button onclick="insertLatexSnippet('\\pi')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\pi$</button>
-                    <button onclick="insertLatexSnippet('\\omega')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\omega$</button>
-                    <button onclick="insertLatexSnippet('\\Delta')" class="px-2.5 py-1 bg-white border rounded hover:bg-blue-50 font-serif">$\Delta$</button>
+            <div class="p-3 space-y-2 overflow-y-auto">
+                <div class="flex flex-wrap gap-1 p-2 bg-slate-50 border rounded-lg">
+                    <button onclick="insertLatexSnippet('\\frac{a}{b}')" class="px-2 py-1 bg-white border rounded hover:bg-blue-50 font-serif text-xs">$\frac{a}{b}$</button>
+                    <button onclick="insertLatexSnippet('\\sqrt{x}')" class="px-2 py-1 bg-white border rounded hover:bg-blue-50 font-serif text-xs">$\sqrt{x}$</button>
+                    <button onclick="insertLatexSnippet('x^{2}')" class="px-2 py-1 bg-white border rounded hover:bg-blue-50 font-serif text-xs">$x^2$</button>
+                    <button onclick="insertLatexSnippet('\\int_{a}^{b}')" class="px-2 py-1 bg-white border rounded hover:bg-blue-50 font-serif text-xs">$\int$</button>
+                    <button onclick="insertLatexSnippet('\\sum')" class="px-2 py-1 bg-white border rounded hover:bg-blue-50 font-serif text-xs">$\sum$</button>
+                    <button onclick="insertLatexSnippet('\\alpha')" class="px-2 py-1 bg-white border rounded hover:bg-blue-50 font-serif text-xs">$\alpha$</button>
+                    <button onclick="insertLatexSnippet('\\theta')" class="px-2 py-1 bg-white border rounded hover:bg-blue-50 font-serif text-xs">$\theta$</button>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">LaTeX কোড:</label>
-                    <textarea id="modal-latex-input" rows="3" class="w-full border border-gray-300 rounded-lg p-2.5 font-mono text-sm focus:ring-2 focus:ring-blue-500 outline-none" oninput="updateModalMathPreview()">\int_{0}^{\infty} e^{-x^2} dx = \frac{\sqrt{\pi}}{2}</textarea>
+                    <textarea id="modal-latex-input" rows="2" class="w-full border border-gray-300 rounded p-2 font-mono text-xs focus:ring-1 focus:ring-blue-500 outline-none" oninput="updateModalMathPreview()">E = mc^2</textarea>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">লাইভ প্রিভিউ:</label>
-                    <div id="modal-math-preview" class="border border-slate-200 bg-slate-50 rounded-lg p-3 min-h-[60px] flex items-center justify-center text-lg overflow-x-auto">
-                        $\int_{0}^{\infty} e^{-x^2} dx = \frac{\sqrt{\pi}}{2}$
-                    </div>
+                <div id="modal-math-preview" class="border border-slate-200 bg-slate-50 rounded p-2 min-h-[40px] flex items-center justify-center text-sm">
+                    $E = mc^2$
                 </div>
             </div>
 
-            <div class="bg-gray-100 px-5 py-3 flex justify-end gap-2 border-t shrink-0">
-                <button onclick="closeMathModal()" class="px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300">বাতিল</button>
-                <button onclick="confirmInsertMath()" class="px-5 py-2 text-sm bg-blue-700 text-white rounded-lg font-bold hover:bg-blue-800">সমীকরণ যুক্ত করুন</button>
+            <div class="bg-gray-100 px-4 py-2 flex justify-end gap-2 border-t shrink-0">
+                <button onclick="closeMathModal()" class="px-3 py-1.5 text-xs bg-gray-200 text-gray-700 rounded font-semibold">বাতিল</button>
+                <button onclick="confirmInsertMath()" class="px-4 py-1.5 text-xs bg-blue-700 text-white rounded font-bold">যোগ করুন</button>
             </div>
         </div>
     </div>
 
     <!-- 2. GEOMETRY / SKETCH MODAL -->
     <div id="draw-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-3 hidden">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden border border-gray-200 flex flex-col">
-            <div class="bg-purple-800 text-white px-5 py-3 flex justify-between items-center">
-                <h3 class="font-bold text-base flex items-center gap-2"><i class="fas fa-shapes"></i> জ্যামিতি ও গ্রাফিক্স ড্রয়িং বোর্ড</h3>
-                <button onclick="closeDrawModal()" class="text-white hover:text-gray-200"><i class="fas fa-times text-lg"></i></button>
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden border border-gray-200 flex flex-col">
+            <div class="bg-purple-800 text-white px-4 py-2.5 flex justify-between items-center">
+                <h3 class="font-bold text-sm flex items-center gap-2"><i class="fas fa-shapes"></i> চিত্র ও গ্রাফিক্স বোর্ড</h3>
+                <button onclick="closeDrawModal()" class="text-white hover:text-gray-200"><i class="fas fa-times text-base"></i></button>
             </div>
             
-            <div class="bg-slate-100 p-2.5 flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 text-xs">
-                <div class="flex items-center gap-1 flex-wrap">
-                    <span class="font-bold text-gray-600">টুলস:</span>
+            <div class="bg-slate-100 p-2 flex flex-wrap items-center justify-between gap-1 border-b text-xs">
+                <div class="flex items-center gap-1">
                     <button id="draw-tool-free" onclick="setDrawTool('free')" class="px-2 py-1 bg-purple-100 text-purple-700 font-bold rounded border border-purple-300">পেনসিল</button>
-                    <button id="draw-tool-line" onclick="setDrawTool('line')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">সরলরেখা</button>
-                    <button id="draw-tool-arrow" onclick="setDrawTool('arrow')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">ভেক্টর তীর</button>
-                    <button id="draw-tool-triangle" onclick="setDrawTool('triangle')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">ত্রিভুজ</button>
-                    <button id="draw-tool-rect" onclick="setDrawTool('rect')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">আয়তক্ষেত্র</button>
-                    <button id="draw-tool-circle" onclick="setDrawTool('circle')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">বৃত্ত</button>
-                    <button id="draw-tool-axis" onclick="setDrawTool('axis')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">X-Y অক্ষ</button>
-                    <button id="draw-tool-text" onclick="setDrawTool('text')" class="px-2 py-1 bg-white text-gray-700 rounded border border-gray-300">টেক্সট</button>
+                    <button id="draw-tool-line" onclick="setDrawTool('line')" class="px-2 py-1 bg-white text-gray-700 rounded border">রেখা</button>
+                    <button id="draw-tool-circle" onclick="setDrawTool('circle')" class="px-2 py-1 bg-white text-gray-700 rounded border">বৃত্ত</button>
                 </div>
-
-                <div class="flex items-center gap-2">
-                    <select id="drawLineStyle" class="border border-gray-300 rounded p-1 bg-white outline-none">
-                        <option value="solid">সলিড লাইন</option>
-                        <option value="dashed">ড্যাশড লাইন</option>
-                        <option value="dotted">ডটেড লাইন</option>
-                    </select>
-
-                    <select id="drawLineWidth" class="border border-gray-300 rounded p-1 bg-white outline-none">
-                        <option value="2">2px</option>
-                        <option value="4" selected>4px</option>
-                        <option value="6">6px</option>
-                    </select>
-
-                    <input type="color" id="drawColor" value="#000000" class="w-6 h-6 border rounded cursor-pointer">
-                </div>
-
-                <button onclick="clearCanvas()" class="px-2.5 py-1 bg-red-100 text-red-700 rounded font-bold hover:bg-red-200"><i class="fas fa-trash-alt"></i> মুছুন</button>
+                <button onclick="clearCanvas()" class="px-2 py-1 bg-red-100 text-red-700 rounded font-bold">মুছুন</button>
             </div>
 
-            <div class="p-4 bg-gray-200 flex justify-center">
-                <canvas id="sketchCanvas" width="700" height="350" class="bg-white rounded border border-gray-400 shadow cursor-crosshair"></canvas>
+            <div class="p-2 bg-gray-200 flex justify-center">
+                <canvas id="sketchCanvas" width="480" height="260" class="bg-white rounded border border-gray-400 shadow cursor-crosshair max-w-full"></canvas>
             </div>
 
-            <div class="bg-gray-100 px-5 py-3 flex justify-between items-center border-t">
-                <div class="flex items-center gap-2 text-xs">
-                    <span class="font-bold text-gray-700">ভিউ স্টাইল:</span>
-                    <select id="imgViewStyle" class="border border-gray-300 rounded px-2 py-1 bg-white outline-none font-semibold text-purple-800">
-                        <option value="img-style-default">সাধারণ ভিউ</option>
-                        <option value="img-style-3d" selected>৩ডি এলিভেশন (3D View)</option>
-                        <option value="img-style-polaroid">পোলারয়েড ফ্রেম</option>
-                        <option value="img-style-glow">সফট গ্লো (Soft Glow)</option>
-                    </select>
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="closeDrawModal()" class="px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300">বাতিল</button>
-                    <button onclick="insertDrawingToDoc()" class="px-5 py-2 text-sm bg-purple-700 text-white rounded-lg font-bold hover:bg-purple-800">ডকুমেন্টে যুক্ত করুন</button>
-                </div>
+            <div class="bg-gray-100 px-4 py-2 flex justify-end gap-2 border-t">
+                <button onclick="closeDrawModal()" class="px-3 py-1.5 text-xs bg-gray-200 text-gray-700 rounded font-semibold">বাতিল</button>
+                <button onclick="insertDrawingToDoc()" class="px-4 py-1.5 text-xs bg-purple-700 text-white rounded font-bold">যুক্ত করুন</button>
             </div>
         </div>
     </div>
 
     <!-- 3. TABLE MODAL -->
     <div id="table-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-3 hidden">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-200 flex flex-col">
-            <div class="bg-teal-700 text-white px-5 py-3 flex justify-between items-center">
-                <h3 class="font-bold text-base flex items-center gap-2"><i class="fas fa-table"></i> টেবিল তৈরি করুন</h3>
-                <button onclick="closeTableModal()" class="text-white hover:text-gray-200"><i class="fas fa-times text-lg"></i></button>
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-xs overflow-hidden border border-gray-200 flex flex-col">
+            <div class="bg-teal-700 text-white px-4 py-2.5 flex justify-between items-center">
+                <h3 class="font-bold text-sm flex items-center gap-2"><i class="fas fa-table"></i> টেবিল তৈরি</h3>
+                <button onclick="closeTableModal()" class="text-white hover:text-gray-200"><i class="fas fa-times text-base"></i></button>
             </div>
             
-            <div class="p-5 space-y-4">
-                <div class="grid grid-cols-2 gap-3">
+            <div class="p-4 space-y-3">
+                <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">সারি (Rows):</label>
-                        <input type="number" id="newTableRows" value="3" min="1" max="25" class="w-full border rounded p-2 text-center text-sm">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">সারি:</label>
+                        <input type="number" id="newTableRows" value="3" min="1" max="20" class="w-full border rounded p-1 text-center text-xs">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">কলাম (Cols):</label>
-                        <input type="number" id="newTableCols" value="3" min="1" max="15" class="w-full border rounded p-2 text-center text-sm">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">কলাম:</label>
+                        <input type="number" id="newTableCols" value="3" min="1" max="10" class="w-full border rounded p-1 text-center text-xs">
                     </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">টেবিলের ডিজাইন থিম:</label>
-                    <select id="newTableTheme" class="w-full border rounded p-2 text-sm bg-white outline-none">
-                        <option value="table-theme-classic">ক্লাসিক বর্ডার (Classic Grid)</option>
-                        <option value="table-theme-striped">স্ট্রাইপড থিম (Zebra Rows)</option>
-                        <option value="table-theme-modern">মডার্ন ডার্ক হেডার (Modern Header)</option>
-                    </select>
                 </div>
             </div>
 
-            <div class="bg-gray-100 px-5 py-3 flex justify-end gap-2 border-t">
-                <button onclick="closeTableModal()" class="px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300">বাতিল</button>
-                <button onclick="confirmInsertCustomTable()" class="px-5 py-2 text-sm bg-teal-700 text-white rounded-lg font-bold hover:bg-teal-800">তৈরি করুন</button>
+            <div class="bg-gray-100 px-4 py-2 flex justify-end gap-2 border-t">
+                <button onclick="closeTableModal()" class="px-3 py-1.5 text-xs bg-gray-200 text-gray-700 rounded font-semibold">বাতিল</button>
+                <button onclick="confirmInsertCustomTable()" class="px-4 py-1.5 text-xs bg-teal-700 text-white rounded font-bold">তৈরি করুন</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- MULTI-PAGE AUTO-PAGINATION & MANAGEMENT ---
+        // Dropdown Toggle Logic
+        function toggleDropdown(event) {
+            if(event) event.stopPropagation();
+            const dropdown = document.getElementById('action-dropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        window.onclick = function(event) {
+            const dropdown = document.getElementById('action-dropdown');
+            if (!event.target.closest('.relative')) {
+                if (dropdown && !dropdown.classList.contains('hidden')) dropdown.classList.add('hidden');
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.toggle('hidden');
+        }
+
+        // Auto Pagination Watcher
         let autoSaveTimer = null;
 
         function checkAndAutoPaginate(editable) {
             handleAutoSave();
-            
-            // Check overflow: if content exceeds the available vertical height of the page frame
             if (editable.scrollHeight > editable.clientHeight + 4) {
                 splitContentToNextPage(editable);
             }
@@ -745,7 +532,6 @@
             const currentPage = currentEditable.closest('.editor-page-container');
             let nextPage = currentPage.nextElementSibling;
 
-            // Automatically create next page if it doesn't exist
             if (!nextPage || !nextPage.classList.contains('editor-page-container')) {
                 nextPage = createNewPageElement();
                 currentPage.after(nextPage);
@@ -753,7 +539,6 @@
 
             const nextEditable = nextPage.querySelector('.page-content-editable');
 
-            // Move the overflowed children to the top of the next page
             while (currentEditable.scrollHeight > currentEditable.clientHeight + 4 && currentEditable.childNodes.length > 1) {
                 const overflowNode = currentEditable.lastChild;
                 nextEditable.insertBefore(overflowNode, nextEditable.firstChild);
@@ -762,7 +547,6 @@
             updateAllPageNumbers();
             nextEditable.focus();
 
-            // Set cursor to start of new page
             const range = document.createRange();
             const sel = window.getSelection();
             range.setStart(nextEditable, 0);
@@ -772,7 +556,6 @@
         }
 
         function handleKeyDownPagination(e, editable) {
-            // If Backspace pressed on an empty page, merge back with previous page
             if (e.key === "Backspace" && (editable.innerText.trim() === "" || editable.childNodes.length <= 1)) {
                 const currentPage = editable.closest('.editor-page-container');
                 const prevPage = currentPage.previousElementSibling;
@@ -783,7 +566,6 @@
                     updateAllPageNumbers();
                     prevEditable.focus();
 
-                    // Place cursor at the end of previous page
                     const range = document.createRange();
                     const sel = window.getSelection();
                     range.selectNodeContents(prevEditable);
@@ -801,7 +583,6 @@
             container.appendChild(newPage);
             updateAllPageNumbers();
             
-            // Focus on newly created page
             const newEditable = newPage.querySelector('.page-content-editable');
             newEditable.focus();
             newPage.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -814,8 +595,6 @@
         function createNewPageElement() {
             const masterPage = document.querySelector('.editor-page-container');
             const newPage = document.createElement('div');
-            
-            // Replicate master settings
             newPage.className = masterPage.className;
             newPage.innerHTML = `
                 <div class="page-inner-frame ${masterPage.querySelector('.page-inner-frame').className.replace('page-inner-frame', '').trim()}">
@@ -866,7 +645,6 @@
             });
         }
 
-        // --- FOLDER MANAGEMENT SYSTEM ---
         function createFolderPrompt() {
             const folderName = prompt("নতুন ফোল্ডারের নাম দিন:", "নতুন ফোল্ডার");
             if (folderName && folderName.trim() !== "") {
@@ -878,28 +656,17 @@
                     <button onclick="deleteFolderItem(this)" class="hidden group-hover:block text-gray-500 hover:text-red-400 text-xs"><i class="fas fa-times"></i></button>
                 `;
                 list.appendChild(li);
-                saveFolderListState();
+                localStorage.setItem('sahal_tec_folder_list', list.innerHTML);
             }
         }
 
         function deleteFolderItem(btn) {
             if (confirm("এই ফোল্ডারটি মুছে ফেলতে চান?")) {
                 btn.closest('li').remove();
-                saveFolderListState();
+                localStorage.setItem('sahal_tec_folder_list', document.getElementById('folder-list').innerHTML);
             }
         }
 
-        function saveFolderListState() {
-            const list = document.getElementById('folder-list').innerHTML;
-            localStorage.setItem('sahal_tec_folder_list', list);
-        }
-
-        function restoreFolderListState() {
-            const saved = localStorage.getItem('sahal_tec_folder_list');
-            if (saved) document.getElementById('folder-list').innerHTML = saved;
-        }
-
-        // --- AUTO-SAVE ENGINE & LOCAL STORAGE ---
         function handleAutoSave() {
             recordHistory();
             const badge = document.getElementById('save-status-badge');
@@ -918,13 +685,16 @@
                     pageColumn: document.getElementById('pageColumnSelect').value,
                     pageNumber: document.getElementById('pageNumberSelect').value
                 };
-                localStorage.setItem('sahal_tec_doc_autosave_v3', JSON.stringify(docData));
+                localStorage.setItem('sahal_tec_doc_autosave_v4', JSON.stringify(docData));
                 badge.innerHTML = '<i class="fas fa-check-circle"></i> অটো-সেভড';
             }, 1200);
         }
 
         function restoreAutoSavedData() {
-            const saved = localStorage.getItem('sahal_tec_doc_autosave_v3');
+            const savedFolders = localStorage.getItem('sahal_tec_folder_list');
+            if (savedFolders) document.getElementById('folder-list').innerHTML = savedFolders;
+
+            const saved = localStorage.getItem('sahal_tec_doc_autosave_v4');
             if (saved) {
                 try {
                     const data = JSON.parse(saved);
@@ -953,7 +723,6 @@
             window.print();
         }
 
-        // --- HISTORY STACK ---
         let undoStack = [];
         let redoStack = [];
         const MAX_HISTORY = 40;
@@ -973,9 +742,6 @@
             if (undoStack.length > 1) {
                 redoStack.push(undoStack.pop());
                 container.innerHTML = undoStack[undoStack.length - 1];
-            } else if (undoStack.length === 1) {
-                redoStack.push(undoStack.pop());
-                container.innerHTML = "";
             }
             if (window.MathJax) MathJax.typesetPromise([container]).catch(() => {});
             updateAllPageNumbers();
@@ -993,10 +759,8 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            restoreFolderListState();
             restoreAutoSavedData();
             recordHistory();
-            initTableFocusListeners();
             updateAllPageNumbers();
         });
 
@@ -1013,7 +777,6 @@
             }
         }
 
-        // --- PAGE LAYOUT & COLUMN ENGINE ---
         function applyPageLayout() {
             const size = document.getElementById('pageSizeSelect').value;
             const orientation = document.getElementById('pageOrientationSelect').value;
@@ -1038,88 +801,36 @@
             updateAllPageNumbers();
         }
 
-        function applyPageNumbering() {
-            updateAllPageNumbers();
-        }
+        function applyPageNumbering() { updateAllPageNumbers(); }
 
         function changePageBgColor(color) {
-            document.querySelectorAll('#editor-pages-container .editor-page-container').forEach(p => {
-                p.style.backgroundColor = color;
-            });
+            document.querySelectorAll('#editor-pages-container .editor-page-container').forEach(p => { p.style.backgroundColor = color; });
         }
 
         function setWatermarkPrompt() {
-            const text = prompt("ওয়াটারমার্ক টেক্সট লিখুন (খালি রাখলে মুছে যাবে):", "লাভলু");
+            const text = prompt("ওয়াটারমার্ক টেক্সট লিখুন:", "লাভলু");
             if (text !== null) {
                 document.querySelectorAll('.watermark-overlay').forEach(w => {
-                    if (text.trim() === '') {
-                        w.classList.add('hidden');
-                    } else {
-                        w.innerText = text;
-                        w.classList.remove('hidden');
-                    }
+                    if (text.trim() === '') w.classList.add('hidden');
+                    else { w.innerText = text; w.classList.remove('hidden'); }
                 });
             }
         }
 
-        // --- FORMATTING ACTIONS ---
-        function formatDoc(command, value = null) {
-            document.execCommand(command, false, value);
-            handleAutoSave();
-        }
+        function formatDoc(command, value = null) { document.execCommand(command, false, value); handleAutoSave(); }
+        function formatHeading(tag) { document.execCommand('formatBlock', false, tag === 'p' ? '<p>' : `<${tag}>`); handleAutoSave(); }
+        function formatColor(color) { restoreSelection(); document.execCommand('styleWithCSS', false, true); document.execCommand('foreColor', false, color); handleAutoSave(); }
 
-        function formatHeading(tag) {
-            document.execCommand('formatBlock', false, tag === 'p' ? '<p>' : `<${tag}>`);
-            handleAutoSave();
-        }
-
-        function formatColor(color) {
-            restoreSelection();
-            document.execCommand('styleWithCSS', false, true);
-            document.execCommand('foreColor', false, color);
-            handleAutoSave();
-        }
-
-        function formatHighlight(color) {
-            restoreSelection();
-            document.execCommand('styleWithCSS', false, true);
-            document.execCommand('hiliteColor', false, color);
-            handleAutoSave();
-        }
-
-        // --- MATH MODAL SYSTEM ---
-        function openMathModal() {
-            saveSelection();
-            document.getElementById('math-modal').classList.remove('hidden');
-            updateModalMathPreview();
-        }
-
-        function closeMathModal() {
-            document.getElementById('math-modal').classList.add('hidden');
-        }
-
-        function switchMathTab(tab) {
-            document.querySelectorAll('.math-tab-panel').forEach(p => p.classList.add('hidden'));
-            document.getElementById(`tab-content-${tab}`).classList.remove('hidden');
-            ['basic', 'calculus', 'matrix', 'greek'].forEach(t => {
-                const btn = document.getElementById(`tab-btn-${t}`);
-                btn.className = t === tab ? "px-4 py-2 text-blue-700 border-b-2 border-blue-700 bg-white font-bold" : "px-4 py-2 text-gray-600 hover:text-blue-700";
-            });
-        }
-
-        function insertLatexSnippet(snippet) {
-            const input = document.getElementById('modal-latex-input');
-            input.value += (input.value ? ' ' : '') + snippet;
-            updateModalMathPreview();
-        }
-
+        // Math Modal
+        function openMathModal() { saveSelection(); document.getElementById('math-modal').classList.remove('hidden'); updateModalMathPreview(); }
+        function closeMathModal() { document.getElementById('math-modal').classList.add('hidden'); }
+        function insertLatexSnippet(s) { document.getElementById('modal-latex-input').value += ' ' + s; updateModalMathPreview(); }
         function updateModalMathPreview() {
             const input = document.getElementById('modal-latex-input').value;
             const preview = document.getElementById('modal-math-preview');
             preview.innerHTML = `$${input}$`;
             if (window.MathJax) MathJax.typesetPromise([preview]).catch(() => {});
         }
-
         function confirmInsertMath() {
             const latex = document.getElementById('modal-latex-input').value.trim();
             if (latex) {
@@ -1127,7 +838,6 @@
                 const span = document.createElement("span");
                 span.className = "inline-block px-1 font-serif";
                 span.innerHTML = `$${latex}$`;
-                
                 const sel = window.getSelection();
                 if (sel.rangeCount > 0) {
                     const range = sel.getRangeAt(0);
@@ -1138,401 +848,103 @@
                     const editable = document.querySelector('.page-content-editable');
                     if (editable) editable.appendChild(span);
                 }
-
                 if (window.MathJax) MathJax.typesetPromise([span]).catch(() => {});
                 handleAutoSave();
             }
             closeMathModal();
         }
 
-        // --- GEOMETRY & SKETCH BOARD ---
-        let canvas, ctx, isDrawing = false, drawTool = 'free', startX, startY, snapshot;
-
-        function openDrawModal() {
-            saveSelection();
-            document.getElementById('draw-modal').classList.remove('hidden');
-            if (!canvas) initCanvas();
-        }
-
-        function closeDrawModal() {
-            document.getElementById('draw-modal').classList.add('hidden');
-        }
-
+        // Draw Modal
+        let canvas, ctx, isDrawing = false, drawTool = 'free', startX, startY;
+        function openDrawModal() { saveSelection(); document.getElementById('draw-modal').classList.remove('hidden'); if (!canvas) initCanvas(); }
+        function closeDrawModal() { document.getElementById('draw-modal').classList.add('hidden'); }
         function initCanvas() {
             canvas = document.getElementById('sketchCanvas');
             ctx = canvas.getContext('2d');
             canvas.addEventListener('mousedown', startDraw);
             canvas.addEventListener('mousemove', drawing);
-            canvas.addEventListener('mouseup', endDraw);
+            canvas.addEventListener('mouseup', () => isDrawing = false);
+            canvas.addEventListener('touchstart', (e) => { const t = e.touches[0]; const r = canvas.getBoundingClientRect(); startDraw({ clientX: t.clientX, clientY: t.clientY }); });
+            canvas.addEventListener('touchmove', (e) => { const t = e.touches[0]; drawing({ clientX: t.clientX, clientY: t.clientY }); });
+            canvas.addEventListener('touchend', () => isDrawing = false);
         }
-
-        function setDrawTool(tool) {
-            drawTool = tool;
-            ['free', 'line', 'arrow', 'triangle', 'rect', 'circle', 'axis', 'text'].forEach(t => {
-                const btn = document.getElementById(`draw-tool-${t}`);
-                if (btn) btn.className = t === tool ? 'px-2 py-1 bg-purple-100 text-purple-700 font-bold rounded border border-purple-300' : 'px-2 py-1 bg-white text-gray-700 rounded border border-gray-300';
-            });
-        }
-
-        function clearCanvas() {
-            if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-
+        function setDrawTool(t) { drawTool = t; }
+        function clearCanvas() { if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); }
         function startDraw(e) {
+            isDrawing = true;
             const rect = canvas.getBoundingClientRect();
             startX = e.clientX - rect.left;
             startY = e.clientY - rect.top;
-
-            if (drawTool === 'text') {
-                const txt = prompt("চিত্রের টেক্সট বা লেবেল লিখুন:", "A");
-                if (txt) {
-                    ctx.fillStyle = document.getElementById('drawColor').value;
-                    ctx.font = "bold 18px 'Hind Siliguri', sans-serif";
-                    ctx.fillText(txt, startX, startY);
-                }
-                return;
-            }
-
-            isDrawing = true;
-            ctx.strokeStyle = document.getElementById('drawColor').value;
-            ctx.lineWidth = document.getElementById('drawLineWidth').value;
+            ctx.strokeStyle = "#000000";
+            ctx.lineWidth = 3;
             ctx.lineCap = 'round';
-
-            const lineStyle = document.getElementById('drawLineStyle').value;
-            if (lineStyle === 'dashed') ctx.setLineDash([8, 6]);
-            else if (lineStyle === 'dotted') ctx.setLineDash([3, 4]);
-            else ctx.setLineDash([]);
-
-            snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            if (drawTool === 'free') {
-                ctx.beginPath();
-                ctx.moveTo(startX, startY);
-            }
+            if (drawTool === 'free') { ctx.beginPath(); ctx.moveTo(startX, startY); }
         }
-
         function drawing(e) {
             if (!isDrawing) return;
             const rect = canvas.getBoundingClientRect();
             const currentX = e.clientX - rect.left;
             const currentY = e.clientY - rect.top;
-
-            if (drawTool === 'free') {
-                ctx.lineTo(currentX, currentY);
-                ctx.stroke();
-            } else if (drawTool === 'line') {
-                ctx.putImageData(snapshot, 0, 0);
-                ctx.beginPath();
-                ctx.moveTo(startX, startY);
-                ctx.lineTo(currentX, currentY);
-                ctx.stroke();
-            } else if (drawTool === 'arrow') {
-                ctx.putImageData(snapshot, 0, 0);
-                drawVectorArrow(startX, startY, currentX, currentY);
-            } else if (drawTool === 'triangle') {
-                ctx.putImageData(snapshot, 0, 0);
-                ctx.beginPath();
-                ctx.moveTo(startX + (currentX - startX)/2, startY);
-                ctx.lineTo(startX, currentY);
-                ctx.lineTo(currentX, currentY);
-                ctx.closePath();
-                ctx.stroke();
-            } else if (drawTool === 'rect') {
-                ctx.putImageData(snapshot, 0, 0);
-                ctx.beginPath();
-                ctx.strokeRect(startX, startY, currentX - startX, currentY - startY);
-            } else if (drawTool === 'circle') {
-                ctx.putImageData(snapshot, 0, 0);
-                ctx.beginPath();
-                const radius = Math.sqrt(Math.pow(startX - currentX, 2) + Math.pow(startY - currentY, 2));
-                ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
-                ctx.stroke();
-            } else if (drawTool === 'axis') {
-                ctx.putImageData(snapshot, 0, 0);
-                ctx.beginPath();
-                ctx.moveTo(startX, startY + (currentY - startY)/2);
-                ctx.lineTo(currentX, startY + (currentY - startY)/2);
-                ctx.moveTo(startX + (currentX - startX)/2, startY);
-                ctx.lineTo(startX + (currentX - startX)/2, currentY);
-                ctx.stroke();
-            }
+            if (drawTool === 'free') { ctx.lineTo(currentX, currentY); ctx.stroke(); }
         }
-
-        function drawVectorArrow(fromx, fromy, tox, toy) {
-            const headlen = 12;
-            const dx = tox - fromx;
-            const dy = toy - fromy;
-            const angle = Math.atan2(dy, dx);
-            ctx.beginPath();
-            ctx.moveTo(fromx, fromy);
-            ctx.lineTo(tox, toy);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(tox, toy);
-            ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
-            ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
-            ctx.closePath();
-            ctx.fillStyle = ctx.strokeStyle;
-            ctx.fill();
-        }
-
-        function endDraw() {
-            isDrawing = false;
-        }
-
         function insertDrawingToDoc() {
             const dataUrl = canvas.toDataURL('image/png');
-            const viewStyle = document.getElementById('imgViewStyle').value;
             restoreSelection();
-
-            const wrapper = document.createElement('span');
-            wrapper.className = `image-wrapper ${viewStyle}`;
-            wrapper.contentEditable = 'false';
-            wrapper.style.width = '280px';
-
-            wrapper.innerHTML = `
-                <img src="${dataUrl}">
-                <div class="resize-handle"></div>
-                <div class="img-toolbar">
-                    <button onclick="alignImg(this, 'left')" class="text-white hover:text-blue-400 px-1 text-xs" title="বামে"><i class="fas fa-align-left"></i></button>
-                    <button onclick="alignImg(this, 'center')" class="text-white hover:text-blue-400 px-1 text-xs" title="মাঝে"><i class="fas fa-align-center"></i></button>
-                    <button onclick="alignImg(this, 'right')" class="text-white hover:text-blue-400 px-1 text-xs" title="ডানে"><i class="fas fa-align-right"></i></button>
-                    <button onclick="removeImg(this)" class="text-red-400 hover:text-red-500 px-1 text-xs" title="মুছুন"><i class="fas fa-trash"></i></button>
-                </div>
-            `;
-
-            wrapper.addEventListener('click', (e) => {
-                e.stopPropagation();
-                deselectImages();
-                wrapper.classList.add('selected');
-            });
-
-            const handle = wrapper.querySelector('.resize-handle');
-            handle.addEventListener('mousedown', initImageResize);
-
+            const img = document.createElement('img');
+            img.src = dataUrl;
+            img.style.maxWidth = '100%';
+            img.style.margin = '10px auto';
+            img.style.display = 'block';
             const sel = window.getSelection();
             if (sel.rangeCount > 0) {
                 const range = sel.getRangeAt(0);
                 range.deleteContents();
-                range.insertNode(wrapper);
-                range.setStartAfter(wrapper);
+                range.insertNode(img);
             } else {
-                const editable = document.querySelector('.page-content-editable');
-                if (editable) editable.appendChild(wrapper);
+                document.querySelector('.page-content-editable').appendChild(img);
             }
-
             closeDrawModal();
             handleAutoSave();
         }
 
-        function deselectImages() {
-            document.querySelectorAll('.image-wrapper').forEach(w => w.classList.remove('selected'));
-        }
-
-        function alignImg(btn, alignment) {
-            const wrapper = btn.closest('.image-wrapper');
-            if (alignment === 'center') {
-                wrapper.style.display = 'block';
-                wrapper.style.margin = '10px auto';
-                wrapper.style.float = 'none';
-            } else if (alignment === 'left') {
-                wrapper.style.display = 'inline-block';
-                wrapper.style.float = 'left';
-                wrapper.style.margin = '5px 15px 5px 0';
-            } else if (alignment === 'right') {
-                wrapper.style.display = 'inline-block';
-                wrapper.style.float = 'right';
-                wrapper.style.margin = '5px 0 5px 15px';
-            }
-            handleAutoSave();
-        }
-
-        function removeImg(btn) {
-            btn.closest('.image-wrapper').remove();
-            handleAutoSave();
-        }
-
-        function initImageResize(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            const wrapper = e.target.closest('.image-wrapper');
-            const startWidth = wrapper.offsetWidth;
-            const startMouseX = e.clientX;
-
-            function doResize(moveEvent) {
-                const newWidth = startWidth + (moveEvent.clientX - startMouseX);
-                if (newWidth > 80 && newWidth < 700) {
-                    wrapper.style.width = newWidth + 'px';
-                }
-            }
-
-            function stopResize() {
-                window.removeEventListener('mousemove', doResize);
-                window.removeEventListener('mouseup', stopResize);
-                handleAutoSave();
-            }
-
-            window.addEventListener('mousemove', doResize);
-            window.addEventListener('mouseup', stopResize);
-        }
-
-        // --- ENHANCED TABLE CONTROLLER ---
-        let currentActiveTable = null;
-        let currentActiveCell = null;
-
-        function openTableModal() {
-            saveSelection();
-            document.getElementById('table-modal').classList.remove('hidden');
-        }
-
-        function closeTableModal() {
-            document.getElementById('table-modal').classList.add('hidden');
-        }
-
+        // Table Modal
+        function openTableModal() { saveSelection(); document.getElementById('table-modal').classList.remove('hidden'); }
+        function closeTableModal() { document.getElementById('table-modal').classList.add('hidden'); }
         function confirmInsertCustomTable() {
             const rows = parseInt(document.getElementById('newTableRows').value) || 3;
             const cols = parseInt(document.getElementById('newTableCols').value) || 3;
-            const theme = document.getElementById('newTableTheme').value;
             restoreSelection();
-
-            let tableHtml = `
-                <div class="table-container" contenteditable="false">
-                    <span class="table-move-handle" onclick="toggleTableAlign(this)"><i class="fas fa-arrows-alt"></i> টেবিল পজিশন</span>
-                    <table class="styled-table ${theme}" contenteditable="true">
-            `;
+            let tableHtml = `<table class="styled-table table-theme-classic border" border="1" style="width:100%; margin:10px 0;">`;
             for (let r = 0; r < rows; r++) {
                 tableHtml += '<tr>';
-                for (let c = 0; c < cols; c++) {
-                    const tag = (r === 0 && theme === 'table-theme-modern') ? 'th' : 'td';
-                    tableHtml += `<${tag} contenteditable="true">তথ্য</${tag}>`;
-                }
+                for (let c = 0; c < cols; c++) tableHtml += `<td style="border:1px solid #cbd5e1; padding:6px;">তথ্য</td>`;
                 tableHtml += '</tr>';
             }
-            tableHtml += '</table></div><p><br></p>';
-
+            tableHtml += '</table><p><br></p>';
             document.execCommand('insertHTML', false, tableHtml);
             closeTableModal();
             handleAutoSave();
-            initTableFocusListeners();
         }
 
-        function toggleTableAlign(btn) {
-            const container = btn.closest('.table-container');
-            if (container.style.marginLeft === 'auto' && container.style.marginRight === 'auto') {
-                container.style.marginLeft = '0';
-                container.style.marginRight = 'auto';
-            } else {
-                container.style.marginLeft = 'auto';
-                container.style.marginRight = 'auto';
-            }
-            handleAutoSave();
-        }
-
-        function initTableFocusListeners() {
-            document.getElementById('editor-pages-container').addEventListener('focusin', (e) => {
-                const cell = e.target.closest('td, th');
-                if (cell) {
-                    currentActiveCell = cell;
-                    currentActiveTable = cell.closest('table');
-                    document.getElementById('table-tools-ribbon').classList.remove('hidden');
-                }
-            });
-        }
-
-        function addTableRow(position) {
-            if (!currentActiveTable || !currentActiveCell) return;
-            const row = currentActiveCell.parentElement;
-            const colCount = row.children.length;
-            const newRow = currentActiveTable.insertRow(position === 'above' ? row.rowIndex : row.rowIndex + 1);
-            for (let i = 0; i < colCount; i++) {
-                const cell = newRow.insertCell(i);
-                cell.contentEditable = "true";
-                cell.innerText = "তথ্য";
-            }
-            handleAutoSave();
-        }
-
-        function deleteTableRow() {
-            if (!currentActiveTable || !currentActiveCell) return;
-            const row = currentActiveCell.parentElement;
-            currentActiveTable.deleteRow(row.rowIndex);
-            handleAutoSave();
-        }
-
-        function getTableCol(position) {
-            if (!currentActiveTable || !currentActiveCell) return;
-            const colIndex = currentActiveCell.cellIndex;
-            const targetIndex = position === 'left' ? colIndex : colIndex + 1;
-            for (let r = 0; r < currentActiveTable.rows.length; r++) {
-                const cell = currentActiveTable.rows[r].insertCell(targetIndex);
-                cell.contentEditable = "true";
-                cell.innerText = "তথ্য";
-            }
-            handleAutoSave();
-        }
-
-        function deleteTableCol() {
-            if (!currentActiveTable || !currentActiveCell) return;
-            const colIndex = currentActiveCell.cellIndex;
-            for (let r = 0; r < currentActiveTable.rows.length; r++) {
-                currentActiveTable.rows[r].deleteCell(colIndex);
-            }
-            handleAutoSave();
-        }
-
-        function deleteWholeTable() {
-            if (!currentActiveTable) return;
-            currentActiveTable.closest('.table-container').remove();
-            document.getElementById('table-tools-ribbon').classList.add('hidden');
-            handleAutoSave();
-        }
-
-        // --- UI & WORKSPACE CONTROLS ---
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-            document.getElementById('sidebar-overlay').classList.toggle('hidden');
-        }
-
-        function toggleDropdown(event) {
-            if(event) event.stopPropagation();
-            document.getElementById('action-dropdown').classList.toggle('hidden');
-        }
-
-        window.onclick = function(event) {
-            const dropdown = document.getElementById('action-dropdown');
-            if (!event.target.closest('.relative')) {
-                if (dropdown && !dropdown.classList.contains('hidden')) dropdown.classList.add('hidden');
-            }
-            if (!event.target.closest('table') && !event.target.closest('#table-tools-ribbon') && !event.target.closest('.table-move-handle')) {
-                document.getElementById('table-tools-ribbon').classList.add('hidden');
-            }
-        }
-
+        // Mode Switch
         let isEditorMode = true;
         function toggleMode() {
             const editorView = document.getElementById('editor-view');
             const converterView = document.getElementById('converter-view');
-            const pageSetupToolbar = document.getElementById('page-setup-toolbar');
-            const formattingToolbar = document.getElementById('formatting-toolbar');
             const toggleBtn = document.getElementById('mode-toggle-btn');
-
             isEditorMode = !isEditorMode;
             if (isEditorMode) {
                 editorView.classList.replace('hidden', 'flex');
                 converterView.classList.replace('flex', 'hidden');
-                pageSetupToolbar.classList.remove('hidden');
-                formattingToolbar.classList.remove('hidden');
                 toggleBtn.innerHTML = '<i class="fas fa-robot w-5 text-center text-lg"></i> এআই কনভার্টার চালু';
             } else {
                 editorView.classList.replace('flex', 'hidden');
                 converterView.classList.replace('hidden', 'flex');
-                pageSetupToolbar.classList.add('hidden');
-                formattingToolbar.classList.add('hidden');
                 toggleBtn.innerHTML = '<i class="fas fa-pen w-5 text-center text-lg"></i> সরাসরি এডিটরে ফিরুন';
             }
             document.getElementById('action-dropdown').classList.add('hidden');
         }
 
-        // Live Converter Preview
         const aiInput = document.getElementById('ai-input');
         const aiOutput = document.getElementById('ai-output');
         aiInput.addEventListener('input', () => {
@@ -1545,29 +957,22 @@
                 const text = await navigator.clipboard.readText();
                 aiInput.value += text;
                 aiInput.dispatchEvent(new Event('input'));
-            } catch (err) {
-                alert('ব্রাউজার ব্লক করেছে। দয়া করে পেস্ট করুন।');
-            }
+            } catch (err) { alert('পেস্ট করতে টেক্সটবক্সে সরাসরি পেস্ট করুন।'); }
         }
 
-        // DOCX Downloader
         async function downloadDocx() {
             let text = "";
             if (isEditorMode) {
-                const pages = document.querySelectorAll('#editor-pages-container .page-content-editable');
-                pages.forEach(p => text += p.innerText + "\n\n");
+                document.querySelectorAll('#editor-pages-container .page-content-editable').forEach(p => text += p.innerText + "\n\n");
             } else {
                 text = document.getElementById('ai-input').value;
             }
-
             if (!text.trim()) return alert('কোনো লেখা নেই!');
 
             const docTitle = document.getElementById('doc-title').value.trim() || 'SAHAL_TEC_Document';
             const btn = document.getElementById('download-btn');
             const textSpan = document.getElementById('download-text');
-            
             textSpan.innerText = 'কনভার্ট হচ্ছে...';
-            btn.classList.add('opacity-50', 'cursor-not-allowed');
             btn.disabled = true;
 
             try {
@@ -1577,7 +982,6 @@
                     body: JSON.stringify({ text })
                 });
                 if (!response.ok) throw new Error('সার্ভার এরর!');
-
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -1591,7 +995,6 @@
                 alert('ডাউনলোড ব্যর্থ হয়েছে: ' + error.message);
             } finally {
                 textSpan.innerText = 'ডাউনলোড (DOCX)';
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
                 btn.disabled = false;
                 document.getElementById('action-dropdown').classList.add('hidden');
             }
