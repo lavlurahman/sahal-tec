@@ -27,7 +27,7 @@
     <style>
         body { font-family: 'Noto Sans Bengali', sans-serif; background-color: #cbd5e1; overflow: hidden; }
         
-        /* Simulated Real Paper Container */
+        /* Simulated Real Paper Container with Strict Pagination */
         .editor-page-container {
             position: relative;
             background-color: #ffffff;
@@ -36,10 +36,11 @@
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Prevents overflow outside page border */
+            overflow: hidden;
+            flex-shrink: 0;
         }
 
-        /* Fixed Standard Page Heights and Widths */
+        /* Fixed Standard Dimensions (A4 / Letter / Legal) */
         .page-a4-portrait { width: 21cm; height: 29.7cm; }
         .page-a4-landscape { width: 29.7cm; height: 21cm; }
         .page-letter-portrait { width: 21.59cm; height: 27.94cm; }
@@ -47,12 +48,12 @@
         .page-legal-portrait { width: 21.59cm; height: 35.56cm; }
         .page-legal-landscape { width: 35.56cm; height: 21.59cm; }
 
-        /* Outer Margin Spacing */
+        /* Margins */
         .margin-normal { padding: 2.54cm; }
         .margin-narrow { padding: 1.27cm; }
         .margin-wide { padding: 3.81cm; }
 
-        /* Integrated Border Frame */
+        /* Border Frame */
         .page-inner-frame {
             width: 100%;
             height: 100%;
@@ -68,12 +69,12 @@
         .border-double-thick { border: 4px double #1e293b !important; padding: 12px; }
         .border-dashed-thin { border: 2px dashed #64748b !important; padding: 12px; }
 
-        /* Column Layouts */
+        /* Multi Columns */
         .cols-1 { column-count: 1; }
         .cols-2 { column-count: 2; column-gap: 24px; column-rule: 1px dashed #cbd5e1; }
         .cols-3 { column-count: 3; column-gap: 18px; column-rule: 1px dashed #cbd5e1; }
 
-        /* Header and Footer Areas */
+        /* Header / Footer */
         .page-header-area {
             border-bottom: 1px dashed #cbd5e1;
             padding-bottom: 4px;
@@ -116,7 +117,7 @@
             z-index: 1;
         }
 
-        /* Content Area (Page Slice) */
+        /* Strict Page Boundary for Text Content */
         .page-content-editable {
             position: relative;
             z-index: 2;
@@ -129,7 +130,7 @@
             overflow: hidden;
         }
 
-        /* Interactive Resizable & Styled Image Container */
+        /* Resizable Image Container */
         .image-wrapper {
             display: inline-block;
             position: relative;
@@ -188,7 +189,7 @@
         }
         .image-wrapper.selected .img-toolbar { display: flex; }
 
-        /* Advanced Table Resizing and Positioning */
+        /* Tables */
         .table-container {
             position: relative;
             margin: 10px 0;
@@ -223,7 +224,7 @@
         .table-theme-modern th { background-color: #1e293b; color: white; font-weight: bold; }
         .table-theme-modern td { border-bottom: 1px solid #e2e8f0; }
 
-        /* STRICT PRINT STYLES */
+        /* Clean Print Settings */
         @media print {
             body, html {
                 background: transparent !important;
@@ -258,7 +259,7 @@
     <!-- Mobile Sidebar Overlay -->
     <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
 
-    <!-- Sidebar -->
+    <!-- Sidebar: Folder & File Management -->
     <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-50 w-64 bg-[#111827] text-white flex flex-col h-full shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none">
         <div class="p-5 border-b border-gray-800 flex justify-between items-center">
             <h2 class="text-xl font-bold tracking-wide">SAHAL TEC</h2>
@@ -273,19 +274,30 @@
             </div>
         </div>
 
+        <!-- Folder & Page Creation Buttons -->
         <div class="p-4 flex-grow overflow-y-auto">
-            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded text-sm font-semibold flex items-center justify-center gap-2 mb-6 shadow-sm transition">
-                <i class="fas fa-plus"></i> নতুন ফোল্ডার
-            </button>
-            <ul class="space-y-3 text-sm">
-                <li class="cursor-pointer hover:bg-gray-800 p-2 rounded flex items-center gap-3 text-gray-300 transition">
-                    <i class="fas fa-folder text-yellow-500 text-lg"></i> Physics Notes (HSC)
+            <div class="flex flex-col gap-2 mb-4">
+                <button onclick="addNewManualPage()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded text-xs font-bold flex items-center justify-center gap-2 shadow transition">
+                    <i class="fas fa-file-circle-plus"></i> নতুন পেজ যুক্ত করুন
+                </button>
+                <button onclick="createFolderPrompt()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white py-2 rounded text-xs font-semibold flex items-center justify-center gap-2 transition">
+                    <i class="fas fa-folder-plus text-yellow-500"></i> নতুন ফোল্ডার
+                </button>
+            </div>
+
+            <p class="text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">আমার ফোল্ডারসমূহ</p>
+            <ul id="folder-list" class="space-y-1.5 text-sm">
+                <li class="cursor-pointer hover:bg-gray-800 p-2 rounded flex items-center justify-between text-gray-300 transition group">
+                    <span class="flex items-center gap-2 truncate"><i class="fas fa-folder text-yellow-500 text-base"></i> Physics Notes (HSC)</span>
+                    <button onclick="deleteFolderItem(this)" class="hidden group-hover:block text-gray-500 hover:text-red-400 text-xs"><i class="fas fa-times"></i></button>
                 </li>
-                <li class="cursor-pointer hover:bg-gray-800 p-2 rounded flex items-center gap-3 text-gray-300 transition">
-                    <i class="fas fa-folder text-yellow-500 text-lg"></i> Math Question Bank
+                <li class="cursor-pointer hover:bg-gray-800 p-2 rounded flex items-center justify-between text-gray-300 transition group">
+                    <span class="flex items-center gap-2 truncate"><i class="fas fa-folder text-yellow-500 text-base"></i> Math Question Bank</span>
+                    <button onclick="deleteFolderItem(this)" class="hidden group-hover:block text-gray-500 hover:text-red-400 text-xs"><i class="fas fa-times"></i></button>
                 </li>
-                <li class="cursor-pointer hover:bg-gray-800 p-2 rounded flex items-center gap-3 text-gray-300 transition">
-                    <i class="fas fa-folder text-yellow-500 text-lg"></i> Chemistry Diagrams
+                <li class="cursor-pointer hover:bg-gray-800 p-2 rounded flex items-center justify-between text-gray-300 transition group">
+                    <span class="flex items-center gap-2 truncate"><i class="fas fa-folder text-yellow-500 text-base"></i> Chemistry Diagrams</span>
+                    <button onclick="deleteFolderItem(this)" class="hidden group-hover:block text-gray-500 hover:text-red-400 text-xs"><i class="fas fa-times"></i></button>
                 </li>
             </ul>
         </div>
@@ -327,10 +339,10 @@
                             </button>
                         </div>
                         <div class="py-1">
-                            <button onclick="addNewManualPage()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-semibold transition">
-                                <i class="fas fa-file-circle-plus w-5 text-center text-lg text-blue-500"></i> নতুন পেজ যুক্ত করুন
+                            <button onclick="addNewManualPage()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 font-semibold transition">
+                                <i class="fas fa-file-circle-plus w-5 text-center text-lg"></i> নতুন পেজ যুক্ত করুন
                             </button>
-                            <button onclick="manualSaveDoc()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 font-semibold transition">
+                            <button onclick="manualSaveDoc()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-semibold transition">
                                 <i class="fas fa-save w-5 text-center text-lg"></i> সেভ করুন (Manual)
                             </button>
                         </div>
@@ -374,14 +386,13 @@
                     <option value="dashed">বর্ডার: ড্যাশড</option>
                 </select>
 
-                <!-- Column Layout Selector -->
                 <select id="pageColumnSelect" onchange="applyPageLayout()" class="border border-gray-300 rounded px-1.5 py-1 bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0 font-medium text-slate-800">
-                    <option value="1">কলাম: ১টি (স্বাভাবিক)</option>
-                    <option value="2">কলাম: ২টি (প্রশ্নপত্র/নোট)</option>
+                    <option value="1">কলাম: ১টি</option>
+                    <option value="2">কলাম: ২টি</option>
                     <option value="3">কলাম: ৩টি</option>
                 </select>
 
-                <select id="pageNumberSelect" onchange="applyPageNumbering(this.value)" class="border border-gray-300 rounded px-1.5 py-1 bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0 font-medium text-blue-700">
+                <select id="pageNumberSelect" onchange="applyPageNumbering()" class="border border-gray-300 rounded px-1.5 py-1 bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0 font-medium text-blue-700">
                     <option value="none">পেজ নম্বর: বন্ধ</option>
                     <option value="bottom-center" selected>পেজ নং: নিচে মাঝে</option>
                     <option value="bottom-right">পেজ নং: নিচে ডানে</option>
@@ -481,11 +492,11 @@
         <!-- Main Workspace -->
         <div class="flex-1 relative bg-[#cbd5e1] overflow-hidden w-full z-0">
             
-            <!-- MODE 1: Direct Editor View (Multi-Page Container) -->
+            <!-- MODE 1: Direct Editor View (Multi-Page Scroll Container) -->
             <div id="editor-view" class="h-full w-full overflow-y-auto flex flex-col items-center py-6 px-2 md:px-4" onclick="deselectImages(event)">
                 
                 <div id="editor-pages-container" class="w-full flex flex-col items-center">
-                    <!-- Page 1 (Default Master Page) -->
+                    <!-- Master Page 1 -->
                     <div class="editor-page-container page-a4-portrait margin-normal" data-page-index="1">
                         <div class="page-inner-frame border-solid-thin">
                             <div class="watermark-overlay hidden">লাভলু</div>
@@ -495,14 +506,14 @@
                                 <span class="header-page-no hidden font-mono font-semibold">Page 1</span>
                             </div>
 
-                            <div contenteditable="true" class="page-content-editable text-base md:text-lg leading-relaxed text-justify cols-1" oninput="handlePaginationInput(this)" onkeydown="handleKeyDownPagination(event, this)">
+                            <div contenteditable="true" class="page-content-editable text-base md:text-lg leading-relaxed text-justify cols-1" oninput="checkAndAutoPaginate(this)" onkeydown="handleKeyDownPagination(event, this)">
                                 <h1 style="font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 20px;">উচ্চতর গণিত ও পদার্থবিজ্ঞান নোটস</h1>
-                                <p>এখানে আপনি সরাসরি টাইপ করতে পারবেন। পেজ ভর্তি হয়ে গেলে স্বয়ংক্রিয়ভাবে ২য় ও ৩য় পেজ তৈরি হবে এবং কার্সর নতুন পেজে চলে যাবে।</p>
+                                <p>এখানে আপনি সরাসরি টাইপ করতে পারবেন। পেজটি পূর্ণ হলে স্বয়ংক্রিয়ভাবে পরবর্তী নতুন পাতা তৈরি হয়ে কার্সর স্থানান্তর হবে।</p>
                             </div>
 
                             <div class="page-footer-area">
                                 <span contenteditable="true" class="outline-none" placeholder="ফুটার তথ্য...">গোপনীয় ও স্বত্বাধিকার সংরক্ষিত</span>
-                                <span class="footer-page-no font-mono font-semibold">Page 1</span>
+                                <span class="footer-page-no font-mono font-semibold">Page 1 of 1</span>
                             </div>
                         </div>
                     </div>
@@ -618,7 +629,7 @@
         </div>
     </div>
 
-    <!-- 2. ADVANCED GEOMETRY & SKETCH BOARD -->
+    <!-- 2. GEOMETRY / SKETCH MODAL -->
     <div id="draw-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-3 hidden">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden border border-gray-200 flex flex-col">
             <div class="bg-purple-800 text-white px-5 py-3 flex justify-between items-center">
@@ -718,46 +729,23 @@
     </div>
 
     <script>
-        // --- MULTI-PAGE ENGINE & AUTOMATIC PAGINATION ---
+        // --- MULTI-PAGE AUTO-PAGINATION & MANAGEMENT ---
         let autoSaveTimer = null;
 
-        function handlePaginationInput(activeEditable) {
+        function checkAndAutoPaginate(editable) {
             handleAutoSave();
             
-            // Check if content overflows current page's height limit
-            if (activeEditable.scrollHeight > activeEditable.clientHeight + 5) {
-                splitToNextPage(activeEditable);
+            // Check overflow: if content exceeds the available vertical height of the page frame
+            if (editable.scrollHeight > editable.clientHeight + 4) {
+                splitContentToNextPage(editable);
             }
         }
 
-        function handleKeyDownPagination(e, activeEditable) {
-            if (e.key === "Backspace" && activeEditable.innerText.trim() === "") {
-                const currentPage = activeEditable.closest('.editor-page-container');
-                const prevPage = currentPage.previousElementSibling;
-                if (prevPage && prevPage.classList.contains('editor-page-container')) {
-                    e.preventDefault();
-                    const prevEditable = prevPage.querySelector('.page-content-editable');
-                    currentPage.remove();
-                    updateAllPageNumbers();
-                    prevEditable.focus();
-                    
-                    // Move cursor to end of prev page
-                    const range = document.createRange();
-                    const sel = window.getSelection();
-                    range.selectNodeContents(prevEditable);
-                    range.collapse(false);
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                    handleAutoSave();
-                }
-            }
-        }
-
-        function splitToNextPage(currentEditable) {
+        function splitContentToNextPage(currentEditable) {
             const currentPage = currentEditable.closest('.editor-page-container');
             let nextPage = currentPage.nextElementSibling;
 
-            // If next page doesn't exist, create one
+            // Automatically create next page if it doesn't exist
             if (!nextPage || !nextPage.classList.contains('editor-page-container')) {
                 nextPage = createNewPageElement();
                 currentPage.after(nextPage);
@@ -765,10 +753,10 @@
 
             const nextEditable = nextPage.querySelector('.page-content-editable');
 
-            // Move the last block node to the next page
-            while (currentEditable.scrollHeight > currentEditable.clientHeight + 5 && currentEditable.childNodes.length > 1) {
-                const lastNode = currentEditable.lastChild;
-                nextEditable.insertBefore(lastNode, nextEditable.firstChild);
+            // Move the overflowed children to the top of the next page
+            while (currentEditable.scrollHeight > currentEditable.clientHeight + 4 && currentEditable.childNodes.length > 1) {
+                const overflowNode = currentEditable.lastChild;
+                nextEditable.insertBefore(overflowNode, nextEditable.firstChild);
             }
 
             updateAllPageNumbers();
@@ -783,21 +771,51 @@
             sel.addRange(range);
         }
 
+        function handleKeyDownPagination(e, editable) {
+            // If Backspace pressed on an empty page, merge back with previous page
+            if (e.key === "Backspace" && (editable.innerText.trim() === "" || editable.childNodes.length <= 1)) {
+                const currentPage = editable.closest('.editor-page-container');
+                const prevPage = currentPage.previousElementSibling;
+                if (prevPage && prevPage.classList.contains('editor-page-container')) {
+                    e.preventDefault();
+                    const prevEditable = prevPage.querySelector('.page-content-editable');
+                    currentPage.remove();
+                    updateAllPageNumbers();
+                    prevEditable.focus();
+
+                    // Place cursor at the end of previous page
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    range.selectNodeContents(prevEditable);
+                    range.collapse(false);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    handleAutoSave();
+                }
+            }
+        }
+
         function addNewManualPage() {
             const container = document.getElementById('editor-pages-container');
             const newPage = createNewPageElement();
             container.appendChild(newPage);
             updateAllPageNumbers();
-            newPage.querySelector('.page-content-editable').focus();
+            
+            // Focus on newly created page
+            const newEditable = newPage.querySelector('.page-content-editable');
+            newEditable.focus();
+            newPage.scrollIntoView({ behavior: 'smooth', block: 'center' });
             handleAutoSave();
-            document.getElementById('action-dropdown').classList.add('hidden');
+            
+            const dropdown = document.getElementById('action-dropdown');
+            if (dropdown) dropdown.classList.add('hidden');
         }
 
         function createNewPageElement() {
             const masterPage = document.querySelector('.editor-page-container');
             const newPage = document.createElement('div');
             
-            // Retain identical classes as current page layout
+            // Replicate master settings
             newPage.className = masterPage.className;
             newPage.innerHTML = `
                 <div class="page-inner-frame ${masterPage.querySelector('.page-inner-frame').className.replace('page-inner-frame', '').trim()}">
@@ -806,7 +824,7 @@
                         <span contenteditable="true" class="outline-none">${masterPage.querySelector('.page-header-area span:first-child').innerText}</span>
                         <span class="header-page-no font-mono font-semibold ${masterPage.querySelector('.header-page-no').classList.contains('hidden') ? 'hidden' : ''}">Page</span>
                     </div>
-                    <div contenteditable="true" class="page-content-editable text-base md:text-lg leading-relaxed text-justify ${document.getElementById('pageColumnSelect').value === '2' ? 'cols-2' : (document.getElementById('pageColumnSelect').value === '3' ? 'cols-3' : 'cols-1')}" oninput="handlePaginationInput(this)" onkeydown="handleKeyDownPagination(event, this)">
+                    <div contenteditable="true" class="page-content-editable text-base md:text-lg leading-relaxed text-justify ${document.getElementById('pageColumnSelect').value === '2' ? 'cols-2' : (document.getElementById('pageColumnSelect').value === '3' ? 'cols-3' : 'cols-1')}" oninput="checkAndAutoPaginate(this)" onkeydown="handleKeyDownPagination(event, this)">
                         <p><br></p>
                     </div>
                     <div class="page-footer-area">
@@ -841,11 +859,44 @@
                     footerNo.className = 'footer-page-no font-mono font-semibold ml-auto';
                     footerNo.classList.remove('hidden');
                 } else if (style === 'top-right') {
-                    headerNo.innerText = `Page ${pageNo}`;
+                    headerNo.innerText = `Page ${pageNo} of ${total}`;
                     headerNo.className = 'header-page-no font-mono font-semibold ml-auto';
                     headerNo.classList.remove('hidden');
                 }
             });
+        }
+
+        // --- FOLDER MANAGEMENT SYSTEM ---
+        function createFolderPrompt() {
+            const folderName = prompt("নতুন ফোল্ডারের নাম দিন:", "নতুন ফোল্ডার");
+            if (folderName && folderName.trim() !== "") {
+                const list = document.getElementById('folder-list');
+                const li = document.createElement('li');
+                li.className = "cursor-pointer hover:bg-gray-800 p-2 rounded flex items-center justify-between text-gray-300 transition group";
+                li.innerHTML = `
+                    <span class="flex items-center gap-2 truncate"><i class="fas fa-folder text-yellow-500 text-base"></i> ${folderName.trim()}</span>
+                    <button onclick="deleteFolderItem(this)" class="hidden group-hover:block text-gray-500 hover:text-red-400 text-xs"><i class="fas fa-times"></i></button>
+                `;
+                list.appendChild(li);
+                saveFolderListState();
+            }
+        }
+
+        function deleteFolderItem(btn) {
+            if (confirm("এই ফোল্ডারটি মুছে ফেলতে চান?")) {
+                btn.closest('li').remove();
+                saveFolderListState();
+            }
+        }
+
+        function saveFolderListState() {
+            const list = document.getElementById('folder-list').innerHTML;
+            localStorage.setItem('sahal_tec_folder_list', list);
+        }
+
+        function restoreFolderListState() {
+            const saved = localStorage.getItem('sahal_tec_folder_list');
+            if (saved) document.getElementById('folder-list').innerHTML = saved;
         }
 
         // --- AUTO-SAVE ENGINE & LOCAL STORAGE ---
@@ -867,13 +918,13 @@
                     pageColumn: document.getElementById('pageColumnSelect').value,
                     pageNumber: document.getElementById('pageNumberSelect').value
                 };
-                localStorage.setItem('sahal_tec_doc_autosave_v2', JSON.stringify(docData));
+                localStorage.setItem('sahal_tec_doc_autosave_v3', JSON.stringify(docData));
                 badge.innerHTML = '<i class="fas fa-check-circle"></i> অটো-সেভড';
             }, 1200);
         }
 
         function restoreAutoSavedData() {
-            const saved = localStorage.getItem('sahal_tec_doc_autosave_v2');
+            const saved = localStorage.getItem('sahal_tec_doc_autosave_v3');
             if (saved) {
                 try {
                     const data = JSON.parse(saved);
@@ -942,6 +993,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            restoreFolderListState();
             restoreAutoSavedData();
             recordHistory();
             initTableFocusListeners();
@@ -1083,7 +1135,8 @@
                     range.insertNode(span);
                     range.setStartAfter(span);
                 } else {
-                    document.querySelector('.page-content-editable').appendChild(span);
+                    const editable = document.querySelector('.page-content-editable');
+                    if (editable) editable.appendChild(span);
                 }
 
                 if (window.MathJax) MathJax.typesetPromise([span]).catch(() => {});
@@ -1240,10 +1293,10 @@
                 <img src="${dataUrl}">
                 <div class="resize-handle"></div>
                 <div class="img-toolbar">
-                    <button onclick="alignImg(this, 'left')" class="text-white hover:text-blue-400 px-1 text-xs"><i class="fas fa-align-left"></i></button>
-                    <button onclick="alignImg(this, 'center')" class="text-white hover:text-blue-400 px-1 text-xs"><i class="fas fa-align-center"></i></button>
-                    <button onclick="alignImg(this, 'right')" class="text-white hover:text-blue-400 px-1 text-xs"><i class="fas fa-align-right"></i></button>
-                    <button onclick="removeImg(this)" class="text-red-400 hover:text-red-500 px-1 text-xs"><i class="fas fa-trash"></i></button>
+                    <button onclick="alignImg(this, 'left')" class="text-white hover:text-blue-400 px-1 text-xs" title="বামে"><i class="fas fa-align-left"></i></button>
+                    <button onclick="alignImg(this, 'center')" class="text-white hover:text-blue-400 px-1 text-xs" title="মাঝে"><i class="fas fa-align-center"></i></button>
+                    <button onclick="alignImg(this, 'right')" class="text-white hover:text-blue-400 px-1 text-xs" title="ডানে"><i class="fas fa-align-right"></i></button>
+                    <button onclick="removeImg(this)" class="text-red-400 hover:text-red-500 px-1 text-xs" title="মুছুন"><i class="fas fa-trash"></i></button>
                 </div>
             `;
 
@@ -1263,7 +1316,8 @@
                 range.insertNode(wrapper);
                 range.setStartAfter(wrapper);
             } else {
-                document.querySelector('.page-content-editable').appendChild(wrapper);
+                const editable = document.querySelector('.page-content-editable');
+                if (editable) editable.appendChild(wrapper);
             }
 
             closeDrawModal();
@@ -1496,7 +1550,7 @@
             }
         }
 
-        // DOCX Downloader (Extracts content from all pages)
+        // DOCX Downloader
         async function downloadDocx() {
             let text = "";
             if (isEditorMode) {
