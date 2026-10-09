@@ -11,7 +11,7 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- MathJax Configuration for Converter -->
+    <!-- MathJax Configuration for Converter & Editor -->
     <script>
         window.MathJax = {
             tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['[', ']']] },
@@ -29,11 +29,11 @@
             background: white;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             margin: 0 auto;
-            padding: 8% 5%; /* Mobile friendly padding */
+            padding: 8% 5%;
             outline: none;
         }
         @media (min-width: 768px) {
-            .editor-page { padding: 2.54cm; } /* Desktop padding */
+            .editor-page { padding: 2.54cm; }
         }
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -129,7 +129,7 @@
                             <button id="download-btn" onclick="downloadDocx()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-green-600 hover:bg-green-50 font-semibold transition">
                                 <i class="fas fa-download w-5 text-center text-lg"></i> <span id="download-text">ডাউনলোড</span>
                             </button>
-                            <button class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-800 hover:bg-gray-100 font-semibold transition">
+                            <button onclick="window.print()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-800 hover:bg-gray-100 font-semibold transition">
                                 <i class="fas fa-print w-5 text-center text-lg"></i> প্রিন্ট
                             </button>
                         </div>
@@ -137,9 +137,10 @@
                 </div>
             </div>
 
-            <!-- Bottom Row: Formatting Tools (Scrollable horizontally on mobile) -->
-            <div id="formatting-toolbar" class="flex items-center gap-2 px-3 md:px-6 py-2 bg-white text-gray-700 border-b border-gray-200 overflow-x-auto whitespace-nowrap hide-scrollbar">
-                <!-- Heading Formatting -->
+            <!-- Bottom Row: Formatting Tools -->
+            <div id="formatting-toolbar" class="flex items-center gap-1.5 md:gap-2 px-3 md:px-6 py-2 bg-white text-gray-700 border-b border-gray-200 overflow-x-auto whitespace-nowrap hide-scrollbar">
+                
+                <!-- Heading Selector -->
                 <select onchange="formatHeading(this.value)" class="border border-gray-300 rounded px-2 py-1 text-sm bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
                     <option value="p">Normal</option>
                     <option value="h1">Heading 1</option>
@@ -149,27 +150,37 @@
                 
                 <div class="w-px h-6 bg-gray-300 mx-1 shrink-0"></div>
                 
-                <!-- Basic Text Styling -->
+                <!-- Text Styling Buttons -->
                 <button onclick="formatDoc('bold')" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg font-bold transition" title="Bold">B</button>
                 <button onclick="formatDoc('italic')" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg italic transition" title="Italic">I</button>
                 <button onclick="formatDoc('underline')" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg underline transition" title="Underline">U</button>
                 
-                <!-- Color Picker -->
-                <label class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center cursor-pointer text-red-500 font-serif text-lg font-bold transition" title="Text Color">
+                <!-- Text Color (Selection Fix) -->
+                <label onmousedown="saveSelection()" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center cursor-pointer text-red-500 font-serif text-lg font-bold transition" title="Text Color">
                     A
-                    <input type="color" onchange="formatColor(this.value)" class="hidden">
+                    <input type="color" oninput="formatColor(this.value)" onchange="formatColor(this.value)" class="hidden">
+                </label>
+
+                <!-- Highlight Color -->
+                <label onmousedown="saveSelection()" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center cursor-pointer text-yellow-500 transition" title="Highlight Color">
+                    <i class="fas fa-highlighter"></i>
+                    <input type="color" value="#fef08a" oninput="formatHighlight(this.value)" onchange="formatHighlight(this.value)" class="hidden">
                 </label>
                 
                 <div class="w-px h-6 bg-gray-300 mx-1 shrink-0"></div>
+
+                <!-- Alignment Tools -->
+                <button onclick="formatDoc('justifyLeft')" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Align Left"><i class="fas fa-align-left"></i></button>
+                <button onclick="formatDoc('justifyCenter')" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Align Center"><i class="fas fa-align-center"></i></button>
+                <button onclick="formatDoc('justifyRight')" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Align Right"><i class="fas fa-align-right"></i></button>
+                <button onclick="formatDoc('justifyFull')" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Justify"><i class="fas fa-align-justify"></i></button>
+
+                <div class="w-px h-6 bg-gray-300 mx-1 shrink-0"></div>
                 
-                <button class="px-2 py-1 shrink-0 text-sm font-bold bg-blue-50 text-blue-600 rounded hover:bg-blue-100 flex items-center gap-1.5 transition">
+                <!-- Equations & Special Elements -->
+                <button onclick="insertMathEquation()" class="px-2 py-1 shrink-0 text-sm font-bold bg-blue-50 text-blue-600 rounded hover:bg-blue-100 flex items-center gap-1.5 transition">
                     <i class="fas fa-square-root-variable"></i> সমীকরণ
                 </button>
-                <button class="px-2 py-1 shrink-0 text-sm font-bold bg-indigo-50 text-indigo-600 rounded hover:bg-indigo-100 flex items-center gap-1.5 transition">
-                    <i class="fas fa-chart-line"></i> চিত্র
-                </button>
-                
-                <!-- Insert Table -->
                 <button onclick="insertTable()" class="px-2 py-1 shrink-0 text-sm font-bold bg-teal-50 text-teal-600 rounded hover:bg-teal-100 flex items-center gap-1.5 transition">
                     <i class="fas fa-table"></i> টেবিল
                 </button>
@@ -183,11 +194,11 @@
             <div id="editor-view" class="h-full w-full overflow-y-auto flex justify-center py-4 md:py-8 px-2 md:px-4">
                 <div contenteditable="true" class="editor-page text-base md:text-lg leading-relaxed text-justify" placeholder="এখানে সরাসরি টাইপ করা শুরু করুন...">
                     <h1 style="font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 20px;">পদার্থবিজ্ঞান: গতির সমীকরণ</h1>
-                    <p class="text-center text-gray-700">এখানে আপনি সরাসরি টাইপ করতে পারবেন। উপরের টুলবার থেকে সমীকরণ, গ্রাফ বা টেবিল যুক্ত করা যাবে।</p>
+                    <p class="text-center text-gray-700">এখানে আপনি সরাসরি টাইপ করতে পারবেন। উপরের টুলবার থেকে টেক্সটের রঙ পরিবর্তন, বোল্ড, সমীকরণ ও টেবিল যুক্ত করা যাবে।</p>
                 </div>
             </div>
 
-            <!-- MODE 2: AI Chat Converter View (Stack on mobile, split on desktop) -->
+            <!-- MODE 2: AI Chat Converter View -->
             <div id="converter-view" class="hidden h-full w-full flex-col md:flex-row gap-4 p-2 md:p-4 overflow-y-auto md:overflow-hidden">
                 
                 <!-- Left/Top: Input Area -->
@@ -208,8 +219,7 @@
                         <label class="font-bold text-gray-700 text-xs md:text-sm">👁️ লাইভ আউটপুট প্রিভিউ</label>
                     </div>
                     <div class="flex-grow overflow-y-auto p-2 md:p-4 flex justify-center pb-10">
-                        <div id="ai-output" class="editor-page text-base md:text-lg leading-relaxed text-justify h-auto min-h-full">
-                        </div>
+                        <div id="ai-output" class="editor-page text-base md:text-lg leading-relaxed text-justify h-auto min-h-full"></div>
                     </div>
                 </div>
 
@@ -277,6 +287,24 @@
             document.getElementById('action-dropdown').classList.add('hidden');
         }
 
+        // --- SELECTION PRESERVATION LOGIC FOR COLOR PICKER ---
+        let savedRange = null;
+
+        function saveSelection() {
+            const sel = window.getSelection();
+            if (sel.rangeCount > 0) {
+                savedRange = sel.getRangeAt(0);
+            }
+        }
+
+        function restoreSelection() {
+            if (savedRange) {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(savedRange);
+            }
+        }
+
         // --- DIRECT EDITOR FORMATTING FUNCTIONS ---
         function formatDoc(command, value = null) {
             document.execCommand(command, false, value);
@@ -295,7 +323,17 @@
         }
 
         function formatColor(color) {
+            restoreSelection();
+            document.execCommand('styleWithCSS', false, true);
             document.execCommand('foreColor', false, color);
+            const editorPage = document.querySelector('#editor-view .editor-page');
+            if (editorPage) editorPage.focus();
+        }
+
+        function formatHighlight(color) {
+            restoreSelection();
+            document.execCommand('styleWithCSS', false, true);
+            document.execCommand('hiliteColor', false, color);
             const editorPage = document.querySelector('#editor-view .editor-page');
             if (editorPage) editorPage.focus();
         }
@@ -318,6 +356,34 @@
             }
             const editorPage = document.querySelector('#editor-view .editor-page');
             if (editorPage) editorPage.focus();
+        }
+
+        function insertMathEquation() {
+            saveSelection();
+            const latex = prompt("LaTeX সমীকরণটি লিখুন (যেমন: E = mc^2 বা \\frac{a}{b}):", "E = mc^2");
+            if (latex) {
+                restoreSelection();
+                const span = document.createElement("span");
+                span.className = "inline-block px-1";
+                span.innerHTML = `$${latex}$`;
+                
+                const sel = window.getSelection();
+                if (sel.rangeCount > 0) {
+                    const range = sel.getRangeAt(0);
+                    range.deleteContents();
+                    range.insertNode(span);
+                    range.setStartAfter(span);
+                    range.setEndAfter(span);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                } else {
+                    document.querySelector('#editor-view .editor-page').appendChild(span);
+                }
+
+                if (window.MathJax) {
+                    MathJax.typesetPromise([span]).catch((err) => console.log(err.message));
+                }
+            }
         }
 
         // Live Preview for AI Converter
