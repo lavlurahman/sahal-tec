@@ -14,7 +14,7 @@
     <!-- MathJax Configuration for Converter -->
     <script>
         window.MathJax = {
-            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['[', ']']] },
             svg: { fontCache: 'global' }
         };
     </script>
@@ -39,6 +39,9 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="flex h-screen w-screen overflow-hidden bg-gray-200">
@@ -136,24 +139,38 @@
 
             <!-- Bottom Row: Formatting Tools (Scrollable horizontally on mobile) -->
             <div id="formatting-toolbar" class="flex items-center gap-2 px-3 md:px-6 py-2 bg-white text-gray-700 border-b border-gray-200 overflow-x-auto whitespace-nowrap hide-scrollbar">
-                <select class="border border-gray-300 rounded px-2 py-1 text-sm bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
-                    <option>Normal</option>
-                    <option>H1</option>
-                    <option>H2</option>
+                <!-- Heading Formatting -->
+                <select onchange="formatHeading(this.value)" class="border border-gray-300 rounded px-2 py-1 text-sm bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
+                    <option value="p">Normal</option>
+                    <option value="h1">Heading 1</option>
+                    <option value="h2">Heading 2</option>
+                    <option value="h3">Heading 3</option>
                 </select>
+                
                 <div class="w-px h-6 bg-gray-300 mx-1 shrink-0"></div>
-                <button class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg font-bold transition">B</button>
-                <button class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg italic transition">I</button>
-                <button class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg underline transition">U</button>
-                <button class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-red-500 font-serif text-lg font-bold transition">A</button>
+                
+                <!-- Basic Text Styling -->
+                <button onclick="formatDoc('bold')" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg font-bold transition" title="Bold">B</button>
+                <button onclick="formatDoc('italic')" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg italic transition" title="Italic">I</button>
+                <button onclick="formatDoc('underline')" class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center font-serif text-lg underline transition" title="Underline">U</button>
+                
+                <!-- Color Picker -->
+                <label class="w-8 h-8 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center cursor-pointer text-red-500 font-serif text-lg font-bold transition" title="Text Color">
+                    A
+                    <input type="color" onchange="formatColor(this.value)" class="hidden">
+                </label>
+                
                 <div class="w-px h-6 bg-gray-300 mx-1 shrink-0"></div>
+                
                 <button class="px-2 py-1 shrink-0 text-sm font-bold bg-blue-50 text-blue-600 rounded hover:bg-blue-100 flex items-center gap-1.5 transition">
                     <i class="fas fa-square-root-variable"></i> সমীকরণ
                 </button>
                 <button class="px-2 py-1 shrink-0 text-sm font-bold bg-indigo-50 text-indigo-600 rounded hover:bg-indigo-100 flex items-center gap-1.5 transition">
                     <i class="fas fa-chart-line"></i> চিত্র
                 </button>
-                <button class="px-2 py-1 shrink-0 text-sm font-bold bg-teal-50 text-teal-600 rounded hover:bg-teal-100 flex items-center gap-1.5 transition">
+                
+                <!-- Insert Table -->
+                <button onclick="insertTable()" class="px-2 py-1 shrink-0 text-sm font-bold bg-teal-50 text-teal-600 rounded hover:bg-teal-100 flex items-center gap-1.5 transition">
                     <i class="fas fa-table"></i> টেবিল
                 </button>
             </div>
@@ -258,6 +275,49 @@
             }
             
             document.getElementById('action-dropdown').classList.add('hidden');
+        }
+
+        // --- DIRECT EDITOR FORMATTING FUNCTIONS ---
+        function formatDoc(command, value = null) {
+            document.execCommand(command, false, value);
+            const editorPage = document.querySelector('#editor-view .editor-page');
+            if (editorPage) editorPage.focus();
+        }
+
+        function formatHeading(tag) {
+            if (tag === 'p') {
+                document.execCommand('formatBlock', false, '<p>');
+            } else {
+                document.execCommand('formatBlock', false, `<${tag}>`);
+            }
+            const editorPage = document.querySelector('#editor-view .editor-page');
+            if (editorPage) editorPage.focus();
+        }
+
+        function formatColor(color) {
+            document.execCommand('foreColor', false, color);
+            const editorPage = document.querySelector('#editor-view .editor-page');
+            if (editorPage) editorPage.focus();
+        }
+
+        function insertTable() {
+            const rows = prompt("কতগুলো রো (Rows) চান?", "3");
+            const cols = prompt("কতগুলো কলাম (Columns) চান?", "3");
+            
+            if (rows && cols && !isNaN(rows) && !isNaN(cols)) {
+                let tableHtml = '<table border="1" style="width:100%; border-collapse: collapse; margin: 15px 0;">';
+                for (let r = 0; r < rows; r++) {
+                    tableHtml += '<tr>';
+                    for (let c = 0; c < cols; c++) {
+                        tableHtml += `<td style="border: 1px solid #94a3b8; padding: 8px;">সেল ${r+1},${c+1}</td>`;
+                    }
+                    tableHtml += '</tr>';
+                }
+                tableHtml += '</table><p><br></p>';
+                document.execCommand('insertHTML', false, tableHtml);
+            }
+            const editorPage = document.querySelector('#editor-view .editor-page');
+            if (editorPage) editorPage.focus();
         }
 
         // Live Preview for AI Converter
