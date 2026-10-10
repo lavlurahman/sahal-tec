@@ -1,17 +1,16 @@
 {
-  "name": "ms-converter",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "name": "sahal-tec-universal-exporter",
+  "version": "1.3.0",
+  "private": true,
+  "description": "Universal AI chat rich-text, LaTeX and document exporter",
+  "main": "server.js",
   "type": "commonjs",
+  "scripts": { "start": "node server.js", "test": "node --test" },
+  "engines": { "node": ">=18" },
   "dependencies": {
-    "cors": "^2.8.6",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "sanitize-html": "^2.17.0",
+    "turndown": "^7.2.0",
+    "turndown-plugin-gfm": "^1.0.2"
   }
 }
