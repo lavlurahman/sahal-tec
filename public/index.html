@@ -11,15 +11,16 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- MathJax Configuration -->
+    <!-- Original Proven MathJax Configuration -->
     <script>
         window.MathJax = {
             tex: { 
                 inlineMath: [['$', '$'], ['\\(', '\\)']], 
                 displayMath: [['$$', '$$'], ['\\[', '\\]']],
-                packages: {'[+]': ['ams', 'mathtools']}
+                processEscapes: true
             },
-            svg: { fontCache: 'global' }
+            svg: { fontCache: 'global' },
+            startup: { typeset: false }
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -355,7 +356,7 @@
                 </ul>
             </div>
 
-            <!-- Quick Bookmarks / Tools -->
+            <!-- Quick Tools -->
             <div>
                 <p class="text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-wider">রিসেন্ট টুলস</p>
                 <ul class="space-y-1 text-xs text-slate-400">
@@ -593,7 +594,7 @@
 
             </div>
 
-            <!-- MODE 2: AI Chat Converter View (True Full-Scroll & Enhanced Transfer) -->
+            <!-- MODE 2: AI Chat Converter View -->
             <div id="converter-view" class="hidden h-full w-full flex-col md:flex-row gap-3 p-2 md:p-4 overflow-y-auto md:overflow-hidden">
                 
                 <!-- Left: Input Area -->
@@ -624,7 +625,7 @@
                     </div>
                 </div>
 
-                <!-- Right: Completely Scrollable Preview Area -->
+                <!-- Right: Fully Scrollable & Rendered Output Area -->
                 <div class="w-full md:w-1/2 h-[50vh] md:h-full flex flex-col bg-[#cbd5e1] rounded-xl shadow-inner border border-gray-300 overflow-hidden shrink-0 md:shrink">
                     
                     <div class="bg-gray-200 px-3 py-2 border-b border-gray-300 flex justify-between items-center shrink-0 shadow-sm z-10">
@@ -643,7 +644,6 @@
                                 <i class="fas fa-copy"></i>
                             </button>
 
-                            <!-- SEND TO DIRECT EDITOR BUTTON -->
                             <button onclick="sendPreviewToEditor()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded font-bold transition flex items-center gap-1 shadow-sm" title="সম্পূর্ণ লেখাটি মূল এডিটরে পাঠিয়ে এডিট করুন">
                                 <i class="fas fa-paper-plane"></i> এডিটরে পাঠান
                             </button>
@@ -653,7 +653,6 @@
                     <!-- Unlimited Vertical Scrollable Paper View Container -->
                     <div class="flex-grow overflow-y-auto p-2 md:p-4 flex flex-col items-center">
                         <div id="ai-output-wrapper" class="w-full flex justify-center origin-top transition-transform duration-200 my-auto">
-                            <!-- Unlimited Height Scrollable Preview Body -->
                             <div id="ai-output" class="full-preview-paper text-base md:text-lg leading-relaxed text-justify">
                                 <p class="text-slate-400 text-center py-10">বামপাশে টেক্সট পেস্ট করলে এখানে সম্পূর্ণ লাইভ প্রিভিউ প্রদর্শিত হবে...</p>
                             </div>
@@ -977,7 +976,7 @@
             });
         }
 
-        // --- ENHANCED CONVERTER LOGIC & "SEND TO EDITOR" ENGINE ---
+        // --- ENHANCED LIVE CONVERTER & ROBUST MATH ENGINE ---
         let previewZoomLevel = 1.0;
 
         function handleConverterInput() {
@@ -986,11 +985,21 @@
             
             if (!aiInput.value.trim()) {
                 aiOutput.innerHTML = '<p class="text-slate-400 text-center py-10">বামপাশে টেক্সট পেস্ট করলে এখানে সম্পূর্ণ লাইভ প্রিভিউ প্রদর্শিত হবে...</p>';
-            } else {
-                aiOutput.innerHTML = aiInput.value.replace(/\n/g, '<br>');
-                if (window.MathJax) {
-                    MathJax.typesetPromise([aiOutput]).catch((err) => console.log(err));
-                }
+                updateTextCounter();
+                return;
+            }
+
+            // Normalizes LaTeX syntax so MathJax renders without failing
+            let formatted = aiInput.value;
+            formatted = formatted.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$');
+            formatted = formatted.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
+            
+            aiOutput.innerHTML = formatted.replace(/\n/g, '<br>');
+
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([aiOutput]).catch((err) => {
+                    console.log('MathJax typeset error:', err);
+                });
             }
             updateTextCounter();
         }
@@ -1039,10 +1048,11 @@
                 return;
             }
 
-            const rawText = aiInput.value;
-            const paragraphs = rawText.split(/\n\s*\n/); // Split cleanly by paragraphs
+            let rawText = aiInput.value;
+            rawText = rawText.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$');
+            rawText = rawText.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
+            const paragraphs = rawText.split(/\n\s*\n/);
 
-            // Clear extra pages, keep Page 1 as master
             const container = document.getElementById('editor-pages-container');
             const allPages = container.querySelectorAll('.editor-page-container');
             for (let i = 1; i < allPages.length; i++) {
@@ -1051,7 +1061,7 @@
 
             let currentPage = container.querySelector('.editor-page-container');
             let currentEditable = currentPage.querySelector('.page-content-editable');
-            currentEditable.innerHTML = ''; // Clear first page
+            currentEditable.innerHTML = '';
 
             paragraphs.forEach((pText) => {
                 if (!pText.trim()) return;
@@ -1060,7 +1070,6 @@
                 p.innerHTML = pText.replace(/\n/g, '<br>');
                 currentEditable.appendChild(p);
 
-                // Auto create new page if current page overflows during transfer
                 if (currentEditable.scrollHeight > currentEditable.clientHeight + 4) {
                     const newPage = createNewPageElement();
                     container.appendChild(newPage);
@@ -1073,12 +1082,10 @@
 
             updateAllPageNumbers();
 
-            // Re-render math inside all created editor pages
-            if (window.MathJax) {
+            if (window.MathJax && window.MathJax.typesetPromise) {
                 MathJax.typesetPromise([container]).catch(() => {});
             }
 
-            // Automatically switch back to Direct Editor mode
             if (!isEditorMode) {
                 toggleMode();
             }
@@ -1209,7 +1216,7 @@
                 redoStack.push(undoStack.pop());
                 container.innerHTML = "";
             }
-            if (window.MathJax) MathJax.typesetPromise([container]).catch(() => {});
+            if (window.MathJax && window.MathJax.typesetPromise) MathJax.typesetPromise([container]).catch(() => {});
             updateAllPageNumbers();
         }
 
@@ -1220,7 +1227,7 @@
                 undoStack.push(restored);
                 container.innerHTML = restored;
             }
-            if (window.MathJax) MathJax.typesetPromise([container]).catch(() => {});
+            if (window.MathJax && window.MathJax.typesetPromise) MathJax.typesetPromise([container]).catch(() => {});
             updateAllPageNumbers();
         }
 
@@ -1230,6 +1237,13 @@
             recordHistory();
             initTableFocusListeners();
             updateAllPageNumbers();
+            
+            // Initial render call if MathJax ready
+            setTimeout(() => {
+                if (window.MathJax && window.MathJax.typesetPromise) {
+                    MathJax.typesetPromise().catch(() => {});
+                }
+            }, 500);
         });
 
         function saveSelection() {
@@ -1349,7 +1363,7 @@
             const input = document.getElementById('modal-latex-input').value;
             const preview = document.getElementById('modal-math-preview');
             preview.innerHTML = `$${input}$`;
-            if (window.MathJax) MathJax.typesetPromise([preview]).catch(() => {});
+            if (window.MathJax && window.MathJax.typesetPromise) MathJax.typesetPromise([preview]).catch(() => {});
         }
 
         function confirmInsertMath() {
@@ -1371,7 +1385,7 @@
                     if (editable) editable.appendChild(span);
                 }
 
-                if (window.MathJax) MathJax.typesetPromise([span]).catch(() => {});
+                if (window.MathJax && window.MathJax.typesetPromise) MathJax.typesetPromise([span]).catch(() => {});
                 handleAutoSave();
             }
             closeMathModal();
