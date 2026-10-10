@@ -11,16 +11,14 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Robust MathJax Configuration -->
+    <!-- Original Proven MathJax Configuration -->
     <script>
         window.MathJax = {
             tex: { 
                 inlineMath: [['$', '$'], ['\\(', '\\)']], 
-                displayMath: [['$$', '$$'], ['\\[', '\\]']],
-                processEscapes: true
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
             },
-            svg: { fontCache: 'global' },
-            startup: { typeset: false }
+            svg: { fontCache: 'global' }
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -484,8 +482,8 @@
 
             <!-- Rich Formatting Toolbar -->
             <div id="formatting-toolbar" class="flex items-center gap-1.5 px-3 md:px-6 py-1.5 bg-white text-gray-700 border-b border-gray-200 overflow-x-auto whitespace-nowrap hide-scrollbar">
-                <button onclick="handleUndo()" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Undo"><i class="fas fa-undo"></i></button>
-                <button onclick="handleRedo()" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Redo"><i class="fas fa-redo"></i></button>
+                <button onclick="formatDoc('undo')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Undo"><i class="fas fa-undo"></i></button>
+                <button onclick="formatDoc('redo')" class="w-7 h-7 shrink-0 rounded hover:bg-gray-100 flex items-center justify-center text-sm transition" title="Redo"><i class="fas fa-redo"></i></button>
                 <div class="w-px h-5 bg-gray-300 mx-1 shrink-0"></div>
 
                 <select onchange="formatDoc('fontName', this.value)" class="border border-gray-300 rounded px-2 py-0.5 text-xs bg-white outline-none cursor-pointer focus:ring-1 focus:ring-blue-500 shrink-0">
@@ -565,7 +563,7 @@
         <!-- Main Workspace -->
         <div class="flex-1 relative bg-[#cbd5e1] overflow-hidden w-full z-0">
             
-            <!-- MODE 1: Direct Editor View (Multi-Page Scroll Container) -->
+            <!-- MODE 1: Direct Editor View -->
             <div id="editor-view" class="h-full w-full overflow-y-auto overflow-x-hidden flex flex-col items-center py-4 px-1 md:py-6 md:px-4" onclick="deselectImages(event)">
                 
                 <div id="editor-pages-container" class="w-full flex flex-col items-center">
@@ -605,9 +603,6 @@
                         </span>
                         
                         <div class="flex items-center gap-1.5">
-                            <button onclick="cleanAndFixMath()" class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded font-bold hover:bg-purple-200 transition flex items-center gap-1" title="চিহ্ন ও ফর্মুলা ব্র্যাকেট অটো-ক্লিন করুন">
-                                <i class="fas fa-magic"></i> অটো-ক্লিন
-                            </button>
                             <button onclick="pasteText()" class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded font-bold hover:bg-blue-200 transition flex items-center gap-1">
                                 <i class="fas fa-paste"></i> পেস্ট
                             </button>
@@ -620,7 +615,7 @@
                     <textarea id="ai-input" class="w-full h-full flex-grow p-3 md:p-4 focus:outline-none resize-none font-mono text-sm md:text-base bg-gray-50 overflow-y-auto" placeholder="ChatGPT বা AI থেকে কপি করা টেক্সট ও সমীকরণ এখানে দিন..." oninput="handleConverterInput()"></textarea>
 
                     <div class="bg-slate-50 px-3 py-1 border-t border-gray-200 flex justify-between items-center text-[11px] text-gray-500 shrink-0 font-medium">
-                        <span id="char-word-count">শব্দ: 0 | অক্ষর: 0 | সমীকরণ: 0</span>
+                        <span id="char-word-count">শব্দ: 0 | অক্ষর: 0</span>
                         <span class="text-emerald-600 flex items-center gap-1"><i class="fas fa-bolt"></i> লাইভ রেন্ডার অন</span>
                     </div>
                 </div>
@@ -634,12 +629,6 @@
                         </span>
 
                         <div class="flex items-center gap-1.5">
-                            <div class="hidden sm:flex items-center bg-white border border-gray-300 rounded px-1 text-xs">
-                                <button onclick="adjustPreviewZoom(-0.1)" class="px-1.5 py-0.5 hover:text-blue-600 font-bold" title="ছোট করুন">-</button>
-                                <span id="preview-zoom-val" class="px-1 text-[10px] text-gray-500">100%</span>
-                                <button onclick="adjustPreviewZoom(0.1)" class="px-1.5 py-0.5 hover:text-blue-600 font-bold" title="বড় করুন">+</button>
-                            </div>
-
                             <button onclick="copyPreviewText()" class="text-xs bg-white text-gray-700 border border-gray-300 px-2 py-1 rounded font-semibold hover:bg-gray-100 transition" title="রেন্ডার করা টেক্সট কপি করুন">
                                 <i class="fas fa-copy"></i>
                             </button>
@@ -976,29 +965,7 @@
             });
         }
 
-        // --- INTELLIGENT AUTO-MATH CONVERTER ENGINE ---
-        let previewZoomLevel = 1.0;
-
-        // Auto wraps naked LaTeX commands inside $ ... $
-        function parseAndFormatMath(text) {
-            if (!text) return "";
-
-            // Convert explicit LaTeX delimiters
-            text = text.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$');
-            text = text.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
-
-            // Intelligently wrap naked LaTeX math formulas (e.g. 200\text{ J}^\circ\text{C}^{-1})
-            text = text.replace(/((?:(?:\d+|[a-zA-Z])?(?:\\(?:text|times|approx|alpha|beta|gamma|theta|lambda|pi|mu|sigma|omega|Delta|circ|frac|sqrt|vec|hat|int|sum|pm|div|neq|leq|geq|infty|cdot)\b(?:\s*\{[^}]*\})*|[\^_]\{[^}]*\}|[\^_][a-zA-Z0-9])(?:[+\-*/=><^_\s]*(?:\\(?:text|times|approx|alpha|beta|gamma|theta|lambda|pi|mu|sigma|omega|Delta|circ|frac|sqrt|vec|hat|int|sum|pm|div|neq|leq|geq|infty|cdot)\b(?:\s*\{[^}]*\})*|[\^_]\{[^}]*\}|[\^_][a-zA-Z0-9]|\d+|[a-zA-Z]))+)/g, function(match) {
-                // Ignore if already inside dollars
-                return `$${match.trim()}$`;
-            });
-
-            // Prevent double wrapping like $$...$$ to $$$$...$$$$
-            text = text.replace(/\${3,}/g, '$$');
-
-            return text;
-        }
-
+        // --- SAFE AND CLEAN CONVERTER LOGIC ---
         function handleConverterInput() {
             const aiInput = document.getElementById('ai-input');
             const aiOutput = document.getElementById('ai-output');
@@ -1009,13 +976,15 @@
                 return;
             }
 
-            let formatted = parseAndFormatMath(aiInput.value);
-            aiOutput.innerHTML = formatted.replace(/\n/g, '<br>');
+            // Safe replacement of LaTeX bracket delimiters to dollar delimiters
+            let text = aiInput.value;
+            text = text.split('\\[').join('$$').split('\\]').join('$$');
+            text = text.split('\\(').join('$').split('\\)').join('$');
+
+            aiOutput.innerHTML = text.replace(/\n/g, '<br>');
 
             if (window.MathJax && window.MathJax.typesetPromise) {
-                MathJax.typesetPromise([aiOutput]).catch((err) => {
-                    console.log('MathJax typeset error:', err);
-                });
+                MathJax.typesetPromise([aiOutput]).catch((err) => console.log(err));
             }
             updateTextCounter();
         }
@@ -1024,23 +993,7 @@
             const text = document.getElementById('ai-input').value;
             const words = text.trim() ? text.trim().split(/\s+/).length : 0;
             const chars = text.length;
-            const equations = (text.match(/\\(?:text|times|alpha|frac|sqrt)|\$/g) || []).length;
-            
-            document.getElementById('char-word-count').innerText = `শব্দ: ${words} | অক্ষর: ${chars} | সমীকরণ: ${equations}`;
-        }
-
-        function cleanAndFixMath() {
-            const input = document.getElementById('ai-input');
-            if (!input.value) return;
-
-            input.value = parseAndFormatMath(input.value);
-            handleConverterInput();
-        }
-
-        function adjustPreviewZoom(delta) {
-            previewZoomLevel = Math.min(Math.max(0.6, previewZoomLevel + delta), 1.6);
-            document.getElementById('ai-output-wrapper').style.transform = `scale(${previewZoomLevel})`;
-            document.getElementById('preview-zoom-val').innerText = `${Math.round(previewZoomLevel * 100)}%`;
+            document.getElementById('char-word-count').innerText = `শব্দ: ${words} | অক্ষর: ${chars}`;
         }
 
         function copyPreviewText() {
@@ -1051,7 +1004,6 @@
             });
         }
 
-        // FULL MULTI-PAGE TRANSFER TO EDITOR
         function sendPreviewToEditor() {
             const aiInput = document.getElementById('ai-input');
             if (!aiInput.value.trim()) {
@@ -1059,8 +1011,10 @@
                 return;
             }
 
-            let formattedText = parseAndFormatMath(aiInput.value);
-            const paragraphs = formattedText.split(/\n\s*\n/);
+            let text = aiInput.value;
+            text = text.split('[').join('$$').split(']').join('$$');
+            text = text.split('\\(').join('$').split('\\)').join('$');
+            const paragraphs = text.split(/\n\s*\n/);
 
             const container = document.getElementById('editor-pages-container');
             const allPages = container.querySelectorAll('.editor-page-container');
@@ -1149,10 +1103,11 @@
 
         // --- AUTO-SAVE ENGINE & LOCAL STORAGE ---
         function handleAutoSave() {
-            recordHistory();
             const badge = document.getElementById('save-status-badge');
-            badge.classList.remove('hidden');
-            badge.innerHTML = '<i class="fas fa-sync fa-spin"></i> সেভ হচ্ছে...';
+            if (badge) {
+                badge.classList.remove('hidden');
+                badge.innerHTML = '<i class="fas fa-sync fa-spin"></i> সেভ হচ্ছে...';
+            }
 
             clearTimeout(autoSaveTimer);
             autoSaveTimer = setTimeout(() => {
@@ -1167,7 +1122,7 @@
                     pageNumber: document.getElementById('pageNumberSelect').value
                 };
                 localStorage.setItem('sahal_tec_doc_autosave_v3', JSON.stringify(docData));
-                badge.innerHTML = '<i class="fas fa-check-circle"></i> অটো-সেভড';
+                if (badge) badge.innerHTML = '<i class="fas fa-check-circle"></i> অটো-সেভড';
             }, 1200);
         }
 
@@ -1201,59 +1156,14 @@
             window.print();
         }
 
-        // --- HISTORY STACK ---
-        let undoStack = [];
-        let redoStack = [];
-        const MAX_HISTORY = 40;
-        let savedRange = null;
-
-        function recordHistory() {
-            const content = document.getElementById('editor-pages-container').innerHTML;
-            if (undoStack.length === 0 || undoStack[undoStack.length - 1] !== content) {
-                undoStack.push(content);
-                if (undoStack.length > MAX_HISTORY) undoStack.shift();
-                redoStack = [];
-            }
-        }
-
-        function handleUndo() {
-            const container = document.getElementById('editor-pages-container');
-            if (undoStack.length > 1) {
-                redoStack.push(undoStack.pop());
-                container.innerHTML = undoStack[undoStack.length - 1];
-            } else if (undoStack.length === 1) {
-                redoStack.push(undoStack.pop());
-                container.innerHTML = "";
-            }
-            if (window.MathJax && window.MathJax.typesetPromise) MathJax.typesetPromise([container]).catch(() => {});
-            updateAllPageNumbers();
-        }
-
-        function handleRedo() {
-            const container = document.getElementById('editor-pages-container');
-            if (redoStack.length > 0) {
-                const restored = redoStack.pop();
-                undoStack.push(restored);
-                container.innerHTML = restored;
-            }
-            if (window.MathJax && window.MathJax.typesetPromise) MathJax.typesetPromise([container]).catch(() => {});
-            updateAllPageNumbers();
-        }
-
         window.addEventListener('DOMContentLoaded', () => {
             restoreFolderListState();
             restoreAutoSavedData();
-            recordHistory();
             initTableFocusListeners();
             updateAllPageNumbers();
-            
-            setTimeout(() => {
-                if (window.MathJax && window.MathJax.typesetPromise) {
-                    MathJax.typesetPromise().catch(() => {});
-                }
-            }, 600);
         });
 
+        let savedRange = null;
         function saveSelection() {
             const sel = window.getSelection();
             if (sel.rangeCount > 0) savedRange = sel.getRangeAt(0);
