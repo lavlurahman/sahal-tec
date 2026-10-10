@@ -1,10 +1,25 @@
+
+'use strict';
+
 function cleanFilename(value) {
-  const cleaned = String(value || 'SAHAL_TEC_Document')
+  let cleaned = String(value || 'SAHAL_TEC_Document')
     .normalize('NFKC')
-    .replace(/[<>:"/\\|?*\u0000-\u001f]/g, '')
+    .replace(/[<>:"/\\|?*\u0000-\u001f\u007f]/g, '')
     .replace(/\s+/g, '_')
     .replace(/^\.+/, '')
+    .replace(/[. ]+$/g, '')
     .slice(0, 80);
-  return cleaned || 'SAHAL_TEC_Document';
+
+  if (!cleaned || /^\.+$/.test(cleaned)) {
+    cleaned = 'SAHAL_TEC_Document';
+  }
+
+  // Windows reserved filenames
+  if (/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)/i.test(cleaned)) {
+    cleaned = `_${cleaned}`;
+  }
+
+  return cleaned;
 }
+
 module.exports = { cleanFilename };
