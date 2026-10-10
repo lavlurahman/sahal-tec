@@ -11,7 +11,7 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Original Proven MathJax Configuration -->
+    <!-- Robust MathJax Configuration -->
     <script>
         window.MathJax = {
             tex: { 
@@ -976,8 +976,28 @@
             });
         }
 
-        // --- ENHANCED LIVE CONVERTER & ROBUST MATH ENGINE ---
+        // --- INTELLIGENT AUTO-MATH CONVERTER ENGINE ---
         let previewZoomLevel = 1.0;
+
+        // Auto wraps naked LaTeX commands inside $ ... $
+        function parseAndFormatMath(text) {
+            if (!text) return "";
+
+            // Convert explicit LaTeX delimiters
+            text = text.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$');
+            text = text.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
+
+            // Intelligently wrap naked LaTeX math formulas (e.g. 200\text{ J}^\circ\text{C}^{-1})
+            text = text.replace(/((?:(?:\d+|[a-zA-Z])?(?:\\(?:text|times|approx|alpha|beta|gamma|theta|lambda|pi|mu|sigma|omega|Delta|circ|frac|sqrt|vec|hat|int|sum|pm|div|neq|leq|geq|infty|cdot)\b(?:\s*\{[^}]*\})*|[\^_]\{[^}]*\}|[\^_][a-zA-Z0-9])(?:[+\-*/=><^_\s]*(?:\\(?:text|times|approx|alpha|beta|gamma|theta|lambda|pi|mu|sigma|omega|Delta|circ|frac|sqrt|vec|hat|int|sum|pm|div|neq|leq|geq|infty|cdot)\b(?:\s*\{[^}]*\})*|[\^_]\{[^}]*\}|[\^_][a-zA-Z0-9]|\d+|[a-zA-Z]))+)/g, function(match) {
+                // Ignore if already inside dollars
+                return `$${match.trim()}$`;
+            });
+
+            // Prevent double wrapping like $$...$$ to $$$$...$$$$
+            text = text.replace(/\${3,}/g, '$$');
+
+            return text;
+        }
 
         function handleConverterInput() {
             const aiInput = document.getElementById('ai-input');
@@ -989,11 +1009,7 @@
                 return;
             }
 
-            // Normalizes LaTeX syntax so MathJax renders without failing
-            let formatted = aiInput.value;
-            formatted = formatted.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$');
-            formatted = formatted.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
-            
+            let formatted = parseAndFormatMath(aiInput.value);
             aiOutput.innerHTML = formatted.replace(/\n/g, '<br>');
 
             if (window.MathJax && window.MathJax.typesetPromise) {
@@ -1008,21 +1024,16 @@
             const text = document.getElementById('ai-input').value;
             const words = text.trim() ? text.trim().split(/\s+/).length : 0;
             const chars = text.length;
-            const equations = (text.match(/\$|\\\(|\\\[/g) || []).length / 2;
+            const equations = (text.match(/\\(?:text|times|alpha|frac|sqrt)|\$/g) || []).length;
             
-            document.getElementById('char-word-count').innerText = `শব্দ: ${words} | অক্ষর: ${chars} | সমীকরণ: ${Math.floor(equations)}`;
+            document.getElementById('char-word-count').innerText = `শব্দ: ${words} | অক্ষর: ${chars} | সমীকরণ: ${equations}`;
         }
 
         function cleanAndFixMath() {
             const input = document.getElementById('ai-input');
-            let val = input.value;
-            if (!val) return;
+            if (!input.value) return;
 
-            val = val.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$');
-            val = val.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
-            val = val.replace(/\n{3,}/g, '\n\n');
-
-            input.value = val;
+            input.value = parseAndFormatMath(input.value);
             handleConverterInput();
         }
 
@@ -1048,10 +1059,8 @@
                 return;
             }
 
-            let rawText = aiInput.value;
-            rawText = rawText.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$');
-            rawText = rawText.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
-            const paragraphs = rawText.split(/\n\s*\n/);
+            let formattedText = parseAndFormatMath(aiInput.value);
+            const paragraphs = formattedText.split(/\n\s*\n/);
 
             const container = document.getElementById('editor-pages-container');
             const allPages = container.querySelectorAll('.editor-page-container');
@@ -1238,12 +1247,11 @@
             initTableFocusListeners();
             updateAllPageNumbers();
             
-            // Initial render call if MathJax ready
             setTimeout(() => {
                 if (window.MathJax && window.MathJax.typesetPromise) {
                     MathJax.typesetPromise().catch(() => {});
                 }
-            }, 500);
+            }, 600);
         });
 
         function saveSelection() {
