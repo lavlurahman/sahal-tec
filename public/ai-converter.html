@@ -1,175 +1,455 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="color-scheme" content="light">
-  <title>SAHAL TEC — AI Chat Converter</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script>
-    window.MathJax = {
-      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
-      options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] },
-      svg: { fontCache: 'global' }
-    };
-  </script>
-  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <style>
-    :root { color-scheme: light; --ink:#172033; --muted:#637083; --line:#dce3ec; --blue:#2859d6; --paper:#fff; --bg:#f2f5fa; }
-    * { box-sizing:border-box; }
-    body { margin:0; background:var(--bg); color:var(--ink); font-family:"Noto Sans Bengali",sans-serif; }
-    header { background:#111b32; color:white; padding:16px clamp(16px,4vw,42px); display:flex; justify-content:space-between; gap:16px; align-items:center; }
-    header h1 { margin:0; font-size:1.15rem; } header p { margin:3px 0 0; color:#c7d3ed; font-size:.85rem; }
-    main { max-width:1440px; margin:auto; padding:22px; }
-    .intro { margin-bottom:18px; } .intro h2 { margin:0 0 5px; font-size:1.35rem; } .intro p { margin:0; color:var(--muted); line-height:1.65; }
-    .grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:18px; align-items:stretch; }
-    .panel { background:white; border:1px solid var(--line); border-radius:14px; overflow:hidden; min-width:0; box-shadow:0 4px 16px #15294a0a; }
-    .panel-head { padding:14px 16px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; gap:10px; }
-    .panel-head h3 { margin:0; font-size:1rem; }
-    .body { padding:14px; }
-    textarea { width:100%; min-height:440px; resize:vertical; border:1px solid var(--line); border-radius:10px; padding:14px; font: .97rem/1.8 ui-monospace,SFMono-Regular,Consolas,monospace; color:#172033; background:#fbfcff; }
-    textarea:focus,select:focus,input:focus { outline:3px solid #2859d626; border-color:var(--blue); }
-    .preview { min-height:440px; max-height:620px; overflow:auto; padding:24px; border:1px solid var(--line); border-radius:10px; background:white; line-height:1.85; overflow-wrap:anywhere; white-space:pre-wrap; }
-    .preview .placeholder { color:#8290a5; text-align:center; padding:80px 10px; white-space:normal; }
-    .controls { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:12px; }
-    select,input { min-height:42px; border:1px solid var(--line); border-radius:8px; padding:8px 10px; background:white; max-width:100%; }
-    button { border:0; border-radius:9px; padding:10px 15px; font:600 .9rem "Noto Sans Bengali",sans-serif; cursor:pointer; min-height:42px; }
-    button:disabled { opacity:.55; cursor:wait; } .primary { background:var(--blue); color:white; } .secondary { background:#e9eef8; color:#1d315a; } .quiet { background:white; border:1px solid var(--line); color:#34445e; }
-    .status { margin-top:12px; min-height:28px; font-size:.9rem; color:var(--muted); } .status.error { color:#b42318; } .status.ok { color:#087443; }
-    .hint { color:var(--muted); font-size:.83rem; line-height:1.65; margin:12px 0 0; }
-    .preview h1,.preview h2,.preview h3 { white-space:normal; }
-    .math-note { border-radius:9px; padding:12px 14px; margin-top:14px; background:#edf4ff; color:#24416e; font-size:.86rem; line-height:1.65; }
-    @media(max-width:850px) { main { padding:14px; } .grid { grid-template-columns:1fr; } textarea,.preview { min-height:300px; } header { align-items:flex-start; } }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>SAHAL TEC — AI Document Converter</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true
+  },
+  options: {
+    skipHtmlTags: ['script','noscript','style','textarea','pre','code']
+  },
+  chtml: { scale: 1 }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+:root {
+  --ink:#172033;
+  --muted:#637083;
+  --line:#dce3ec;
+  --blue:#2859d6;
+  --bg:#f2f5fa;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Noto Sans Bengali",sans-serif;
+}
+header {
+  background:#111b32;
+  color:white;
+  padding:16px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+header h1 { margin:0; font-size:1.2rem; }
+header p { margin:4px 0 0; color:#c7d3ed; }
+main { max-width:1200px; margin:auto; padding:18px; }
+.intro { margin-bottom:18px; line-height:1.8; }
+.intro h2 { margin:0 0 6px; font-size:1.4rem; }
+.intro p { margin:0; color:var(--muted); }
+.grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+.panel {
+  background:white;
+  border:1px solid var(--line);
+  border-radius:15px;
+  overflow:hidden;
+  min-width:0;
+}
+.panel-head {
+  padding:14px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+}
+.panel-head h3 { margin:0; font-size:1rem; }
+.body { padding:14px; }
+label { display:block; margin:8px 0; }
+textarea {
+  width:100%;
+  min-height:330px;
+  resize:vertical;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:13px;
+  font:15px/1.8 monospace;
+  background:#fbfcff;
+  color:var(--ink);
+}
+input,select {
+  width:100%;
+  min-height:43px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:9px;
+  background:white;
+  color:var(--ink);
+  font:inherit;
+}
+button {
+  border:0;
+  border-radius:9px;
+  padding:10px 14px;
+  min-height:42px;
+  font:600 14px "Noto Sans Bengali",sans-serif;
+  cursor:pointer;
+}
+button:disabled { opacity:.6; }
+.primary { background:var(--blue); color:white; }
+.secondary { background:#e9eef8; color:#1d315a; }
+.quiet { background:white; border:1px solid var(--line); color:#34445e; }
+.controls {
+  display:flex;
+  gap:9px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-top:12px;
+}
+.controls select { width:auto; flex:1; min-width:130px; }
+.preview {
+  min-height:330px;
+  max-height:650px;
+  overflow:auto;
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:white;
+  line-height:1.9;
+  overflow-wrap:anywhere;
+  white-space:pre-wrap;
+}
+.preview .placeholder {
+  color:#8290a5;
+  text-align:center;
+  padding:60px 8px;
+  white-space:normal;
+}
+.preview mjx-container {
+  max-width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+}
+.status { margin-top:12px; color:var(--muted); line-height:1.7; }
+.status.error { color:#b42318; }
+.status.ok { color:#087443; }
+.hint { color:var(--muted); font-size:.84rem; line-height:1.7; }
+.note {
+  background:#edf4ff;
+  border-radius:9px;
+  padding:12px;
+  margin-top:12px;
+  color:#24416e;
+  line-height:1.7;
+  font-size:.87rem;
+}
+@media(max-width:800px) {
+  main { padding:12px; }
+  .grid { grid-template-columns:1fr; }
+  textarea,.preview { min-height:280px; }
+  header { align-items:flex-start; }
+}
+</style>
 </head>
+
 <body>
-  <header>
-    <div><h1>SAHAL TEC</h1><p>AI Chat → Document Converter</p></div>
-    <span aria-label="Version">MVP · v1.1</span>
-  </header>
-  <main>
-    <section class="intro">
-      <h2>AI চ্যাটের লেখা ও সমীকরণ রপ্তানি করুন</h2>
-      <p>ChatGPT, Gemini বা অন্য AI থেকে লেখা পেস্ট করুন। LaTeX সূত্র যেমন <code>\[F=ma\]</code>, <code>$$\frac{a}{b}$$</code> এবং বাংলা টেক্সট DOCX/HTML/Markdown-এ রূপান্তর করুন।</p>
-    </section>
-    <div class="grid">
-      <section class="panel" aria-labelledby="input-title">
-        <div class="panel-head"><h3 id="input-title">১. কনটেন্ট ইনপুট</h3><button class="quiet" id="pasteBtn" type="button">পেস্ট</button></div>
-        <div class="body">
-          <label for="title">ডকুমেন্টের নাম</label>
-          <input id="title" type="text" maxlength="100" value="SAHAL_TEC_Document" style="width:100%;margin:6px 0 12px">
-          <label for="source">AI থেকে কপি করা লেখা</label>
-          <textarea id="source" spellcheck="false" placeholder="এখানে AI Chat-এর উত্তর পেস্ট করুন...&#10;&#10;উদাহরণ: নিউটনের দ্বিতীয় সূত্র:&#10;$$F = ma$$&#10;&#10;এখানে F হলো বল।"></textarea>
-          <div class="controls">
-            <button class="secondary" id="sampleBtn" type="button">নমুনা দেখুন</button>
-            <button class="quiet" id="clearBtn" type="button">ক্লিয়ার</button>
-            <span id="counter" class="hint">০ অক্ষর</span>
-          </div>
-          <p class="hint">এই সংস্করণে Markdown/LaTeX-ভিত্তিক ইনপুট সবচেয়ে ভালো কাজ করবে। ব্রাউজারে দেখা সমীকরণ DOCX-এ স্বয়ংক্রিয়ভাবে Word-এর editable equation-এ রূপান্তরিত হতে পারে যখন Pandoc সেটি সমর্থন করে।</p>
-        </div>
-      </section>
-      <section class="panel" aria-labelledby="preview-title">
-        <div class="panel-head"><h3 id="preview-title">২. প্রিভিউ</h3><span id="mathState" class="hint">সূত্র রেন্ডারিং প্রস্তুত হচ্ছে…</span></div>
-        <div class="body">
-          <div id="preview" class="preview" aria-live="polite"><div class="placeholder">বাম পাশে লেখা পেস্ট করলে এখানে প্রিভিউ দেখা যাবে।</div></div>
-          <div class="math-note">মনে রাখুন: প্রিভিউ ও Export আলাদা ইঞ্জিন ব্যবহার করে। তাই রপ্তানির পর DOCX/PDF খুলে সূত্র, বাংলা ফন্ট ও পৃষ্ঠা বিভাজন যাচাই করুন। PDF এই সার্ভারে XeLaTeX থাকলেই চালু হবে।</div>
-          <div class="controls">
-            <label for="format">ফরম্যাট</label>
-            <select id="format">
-              <option value="docx">Word (.docx)</option>
-              <option value="html">HTML (.html)</option>
-              <option value="md">Markdown (.md)</option>
-              <option value="pdf">PDF (.pdf) — XeLaTeX প্রয়োজন</option>
-            </select>
-            <button class="primary" id="exportBtn" type="button">এক্সপোর্ট ও ডাউনলোড</button>
-          </div>
-          <div id="status" class="status" role="status" aria-live="polite"></div>
-        </div>
-      </section>
+<header>
+  <div>
+    <h1>SAHAL TEC</h1>
+    <p>AI Chat → Document Converter</p>
+  </div>
+  <span>MVP · v1.2</span>
+</header>
+
+<main>
+<section class="intro">
+  <h2>AI চ্যাটের লেখা ও সমীকরণ রপ্তানি করুন</h2>
+  <p>DeepSeek, ChatGPT, Gemini বা অন্য AI থেকে লেখা পেস্ট করুন। বাংলা লেখা, LaTeX সূত্র, ভেক্টর, বর্গমূল ও সমীকরণের প্রিভিউ দেখুন এবং DOCX/HTML/Markdown/PDF রপ্তানির চেষ্টা করুন।</p>
+</section>
+
+<div class="grid">
+<section class="panel">
+  <div class="panel-head">
+    <h3>১. কনটেন্ট ইনপুট</h3>
+    <button class="quiet" id="pasteBtn" type="button">পেস্ট</button>
+  </div>
+  <div class="body">
+    <label for="title">ডকুমেন্টের নাম</label>
+    <input id="title" maxlength="100" value="SAHAL_TEC_Document">
+
+    <label for="source">AI থেকে কপি করা লেখা</label>
+    <textarea id="source" spellcheck="false"
+      placeholder="এখানে DeepSeek, ChatGPT বা Gemini-এর উত্তর পেস্ট করুন..."></textarea>
+
+    <div class="controls">
+      <button class="secondary" id="sampleBtn" type="button">নমুনা দেখুন</button>
+      <button class="quiet" id="clearBtn" type="button">ক্লিয়ার</button>
+      <span id="counter" class="hint">০ অক্ষর</span>
     </div>
-  </main>
+
+    <p class="hint">
+      সূত্রের চারপাশে $$...$$ বা \( ... \) থাকলে সবচেয়ে নির্ভরযোগ্যভাবে রেন্ডার হয়।
+      delimiter ছাড়া কিছু সাধারণ LaTeX সূত্রও স্বয়ংক্রিয়ভাবে শনাক্ত করার চেষ্টা করা হবে।
+    </p>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h3>২. প্রিভিউ</h3>
+    <span id="mathState" class="hint">প্রস্তুত</span>
+  </div>
+  <div class="body">
+    <div id="preview" class="preview" aria-live="polite">
+      <div class="placeholder">বাম পাশে লেখা পেস্ট করলে এখানে প্রিভিউ দেখা যাবে।</div>
+    </div>
+
+    <div class="note">
+      প্রিভিউ ও DOCX/PDF রপ্তানি আলাদা ইঞ্জিন ব্যবহার করে।
+      তাই ডাউনলোড করা ফাইল খুলে বাংলা লেখা ও সমীকরণ যাচাই করুন।
+      PDF তৈরির জন্য সার্ভারে প্রয়োজনীয় সফটওয়্যার থাকা আবশ্যক।
+    </div>
+
+    <div class="controls">
+      <select id="format" aria-label="ফাইল ফরম্যাট">
+        <option value="docx">Word (.docx)</option>
+        <option value="html">HTML (.html)</option>
+        <option value="md">Markdown (.md)</option>
+        <option value="pdf">PDF (.pdf)</option>
+      </select>
+      <button class="primary" id="exportBtn" type="button">এক্সপোর্ট ও ডাউনলোড</button>
+    </div>
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+  </div>
+</section>
+</div>
+</main>
+
 <script>
 (() => {
-  const source = document.getElementById('source');
-  const preview = document.getElementById('preview');
-  const status = document.getElementById('status');
-  const counter = document.getElementById('counter');
-  const exportBtn = document.getElementById('exportBtn');
-  const sample = 'নিউটনের দ্বিতীয় সূত্র অনুযায়ী,\\n\\n$$F = ma$$\\n\\nএখানে F হলো বল, m হলো ভর এবং a হলো ত্বরণ।\\n\\nদুটি সংখ্যার যোগফল:\\n\\\\[a+b=c\\\\]';
-  let renderToken = 0;
+  "use strict";
 
-  function escapeHtml(s) {
-    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-  function setStatus(message, kind='') {
+  const source = document.getElementById("source");
+  const preview = document.getElementById("preview");
+  const status = document.getElementById("status");
+  const counter = document.getElementById("counter");
+  const exportBtn = document.getElementById("exportBtn");
+  const mathState = document.getElementById("mathState");
+
+  const sample = String.raw`নিউটনের দ্বিতীয় সূত্র
+
+সূত্র:
+$$F = ma$$
+
+উদাহরণ: কোনো বস্তুর ভর ২ kg এবং ত্বরণ ৩ m/s² হলে বল কত?
+
+সমাধান:
+$$F = ma = 2 \times 3 = 6\,N$$
+
+DeepSeek-এর সূত্র:
+|A|=\sqrt{3^2+2^2+6^2}=7
+
+XZ সমতলে অভিক্ষেপ: \sqrt{3^2+4^2}=5
+
+2\hat{i}+3\hat{j}-এর মান \sqrt{13}
+
+\overrightarrow{PQ}=(0,-2,4)`;
+
+  function setStatus(message, kind) {
     status.textContent = message;
-    status.className = 'status' + (kind ? ' ' + kind : '');
+    status.className = "status" + (kind ? " " + kind : "");
   }
+
+  function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, ch => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    })[ch]);
+  }
+
+  function hasMathDelimiter(line) {
+    return /\$\$|\\\[|\\\]|\\\(|\\\)|(^|[^\\])\$[^$]+\$/.test(line);
+  }
+
+  function containsLatexCommand(text) {
+    return /\\(?:sqrt|frac|dfrac|tfrac|hat|widehat|vec|overrightarrow|overleftarrow|times|cdot|alpha|beta|theta|pi|sum|int|left|right)\b/.test(text);
+  }
+
+  // Wrap common, bare LaTeX fragments inside Bengali explanatory text.
+  // This is a conservative heuristic, not a complete LaTeX parser.
+  function wrapBareFragments(line) {
+    const commands = String.raw`(?:sqrt|frac|dfrac|tfrac|hat|widehat|vec|overrightarrow|overleftarrow)`;
+
+    const expression = new RegExp(
+      String.raw`(?:\\${commands}\{[^{}\n]*\}|[A-Za-z0-9|]+\\${commands}\{[^{}\n]*\})` +
+      String.raw`(?:\s*(?:=|\+|-|\\times|\\cdot)\s*(?:\\${commands}\{[^{}\n]*\}|[A-Za-z0-9|()]+))*`,
+      "g"
+    );
+
+    return line.replace(expression, fragment => {
+      const value = fragment.trim();
+      if (!value || value.includes("\\(") || value.includes("\\[")) return fragment;
+      return "\\(" + value + "\\)";
+    });
+  }
+
+  function normalizeDeepSeekLatex(input) {
+    return input.split("\n").map(originalLine => {
+      let line = originalLine;
+
+      // Preserve any line that already uses recognized math delimiters.
+      if (hasMathDelimiter(line)) return line;
+
+      if (!containsLatexCommand(line)) return line;
+
+      // A line containing only a mathematical expression can be displayed
+      // as a standalone equation.
+      if (!/[\u0980-\u09FF]/.test(line)) {
+        return "\\(" + line.trim() + "\\)";
+      }
+
+      // For Bengali prose, wrap likely formulas rather than the entire line.
+      return wrapBareFragments(line);
+    }).join("\n");
+  }
+
+  let renderId = 0;
+
   async function renderPreview() {
-    const token = ++renderToken;
-    const text = source.value;
-    counter.textContent = text.length.toLocaleString('bn-BD') + ' অক্ষর';
-    // Escape user-provided HTML before creating any preview markup (XSS prevention).
-    preview.innerHTML = text.trim()
-      ? escapeHtml(text).replace(/\n/g, '<br>')
-      : '<div class="placeholder">বাম পাশে লেখা পেস্ট করলে এখানে প্রিভিউ দেখা যাবে।</div>';
-    if (window.MathJax && window.MathJax.typesetPromise && text.trim()) {
-      try {
-        if (window.MathJax.typesetClear) window.MathJax.typesetClear([preview]);
-        await window.MathJax.typesetPromise([preview]);
-        if (token === renderToken) document.getElementById('mathState').textContent = 'সূত্র প্রিভিউ আপডেট হয়েছে';
-      } catch {
-        if (token === renderToken) document.getElementById('mathState').textContent = 'কিছু সূত্র রেন্ডার হয়নি—LaTeX পরীক্ষা করুন';
+    const id = ++renderId;
+    const raw = source.value;
+    counter.textContent = raw.length.toLocaleString("bn-BD") + " অক্ষর";
+
+    if (!raw.trim()) {
+      preview.innerHTML = '<div class="placeholder">বাম পাশে লেখা পেস্ট করলে এখানে প্রিভিউ দেখা যাবে।</div>';
+      mathState.textContent = "প্রস্তুত";
+      return;
+    }
+
+    const normalized = normalizeDeepSeekLatex(raw);
+
+    // Escape all user content before inserting it into the preview.
+    preview.innerHTML = escapeHtml(normalized).replace(/\n/g, "<br>");
+
+    if (!window.MathJax || !window.MathJax.typesetPromise) {
+      mathState.textContent = "MathJax লোড হচ্ছে…";
+      return;
+    }
+
+    try {
+      if (window.MathJax.typesetClear) {
+        window.MathJax.typesetClear([preview]);
+      }
+      await window.MathJax.typesetPromise([preview]);
+
+      if (id === renderId) {
+        mathState.textContent = "সূত্র প্রিভিউ আপডেট হয়েছে";
+      }
+    } catch (error) {
+      if (id === renderId) {
+        mathState.textContent = "কিছু সূত্র রেন্ডার হয়নি";
       }
     }
   }
-  source.addEventListener('input', renderPreview);
-  document.getElementById('sampleBtn').addEventListener('click', () => { source.value = sample; renderPreview(); setStatus('নমুনা যুক্ত হয়েছে।', 'ok'); });
-  document.getElementById('clearBtn').addEventListener('click', () => { source.value = ''; renderPreview(); setStatus('ইনপুট পরিষ্কার করা হয়েছে।'); });
-  document.getElementById('pasteBtn').addEventListener('click', async () => {
+
+  source.addEventListener("input", renderPreview);
+
+  document.getElementById("sampleBtn").addEventListener("click", () => {
+    source.value = sample;
+    renderPreview();
+    setStatus("পরীক্ষার নমুনা যুক্ত হয়েছে।", "ok");
+  });
+
+  document.getElementById("clearBtn").addEventListener("click", () => {
+    source.value = "";
+    renderPreview();
+    setStatus("ইনপুট পরিষ্কার করা হয়েছে।");
+  });
+
+  document.getElementById("pasteBtn").addEventListener("click", async () => {
     try {
       source.value = await navigator.clipboard.readText();
       await renderPreview();
-      setStatus('ক্লিপবোর্ড থেকে লেখা পেস্ট হয়েছে।', 'ok');
-    } catch {
-      setStatus('ব্রাউজার ক্লিপবোর্ড অনুমতি দেয়নি। ইনপুট বক্সে দীর্ঘক্ষণ চেপে Paste করুন।', 'error');
+      setStatus("ক্লিপবোর্ড থেকে লেখা পেস্ট হয়েছে।", "ok");
+    } catch (error) {
+      setStatus("ক্লিপবোর্ড অনুমতি পাওয়া যায়নি। ইনপুট বক্সে দীর্ঘক্ষণ চেপে Paste করুন।", "error");
     }
   });
-  exportBtn.addEventListener('click', async () => {
-    const text = source.value;
-    if (!text.trim()) return setStatus('আগে কিছু লেখা পেস্ট করুন।', 'error');
+
+  exportBtn.addEventListener("click", async () => {
+    const text = source.value.trim();
+    if (!text) {
+      setStatus("আগে কিছু লেখা পেস্ট করুন।", "error");
+      return;
+    }
+
     exportBtn.disabled = true;
-    setStatus('ফাইল তৈরি হচ্ছে…');
+    setStatus("ফাইল তৈরি হচ্ছে…");
+
     try {
-      const response = await fetch('/convert', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({text, format:document.getElementById('format').value, title:document.getElementById('title').value})
+      const response = await fetch("/convert", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+          text: normalizeDeepSeekLatex(text),
+          format: document.getElementById("format").value,
+          title: document.getElementById("title").value
+        })
       });
-      const type = response.headers.get('content-type') || '';
+
+      const contentType = response.headers.get("content-type") || "";
+
       if (!response.ok) {
-        let message = 'ফাইল তৈরি করা যায়নি।';
-        if (type.includes('application/json')) message = (await response.json()).error || message;
-        else message = (await response.text()).slice(0, 500) || message;
+        let message = "ফাইল তৈরি করা যায়নি।";
+        if (contentType.includes("application/json")) {
+          const data = await response.json();
+          message = data.error || message;
+        } else {
+          message = (await response.text()).slice(0, 400) || message;
+        }
         throw new Error(message);
       }
+
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      const ext = document.getElementById('format').value;
-      const title = document.getElementById('title').value.trim().replace(/[<>:"/\\|?*\u0000-\u001f]/g, '').replace(/\s+/g,'_').slice(0,80) || 'SAHAL_TEC_Document';
-      a.download = title + '.' + ext;
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1500);
-      setStatus('ফাইল তৈরি হয়েছে। ডাউনলোড করা ফাইল খুলে সমীকরণ ও বিন্যাস যাচাই করুন।', 'ok');
-    } catch (e) {
-      setStatus(e.message || 'ডাউনলোড ব্যর্থ হয়েছে।', 'error');
+      const anchor = document.createElement("a");
+      const extension = document.getElementById("format").value;
+      const safeTitle = document.getElementById("title").value
+        .trim()
+        .replace(/[<>:"/\\|?*\u0000-\u001f]/g, "")
+        .replace(/\s+/g, "_")
+        .slice(0, 80) || "SAHAL_TEC_Document";
+
+      anchor.href = url;
+      anchor.download = safeTitle + "." + extension;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      setStatus("ফাইল ডাউনলোডের অনুরোধ সম্পন্ন। ফাইল খুলে সূত্র যাচাই করুন।", "ok");
+    } catch (error) {
+      setStatus(error.message || "ডাউনলোড ব্যর্থ হয়েছে।", "error");
     } finally {
       exportBtn.disabled = false;
     }
   });
+
   renderPreview();
 })();
 </script>
